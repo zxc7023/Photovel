@@ -18,4 +18,10 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/clusterTest"
+        android:text="clusterTest"/>
+
 </android.support.constraint.ConstraintLayout>
