@@ -1,4 +1,4 @@
-package com.kitri.photovel;
+package com.kitri.photovel.content;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -26,6 +26,7 @@ import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import com.google.maps.android.ui.IconGenerator;
+import com.kitri.photovel.R;
 import com.kitri.vo.MarkerInfo;
 
 import java.io.IOException;
@@ -55,7 +56,7 @@ public class ClusterTest extends FragmentActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_cluster_test);
+        setContentView(com.kitri.photovel.R.layout.activity_cluster_test);
 
         //프래그먼트에 지도를 보여주기위해 싱크
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
