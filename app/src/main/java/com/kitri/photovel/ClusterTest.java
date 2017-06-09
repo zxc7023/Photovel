@@ -34,7 +34,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Created by Junki on 2017-05-31.
@@ -50,7 +49,6 @@ public class ClusterTest extends FragmentActivity
 
 
     private ClusterManager<Photo> cm;
-    private Random mRandom = new Random(1984);
     private GoogleMap mMap;
 
 
@@ -67,7 +65,7 @@ public class ClusterTest extends FragmentActivity
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        mMap =googleMap;
+        mMap = googleMap;
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(51.50111,-0.122777775), 9.5f));
         startDemo();
 
@@ -152,10 +150,6 @@ public class ClusterTest extends FragmentActivity
 
     }
 
-    private double random(double min, double max) {
-        return mRandom.nextDouble() * (max - min) + min;
-    }
-
     private void addItems(final ClusterManager cm) {
         final String[] strArray = {"1_1.jpg", "1_2.jpg", "1_3.jpg","1_4.jpg","1_5.jpg"};
         final Bitmap[] bitmapArray = new Bitmap[strArray.length];
@@ -204,9 +198,9 @@ public class ClusterTest extends FragmentActivity
 
         public MarkerRenderer() {
             super(getApplicationContext(), mMap, cm);
+            Drawable TRANSPARENT_DRAWABLE = new ColorDrawable(Color.TRANSPARENT);
             multiPhotoView = getLayoutInflater().inflate(R.layout.multi_photo, null);
             multiPhotoView.findViewById(R.id.rankTextView).setVisibility(View.GONE);
-
             mClusterIconGenerator.setContentView(multiPhotoView); // 인플레이터한 전체레이아웃을 아이콘으로 만들어준다.
             mClusterImageView = (ImageView) multiPhotoView.findViewById(R.id.image); //multiPhotoView안의 이미지뷰를 찾아줌
 
@@ -215,9 +209,9 @@ public class ClusterTest extends FragmentActivity
             mDimension = (int) getResources().getDimension(R.dimen.custom_profile_image);
             mImageView.setLayoutParams(new ViewGroup.LayoutParams(mDimension, mDimension));
             int padding = (int) getResources().getDimension(R.dimen.custom_profile_padding);
-            mImageView.setPadding(padding,  padding, padding, padding);
+            mImageView.setPadding(padding, padding, padding, padding);
             mIconGenerator.setContentView(mImageView);
-            Drawable TRANSPARENT_DRAWABLE = new ColorDrawable(Color.TRANSPARENT);
+
             mIconGenerator.setBackground(TRANSPARENT_DRAWABLE);
         }
 
@@ -252,18 +246,18 @@ public class ClusterTest extends FragmentActivity
         protected void onBeforeClusterRendered(Cluster<Photo> cluster, MarkerOptions markerOptions) {
             // Draw multiple people.
             // Note: this method runs on the UI thread. Don't spend too much time in here (like in this example).
-            List<Drawable> profilePhotos = new ArrayList<Drawable>(Math.min(4, cluster.getSize()));
+            List<Drawable> photos = new ArrayList<Drawable>(Math.min(4, cluster.getSize()));
             int width = mDimension;
             int height = mDimension;
 
             for (Photo p : cluster.getItems()) {
                 // Draw 4 at most.
-                if (profilePhotos.size() == 4) break;
+                if (photos.size() == 4) break;
                 Drawable bitmapDrawable = new BitmapDrawable(getResources(), p.getPhoto());
                 bitmapDrawable.setBounds(0, 0, width, height);
-                profilePhotos.add(bitmapDrawable);
+                photos.add(bitmapDrawable);
             }
-            MultiDrawable multiDrawable = new MultiDrawable(profilePhotos);
+            MultiDrawable multiDrawable = new MultiDrawable(photos);
             multiDrawable.setBounds(0, 0, width, height);
 
 
