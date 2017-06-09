@@ -3,9 +3,12 @@ package com.kitri.vo;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
+import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.clustering.ClusterItem;
+
 import java.util.Date;
 
-public class Photo implements Comparable<Photo> {
+public class Photo implements Comparable<Photo>, ClusterItem {
 
     private int contentDetailId;
     private String photoFileName;
@@ -13,6 +16,7 @@ public class Photo implements Comparable<Photo> {
     private Date photoDate;
     private double photoLatitude;
     private double photoLongitude;
+    private LatLng position;
     private Bitmap bitmap;
     private String address;
 
@@ -23,6 +27,18 @@ public class Photo implements Comparable<Photo> {
         this.bitmap = bitmap;
         this.photoDate = photoDate;
         this.address = address;
+    }
+
+    public Photo(Bitmap bitmap, Date photoDate, String address, LatLng position) {
+        this(bitmap, photoDate, address);
+        this.position = position;
+    }
+
+    public Photo(Bitmap bitmap, Date photoDate, LatLng position, String photoFileName) {
+        this.bitmap = bitmap;
+        this.photoDate = photoDate;
+        this.position = position;
+        this.photoFileName = photoFileName;
     }
 
     public int getContentDetailId() {
@@ -81,6 +97,12 @@ public class Photo implements Comparable<Photo> {
         this.photoLongitude = photoLongitude;
     }
 
+    @Override
+    public LatLng getPosition() {
+        position = new LatLng(getPhotoLatitude(), getPhotoLongitude());
+        return position;
+    }
+
     // Photo 모델 복사
     public void CopyData(Photo param)
     {
@@ -98,6 +120,8 @@ public class Photo implements Comparable<Photo> {
         //ascending order
         return this.photoDate.compareTo(compareDate);
     }
+
+
 
     @Override
     public String toString() {
