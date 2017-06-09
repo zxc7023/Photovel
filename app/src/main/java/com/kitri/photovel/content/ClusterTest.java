@@ -32,7 +32,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -127,7 +130,7 @@ public class ClusterTest extends FragmentActivity
     @Override
     public boolean onClusterItemClick(final Photo photo) {
         // Does nothing, but you could go into the user's profile page, for example.
-        Toast.makeText(this, photo.getName()+"이 선택되었습니다.", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, photo.getPhotoFileName()+"이 선택되었습니다.", Toast.LENGTH_SHORT).show();
         mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
             @Override
             public View getInfoWindow(Marker marker) {
@@ -154,7 +157,10 @@ public class ClusterTest extends FragmentActivity
         final String[] strArray = {"1_1.jpg", "1_2.jpg", "1_3.jpg","1_4.jpg","1_5.jpg"};
         final Bitmap[] bitmapArray = new Bitmap[strArray.length];
         final LatLng []latLngs = {new LatLng(51.50111,-0.122777775),new LatLng(51.524025,-0.1584639),new LatLng(51.50083,-0.122777775),new LatLng(51.531944,-0.12416667),new LatLng(51.503887,-0.07638889)};
-        final int []rank = {1,2,3,4,5};
+        SimpleDateFormat sdf = new SimpleDateFormat();
+        sdf.applyPattern("yyyy-MM-dd");
+
+        final Date[] photoDates = {};
 
         new Thread(){
             public void run() {
@@ -169,7 +175,7 @@ public class ClusterTest extends FragmentActivity
                         @Override
                         public void run() {
                             for(int i=0;i<strArray.length;i++) {
-                                cm.addItem(new Photo(latLngs[i], strArray[i], bitmapArray[i], rank[i]));
+                                cm.addItem(new Photo(bitmapArray[i],  photoDates[i], latLngs[i], strArray[i]));
                             }
                             cm.cluster();
                         }
@@ -228,15 +234,16 @@ public class ClusterTest extends FragmentActivity
             View newMultiPhotoView = getLayoutInflater().inflate(R.layout.multi_photo, null);
             //시도중입니다.
             proFileInImageView = (ImageView)newMultiPhotoView.findViewById(R.id.image);
-            proFileInImageView.setImageBitmap(photo.getPhoto());
+            proFileInImageView.setImageBitmap(photo.getBitmap());
             rankTextView = (TextView)newMultiPhotoView.findViewById(R.id.rankTextView);
-            rankTextView.setText(photo.getRank()+"");
+//            rankTextView.setText(photo.getRank()+"");
             amu_text = (TextView)newMultiPhotoView.findViewById(R.id.amu_text);
             amu_text.setVisibility(View.GONE);
 
             mIconGenerator.setContentView(newMultiPhotoView);
             Bitmap icon = mIconGenerator.makeIcon();
-            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(icon)).title(photo.getName());
+            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(icon));
+            //.title(photo.getName());
 
 
 
