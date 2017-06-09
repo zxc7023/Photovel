@@ -1,4 +1,4 @@
-package com.kitri.photovel;
+package com.kitri.photovel.content;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -28,15 +28,17 @@ import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import com.google.maps.android.ui.IconGenerator;
 import com.kitri.vo.Photo;
 
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.DateFormat;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import com.kitri.photovel.R;
 
 /**
  * Created by Junki on 2017-05-31.
@@ -79,7 +81,7 @@ public class ClusterTest extends FragmentActivity
     @Override
     public boolean onClusterClick(Cluster<Photo> cluster) {
         // Show a toast with some info when the cluster is clicked.
-        String firstName = cluster.getItems().iterator().next().getName();
+        String firstName = cluster.getItems().iterator().next().getPhotoFileName();
         Toast.makeText(this, cluster.getSize() + " (including " + firstName + ")", Toast.LENGTH_SHORT).show();
 
         // Zoom in the cluster. Need to create LatLngBounds and including all the cluster items
@@ -140,7 +142,7 @@ public class ClusterTest extends FragmentActivity
             @Override
             public View getInfoContents(Marker marker) {
                 View testView = getLayoutInflater().inflate(R.layout.multi_photo_detail, null);
-                ((ImageView)testView.findViewById(R.id.photo_detail)).setImageBitmap(photo.getPhoto());
+                ((ImageView)testView.findViewById(R.id.photo_detail)).setImageBitmap(photo.getBitmap());
                 return testView;
             }
         });
@@ -175,7 +177,7 @@ public class ClusterTest extends FragmentActivity
                         @Override
                         public void run() {
                             for(int i=0;i<strArray.length;i++) {
-                                cm.addItem(new Photo(bitmapArray[i],  photoDates[i], latLngs[i], strArray[i]));
+                                cm.addItem(new Photo(bitmapArray[i], latLngs[i].latitude , latLngs[i].longitude, strArray[i]));
                             }
                             cm.cluster();
                         }
@@ -260,7 +262,7 @@ public class ClusterTest extends FragmentActivity
             for (Photo p : cluster.getItems()) {
                 // Draw 4 at most.
                 if (photos.size() == 4) break;
-                Drawable bitmapDrawable = new BitmapDrawable(getResources(), p.getPhoto());
+                Drawable bitmapDrawable = new BitmapDrawable(getResources(), p.getBitmap());
                 bitmapDrawable.setBounds(0, 0, width, height);
                 photos.add(bitmapDrawable);
             }

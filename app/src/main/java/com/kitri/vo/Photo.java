@@ -29,9 +29,11 @@ public class Photo implements Comparable<Photo>, ClusterItem {
         this.address = address;
     }
 
-    public Photo(Bitmap bitmap, Date photoDate, String address, LatLng position) {
-        this(bitmap, photoDate, address);
-        this.position = position;
+    public Photo(Bitmap bitmap, double latitude, double longitude, String fileName) {
+        this.bitmap = bitmap;
+        this.photoLatitude = latitude;
+        this.photoLongitude = longitude;
+        this.photoFileName = fileName;
     }
 
     public Photo(Bitmap bitmap, Date photoDate, LatLng position, String photoFileName) {
@@ -44,6 +46,7 @@ public class Photo implements Comparable<Photo>, ClusterItem {
     public int getContentDetailId() {
         return contentDetailId;
     }
+
     public void setContentDetailId(int contentDetailId) {
         this.contentDetailId = contentDetailId;
     }
@@ -51,6 +54,7 @@ public class Photo implements Comparable<Photo>, ClusterItem {
     public Bitmap getBitmap() {
         return bitmap;
     }
+
     public void setBitmap(Bitmap bitmap) {
         this.bitmap = bitmap;
     }
@@ -58,6 +62,7 @@ public class Photo implements Comparable<Photo>, ClusterItem {
     public String getAddress() {
         return address;
     }
+
     public void setAddress(String address) {
         this.address = address;
     }
@@ -65,6 +70,7 @@ public class Photo implements Comparable<Photo>, ClusterItem {
     public String getPhotoFileName() {
         return photoFileName;
     }
+
     public void setPhotoFileName(String photoFileName) {
         this.photoFileName = photoFileName;
     }
@@ -72,6 +78,7 @@ public class Photo implements Comparable<Photo>, ClusterItem {
     public int getPhotoTopFlag() {
         return photoTopFlag;
     }
+
     public void setPhotoTopFlag(int photoTopFlag) {
         this.photoTopFlag = photoTopFlag;
     }
@@ -79,6 +86,7 @@ public class Photo implements Comparable<Photo>, ClusterItem {
     public Date getPhotoDate() {
         return photoDate;
     }
+
     public void setPhotoDate(Date photoDate) {
         this.photoDate = photoDate;
     }
@@ -86,6 +94,7 @@ public class Photo implements Comparable<Photo>, ClusterItem {
     public double getPhotoLatitude() {
         return photoLatitude;
     }
+
     public void setPhotoLatitude(double photoLatitude) {
         this.photoLatitude = photoLatitude;
     }
@@ -93,6 +102,7 @@ public class Photo implements Comparable<Photo>, ClusterItem {
     public double getPhotoLongitude() {
         return photoLongitude;
     }
+
     public void setPhotoLongitude(double photoLongitude) {
         this.photoLongitude = photoLongitude;
     }
@@ -105,8 +115,7 @@ public class Photo implements Comparable<Photo>, ClusterItem {
 
 
     // Photo 모델 복사
-    public void CopyData(Photo param)
-    {
+    public void CopyData(Photo param) {
         this.contentDetailId = param.getContentDetailId();
         this.photoFileName = param.getPhotoFileName();
         this.photoTopFlag = param.getPhotoTopFlag();
@@ -121,7 +130,6 @@ public class Photo implements Comparable<Photo>, ClusterItem {
         //ascending order
         return this.photoDate.compareTo(compareDate);
     }
-
 
 
     @Override
