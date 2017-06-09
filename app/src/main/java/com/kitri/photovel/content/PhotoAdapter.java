@@ -107,7 +107,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
         //사진
         holder.ivphoto.setImageBitmap(mDataset.get(position).getBitmap());
 
-        //날짜 ->position별로 각가 바껴야함!!!
+        //날짜
         holder.tvDate.setText(date2);
         holder.tvDate.setOnClickListener(new View.OnClickListener() {
             @Override
