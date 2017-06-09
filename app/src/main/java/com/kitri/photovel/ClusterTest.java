@@ -47,6 +47,8 @@ public class ClusterTest extends FragmentActivity
         ClusterManager.OnClusterItemClickListener<MarkerInfo>,
         ClusterManager.OnClusterItemInfoWindowClickListener<MarkerInfo> {
 
+
+
     private ClusterManager<MarkerInfo> cm;
     private Random mRandom = new Random(1984);
     private GoogleMap mMap;
@@ -104,9 +106,11 @@ public class ClusterTest extends FragmentActivity
 
         cm = new ClusterManager<MarkerInfo>(this, mMap);
         cm.setRenderer(new MarkerRenderer());
+
         mMap.setOnCameraIdleListener(cm);
         mMap.setOnMarkerClickListener(cm);
         mMap.setOnInfoWindowClickListener(cm);
+
         cm.setOnClusterClickListener(this);
         cm.setOnClusterInfoWindowClickListener(this);
         cm.setOnClusterItemClickListener(this);
@@ -133,7 +137,7 @@ public class ClusterTest extends FragmentActivity
 
             @Override
             public View getInfoContents(Marker marker) {
-                View testView = getLayoutInflater().inflate(R.layout.photo_detail, null);
+                View testView = getLayoutInflater().inflate(R.layout.multi_photo_detail, null);
                 ((ImageView)testView.findViewById(R.id.photo_detail)).setImageBitmap(markerInfo.photo);
                 return testView;
             }
@@ -145,10 +149,6 @@ public class ClusterTest extends FragmentActivity
     public void onClusterItemInfoWindowClick(MarkerInfo markerInfo) {
         // Does nothing, but you could go into the user's profile page, for example.
 
-    }
-
-    private LatLng position() {
-        return new LatLng(random(37.550865, 37.650865), random(126.985423, 127.285423));
     }
 
     private double random(double min, double max) {
@@ -193,8 +193,9 @@ public class ClusterTest extends FragmentActivity
         private final IconGenerator mClusterIconGenerator = new IconGenerator(getApplicationContext()); // 클러스트된 아이콘을 Generator해줌
         private final ImageView mImageView; // 클러스트가 되어진 마커가 아닌 일반 마커를 의미
         private final ImageView mClusterImageView; // 클러스트가 된 마커를 의미
+
         private final int mDimension;
-        View multiProfile;
+        View multiProfile; //클러스터가 아닌 일반 마커의 전체 뷰
         ImageView proFileInImageView;
         TextView rankTextView;
         TextView amu_text;
@@ -202,7 +203,7 @@ public class ClusterTest extends FragmentActivity
 
         public MarkerRenderer() {
             super(getApplicationContext(), mMap, cm);
-            multiProfile = getLayoutInflater().inflate(R.layout.multi_profile, null);
+            multiProfile = getLayoutInflater().inflate(R.layout.multi_photo, null);
             multiProfile.findViewById(R.id.rankTextView).setVisibility(View.GONE);
 
             mClusterIconGenerator.setContentView(multiProfile); // 인플레이터한 전체레이아웃을 아이콘으로 만들어준다.
@@ -232,7 +233,7 @@ public class ClusterTest extends FragmentActivity
             Bitmap icon = mIconGenerator.makeIcon();
             markerOptions.icon(BitmapDescriptorFactory.fromBitmap(icon)).title(markerInfo.name);
             */
-            View newMultiProfile = getLayoutInflater().inflate(R.layout.multi_profile, null);
+            View newMultiProfile = getLayoutInflater().inflate(R.layout.multi_photo, null);
             //시도중입니다.
             proFileInImageView = (ImageView)newMultiProfile.findViewById(R.id.image);
             proFileInImageView.setImageBitmap(markerInfo.getPhoto());
