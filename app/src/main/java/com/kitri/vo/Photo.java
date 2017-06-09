@@ -7,20 +7,13 @@ import java.util.Date;
 
 public class Photo implements Comparable<Photo> {
 
-    private Integer contentDetailId;
-
+    private int contentDetailId;
     private String photoFileName;
-
-    private Integer photoTopFlag;
-
+    private int photoTopFlag;
     private Date photoDate;
-
-    private Double photoLatitude;
-
-    private Double photoLongitude;
-
+    private double photoLatitude;
+    private double photoLongitude;
     private Bitmap bitmap;
-
     private String address;
 
     public Photo() {
@@ -32,18 +25,16 @@ public class Photo implements Comparable<Photo> {
         this.address = address;
     }
 
-    public Integer getContentDetailId() {
+    public int getContentDetailId() {
         return contentDetailId;
     }
-
-    public void setContentDetailId(Integer contentDetailId) {
+    public void setContentDetailId(int contentDetailId) {
         this.contentDetailId = contentDetailId;
     }
 
     public Bitmap getBitmap() {
         return bitmap;
     }
-
     public void setBitmap(Bitmap bitmap) {
         this.bitmap = bitmap;
     }
@@ -51,7 +42,6 @@ public class Photo implements Comparable<Photo> {
     public String getAddress() {
         return address;
     }
-
     public void setAddress(String address) {
         this.address = address;
     }
@@ -59,40 +49,35 @@ public class Photo implements Comparable<Photo> {
     public String getPhotoFileName() {
         return photoFileName;
     }
-
     public void setPhotoFileName(String photoFileName) {
         this.photoFileName = photoFileName;
     }
 
-    public Integer getPhotoTopFlag() {
+    public int getPhotoTopFlag() {
         return photoTopFlag;
     }
-
-    public void setPhotoTopFlag(Integer photoTopFlag) {
+    public void setPhotoTopFlag(int photoTopFlag) {
         this.photoTopFlag = photoTopFlag;
     }
 
     public Date getPhotoDate() {
         return photoDate;
     }
-
     public void setPhotoDate(Date photoDate) {
         this.photoDate = photoDate;
     }
 
-    public Double getPhotoLatitude() {
+    public double getPhotoLatitude() {
         return photoLatitude;
     }
-
-    public void setPhotoLatitude(Double photoLatitude) {
+    public void setPhotoLatitude(double photoLatitude) {
         this.photoLatitude = photoLatitude;
     }
 
-    public Double getPhotoLongitude() {
+    public double getPhotoLongitude() {
         return photoLongitude;
     }
-
-    public void setPhotoLongitude(Double photoLongitude) {
+    public void setPhotoLongitude(double photoLongitude) {
         this.photoLongitude = photoLongitude;
     }
 
