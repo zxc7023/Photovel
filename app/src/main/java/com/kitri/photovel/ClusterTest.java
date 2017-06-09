@@ -195,7 +195,7 @@ public class ClusterTest extends FragmentActivity
         private final ImageView mClusterImageView; // 클러스트가 된 마커를 의미
 
         private final int mDimension;
-        View multiProfile; //클러스터가 아닌 일반 마커의 전체 뷰
+        View multiPhotoView;
         ImageView proFileInImageView;
         TextView rankTextView;
         TextView amu_text;
@@ -203,11 +203,11 @@ public class ClusterTest extends FragmentActivity
 
         public MarkerRenderer() {
             super(getApplicationContext(), mMap, cm);
-            multiProfile = getLayoutInflater().inflate(R.layout.multi_photo, null);
-            multiProfile.findViewById(R.id.rankTextView).setVisibility(View.GONE);
+            multiPhotoView = getLayoutInflater().inflate(R.layout.multi_photo, null);
+            multiPhotoView.findViewById(R.id.rankTextView).setVisibility(View.GONE);
 
-            mClusterIconGenerator.setContentView(multiProfile); // 인플레이터한 전체레이아웃을 아이콘으로 만들어준다.
-            mClusterImageView = (ImageView) multiProfile.findViewById(R.id.image); //multiprofile안의 이미지뷰를 찾아줌
+            mClusterIconGenerator.setContentView(multiPhotoView); // 인플레이터한 전체레이아웃을 아이콘으로 만들어준다.
+            mClusterImageView = (ImageView) multiPhotoView.findViewById(R.id.image); //multiPhotoView안의 이미지뷰를 찾아줌
 
             //새로 만든 이미지뷰를 설정해줌
             mImageView = new ImageView(getApplicationContext());
@@ -233,16 +233,16 @@ public class ClusterTest extends FragmentActivity
             Bitmap icon = mIconGenerator.makeIcon();
             markerOptions.icon(BitmapDescriptorFactory.fromBitmap(icon)).title(markerInfo.name);
             */
-            View newMultiProfile = getLayoutInflater().inflate(R.layout.multi_photo, null);
+            View newMultiPhotoView = getLayoutInflater().inflate(R.layout.multi_photo, null);
             //시도중입니다.
-            proFileInImageView = (ImageView)newMultiProfile.findViewById(R.id.image);
+            proFileInImageView = (ImageView)newMultiPhotoView.findViewById(R.id.image);
             proFileInImageView.setImageBitmap(markerInfo.getPhoto());
-            rankTextView = (TextView)newMultiProfile.findViewById(R.id.rankTextView);
+            rankTextView = (TextView)newMultiPhotoView.findViewById(R.id.rankTextView);
             rankTextView.setText(markerInfo.getRank()+"");
-            amu_text = (TextView)newMultiProfile.findViewById(R.id.amu_text);
+            amu_text = (TextView)newMultiPhotoView.findViewById(R.id.amu_text);
             amu_text.setVisibility(View.GONE);
 
-            mIconGenerator.setContentView(newMultiProfile);
+            mIconGenerator.setContentView(newMultiPhotoView);
             Bitmap icon = mIconGenerator.makeIcon();
             markerOptions.icon(BitmapDescriptorFactory.fromBitmap(icon)).title(markerInfo.name);
 
