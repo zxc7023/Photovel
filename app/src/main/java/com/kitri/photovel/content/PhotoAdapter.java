@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -22,6 +23,7 @@ import com.kitri.vo.Photo;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 
 /**
@@ -34,6 +36,29 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
     private Context mcontext;
     private ViewHolder holder;
     private int myear, mmonth, mday, position;
+    PhotoAdapter pa = null;
+
+    public int getPosition() {
+        return position;
+    }
+    public void setPosition(int position) {
+        this.position = position;
+    }
+
+    public ViewHolder getHolder() {
+        return holder;
+    }
+    public void setHolder(ViewHolder holder) {
+        this.holder = holder;
+    }
+
+    public PhotoAdapter() {
+    }
+
+    public PhotoAdapter(ArrayList<Photo> myDataset, Context mycontext) {
+        mDataset = myDataset;
+        mcontext = mycontext;
+    }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public ImageView ivphoto;
@@ -55,11 +80,6 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
         }
     }
 
-    public PhotoAdapter(ArrayList<Photo> myDataset, Context mycontext) {
-        mDataset = myDataset;
-        mcontext = mycontext;
-    }
-
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // create a new view
@@ -69,7 +89,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, final int position) {
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
         this.holder = holder;
         this.position = position;
         Log.i("position",position+"");
@@ -87,17 +107,35 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
         //사진
         holder.ivphoto.setImageBitmap(mDataset.get(position).getBitmap());
 
-        //날짜
+        //날짜 ->position별로 각가 바껴야함!!!
         holder.tvDate.setText(date2);
         holder.tvDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.i("position2",position+"");
+                pa = new PhotoAdapter();
+                pa.setPosition(position);
+                pa.setHolder(holder);
+                Log.i("position3",pa.getPosition()+"");
+
+                final Date date=mDataset.get(pa.getPosition()).getPhotoDate();
+                String date2=null;
+                try {
+                    date2 = new SimpleDateFormat("yyyy.MM.dd").format(date);
+                    String str[] = date2.split("\\.");
+                    myear = Integer.parseInt(str[0]);
+                    mmonth = Integer.parseInt(str[1]);
+                    mday = Integer.parseInt(str[2]);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
                 DatePickerDialog datepicker = new DatePickerDialog(mcontext, dateSetListener, myear, mmonth-1, mday);
                 datepicker.show();
             }
         });
 
-        //위치
+        //위치 ->주소가있다면 그 주소에 맞게 마커가 이동, 없다면 자신의 위치-->마커클릭시 주소변환(position별로)/검색
         holder.tvLocation.setText(mDataset.get(position).getAddress());
         holder.tvLocation.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -127,7 +165,8 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
             }
         });
     }
-
+    
+    //datePicker에서 날짜선택하고 확인
     DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener(){
         private Date date;
         @Override
@@ -148,8 +187,8 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            holder.tvDate.setText(strDate);
-            mDataset.get(position).setPhotoDate(date);
+            pa.getHolder().tvDate.setText(strDate);
+            mDataset.get(pa.getPosition()).setPhotoDate(date);
         }
     };
 
@@ -157,7 +196,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
     public int getItemCount() {
         return mDataset.size();
     }
-
+    
     public void removeAt(int position) {
         mDataset.remove(position);
         notifyItemRemoved(position);
