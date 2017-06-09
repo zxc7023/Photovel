@@ -8,7 +8,6 @@ import com.google.maps.android.clustering.ClusterItem;
 /**
  * Created by Junki on 2017-05-31.
  */
-
 public class Photo implements ClusterItem {
     private String name;
     private Bitmap photo;
