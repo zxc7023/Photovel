@@ -103,6 +103,7 @@ public class Photo implements Comparable<Photo>, ClusterItem {
         return position;
     }
 
+
     // Photo 모델 복사
     public void CopyData(Photo param)
     {
