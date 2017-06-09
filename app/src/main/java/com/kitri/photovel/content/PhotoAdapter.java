@@ -129,7 +129,6 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
                 DatePickerDialog datepicker = new DatePickerDialog(mcontext, dateSetListener, myear, mmonth-1, mday);
                 datepicker.show();
             }
