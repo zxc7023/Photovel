@@ -112,11 +112,9 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
         holder.tvDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("position2",position+"");
                 pa = new PhotoAdapter();
                 pa.setPosition(position);
                 pa.setHolder(holder);
-                Log.i("position3",pa.getPosition()+"");
 
                 final Date date=mDataset.get(pa.getPosition()).getPhotoDate();
                 String date2=null;

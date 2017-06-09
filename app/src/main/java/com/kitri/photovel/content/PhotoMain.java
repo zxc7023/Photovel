@@ -41,7 +41,7 @@ import java.util.Locale;
 public class PhotoMain extends Activity {
 
     private LinearLayout iv;
-    private Button btnAddPhots;
+    private Button btnAddPhots, btnSort;
     private String path;
     private ExifInterface exif;
     final int PICTURE_REQUEST_CODE = 10;
@@ -82,6 +82,15 @@ public class PhotoMain extends Activity {
                 //공통 갤러리이기 때문에 바꾸면 안됨!!
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICTURE_REQUEST_CODE);
+            }
+        });
+
+        btnSort = (Button)findViewById(R.id.btnSort);
+        btnSort.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Collections.sort(myDataset);    //정렬해줘야함
+                mAdapter.notifyDataSetChanged();
             }
         });
     }
