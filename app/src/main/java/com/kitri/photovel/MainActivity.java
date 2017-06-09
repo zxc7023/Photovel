@@ -1,4 +1,5 @@
 package com.kitri.photovel;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -13,6 +14,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
+
+import com.kitri.photovel.content.ClusterTest;
+import com.kitri.photovel.content.PhotoMain;
+
+import java.util.HashMap;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private SearchView searchView;
@@ -25,8 +33,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Adding Toolbar to the activity
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-
 
         // Adding FloatingActionButton to the activity
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -45,6 +51,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+
+        HashMap<Integer,Class> map = new HashMap<>();
+        map.put(R.id.clusterTest, ClusterTest.class);
+        map.put(R.id.photoTest,PhotoMain.class);
+        Set<Integer> keys = map.keySet();
+        //주석입니다.
+        for(int key: keys){
+
+            final Class clazz = map.get(key);
+            Button bt = (Button) findViewById(key);
+            bt.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getApplicationContext(),clazz);
+                    startActivity(intent);
+                }
+            });
+        }
     }
 
 
