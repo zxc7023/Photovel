@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.kitri.photovel;
+package com.kitri.photovel.content;
 
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;

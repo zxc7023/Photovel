@@ -16,6 +16,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 
+import com.kitri.photovel.content.ClusterTest;
+import com.kitri.photovel.content.PhotoMain;
+
 import java.util.HashMap;
 import java.util.Set;
 
@@ -53,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         HashMap<Integer,Class> map = new HashMap<>();
         map.put(R.id.clusterTest,ClusterTest.class);
+        map.put(R.id.photoTest,PhotoMain.class);
         Set<Integer> keys = map.keySet();
         for(int key: keys){
             final Class clazz = map.get(key);
