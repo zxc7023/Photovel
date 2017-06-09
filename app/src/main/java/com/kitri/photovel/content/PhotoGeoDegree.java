@@ -3,7 +3,7 @@ package com.kitri.photovel.content;
 import android.media.ExifInterface;
 
 /**
- * Created by EunD on 2017-05-29.
+ * 위도 경도 받아서 주소로 바꿔줌
  */
 
 public class PhotoGeoDegree {

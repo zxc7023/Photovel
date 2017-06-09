@@ -102,8 +102,7 @@ public class PhotoGoogleMap extends AppCompatActivity
             location.setLatitude(marker.getPosition().latitude);
             location.setLongitude(marker.getPosition().longitude);
             String markerTitle = getCurrentAddress(location);
-            String markerSnippet = "위도:"+String.valueOf(location.getLatitude())
-                    + " 경도:"+String.valueOf(location.getLongitude());
+            String markerSnippet = "위도:"+String.valueOf(location.getLatitude()) + " 경도:"+String.valueOf(location.getLongitude());
             setCurrentLocation(location, markerTitle, markerSnippet );
         }
 
@@ -451,8 +450,7 @@ public class PhotoGoogleMap extends AppCompatActivity
             markerOptions.title(markerTitle);
             markerOptions.snippet(markerSnippet);
             markerOptions.draggable(true);
-            markerOptions.icon(BitmapDescriptorFactory
-                    .defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
             currentMarker = mGoogleMap.addMarker(markerOptions);
             currentMarker.showInfoWindow();
 
