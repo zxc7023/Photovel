@@ -23,7 +23,6 @@ import com.kitri.vo.Photo;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 
 /**
@@ -129,7 +128,6 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
                 DatePickerDialog datepicker = new DatePickerDialog(mcontext, dateSetListener, myear, mmonth-1, mday);
                 datepicker.show();
             }
