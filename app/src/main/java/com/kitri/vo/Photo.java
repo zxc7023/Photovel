@@ -3,9 +3,12 @@ package com.kitri.vo;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
+import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.clustering.ClusterItem;
+
 import java.util.Date;
 
-public class Photo implements Comparable<Photo> {
+public class Photo implements Comparable<Photo>, ClusterItem {
 
     private int contentDetailId;
     private String photoFileName;
@@ -13,6 +16,7 @@ public class Photo implements Comparable<Photo> {
     private Date photoDate;
     private double photoLatitude;
     private double photoLongitude;
+    private LatLng position;
     private Bitmap bitmap;
     private String address;
 
@@ -25,9 +29,24 @@ public class Photo implements Comparable<Photo> {
         this.address = address;
     }
 
+    public Photo(Bitmap bitmap, double latitude, double longitude, String fileName) {
+        this.bitmap = bitmap;
+        this.photoLatitude = latitude;
+        this.photoLongitude = longitude;
+        this.photoFileName = fileName;
+    }
+
+    public Photo(Bitmap bitmap, Date photoDate, LatLng position, String photoFileName) {
+        this.bitmap = bitmap;
+        this.photoDate = photoDate;
+        this.position = position;
+        this.photoFileName = photoFileName;
+    }
+
     public int getContentDetailId() {
         return contentDetailId;
     }
+
     public void setContentDetailId(int contentDetailId) {
         this.contentDetailId = contentDetailId;
     }
@@ -35,6 +54,7 @@ public class Photo implements Comparable<Photo> {
     public Bitmap getBitmap() {
         return bitmap;
     }
+
     public void setBitmap(Bitmap bitmap) {
         this.bitmap = bitmap;
     }
@@ -42,6 +62,7 @@ public class Photo implements Comparable<Photo> {
     public String getAddress() {
         return address;
     }
+
     public void setAddress(String address) {
         this.address = address;
     }
@@ -49,6 +70,7 @@ public class Photo implements Comparable<Photo> {
     public String getPhotoFileName() {
         return photoFileName;
     }
+
     public void setPhotoFileName(String photoFileName) {
         this.photoFileName = photoFileName;
     }
@@ -56,6 +78,7 @@ public class Photo implements Comparable<Photo> {
     public int getPhotoTopFlag() {
         return photoTopFlag;
     }
+
     public void setPhotoTopFlag(int photoTopFlag) {
         this.photoTopFlag = photoTopFlag;
     }
@@ -63,6 +86,7 @@ public class Photo implements Comparable<Photo> {
     public Date getPhotoDate() {
         return photoDate;
     }
+
     public void setPhotoDate(Date photoDate) {
         this.photoDate = photoDate;
     }
@@ -70,6 +94,7 @@ public class Photo implements Comparable<Photo> {
     public double getPhotoLatitude() {
         return photoLatitude;
     }
+
     public void setPhotoLatitude(double photoLatitude) {
         this.photoLatitude = photoLatitude;
     }
@@ -77,13 +102,20 @@ public class Photo implements Comparable<Photo> {
     public double getPhotoLongitude() {
         return photoLongitude;
     }
+
     public void setPhotoLongitude(double photoLongitude) {
         this.photoLongitude = photoLongitude;
     }
 
+    @Override
+    public LatLng getPosition() {
+        position = new LatLng(getPhotoLatitude(), getPhotoLongitude());
+        return position;
+    }
+
+
     // Photo 모델 복사
-    public void CopyData(Photo param)
-    {
+    public void CopyData(Photo param) {
         this.contentDetailId = param.getContentDetailId();
         this.photoFileName = param.getPhotoFileName();
         this.photoTopFlag = param.getPhotoTopFlag();
@@ -98,6 +130,7 @@ public class Photo implements Comparable<Photo> {
         //ascending order
         return this.photoDate.compareTo(compareDate);
     }
+
 
     @Override
     public String toString() {

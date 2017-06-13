@@ -26,46 +26,53 @@ import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import com.google.maps.android.ui.IconGenerator;
-import com.kitri.photovel.R;
-import com.kitri.vo.MarkerInfo;
+import com.kitri.vo.Photo;
+
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import com.kitri.photovel.R;
+
+
+public class ClusterTest
 /**
  * Created by Junki on 2017-05-31.
- */
-
-public class ClusterTest extends FragmentActivity
+ */extends FragmentActivity
         implements OnMapReadyCallback,
-        ClusterManager.OnClusterClickListener<MarkerInfo>,
-        ClusterManager.OnClusterInfoWindowClickListener<MarkerInfo>,
-        ClusterManager.OnClusterItemClickListener<MarkerInfo>,
-        ClusterManager.OnClusterItemInfoWindowClickListener<MarkerInfo> {
+        ClusterManager.OnClusterClickListener<Photo>,
+        ClusterManager.OnClusterInfoWindowClickListener<Photo>,
+        ClusterManager.OnClusterItemClickListener<Photo>,
+        ClusterManager.OnClusterItemInfoWindowClickListener<Photo> {
 
-    private ClusterManager<MarkerInfo> cm;
-    private Random mRandom = new Random(1984);
+
+
+    private ClusterManager<Photo> cm;
     private GoogleMap mMap;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(com.kitri.photovel.R.layout.activity_cluster_test);
+        setContentView(R.layout.activity_cluster_test);
 
         //프래그먼트에 지도를 보여주기위해 싱크
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        mMap =googleMap;
+        mMap = googleMap;
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(51.50111,-0.122777775), 9.5f));
         startDemo();
 
@@ -74,9 +81,10 @@ public class ClusterTest extends FragmentActivity
 
     //클러스터된 아이템을 클릭되었을때의 이벤트
     @Override
-    public boolean onClusterClick(Cluster<MarkerInfo> cluster) {
+    public boolean onClusterClick(Cluster<Photo> cluster) {
         // Show a toast with some info when the cluster is clicked.
-        String firstName = cluster.getItems().iterator().next().name;
+
+        String firstName = cluster.getItems().iterator().next().getPhotoFileName();
         Toast.makeText(this, cluster.getSize() + " (including " + firstName + ")", Toast.LENGTH_SHORT).show();
 
         // Zoom in the cluster. Need to create LatLngBounds and including all the cluster items
@@ -103,11 +111,13 @@ public class ClusterTest extends FragmentActivity
     protected void startDemo() {
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(51.50111,-0.122777775), 9.5f));
 
-        cm = new ClusterManager<MarkerInfo>(this, mMap);
+        cm = new ClusterManager<Photo>(this, mMap);
         cm.setRenderer(new MarkerRenderer());
+
         mMap.setOnCameraIdleListener(cm);
         mMap.setOnMarkerClickListener(cm);
         mMap.setOnInfoWindowClickListener(cm);
+
         cm.setOnClusterClickListener(this);
         cm.setOnClusterInfoWindowClickListener(this);
         cm.setOnClusterItemClickListener(this);
@@ -117,15 +127,15 @@ public class ClusterTest extends FragmentActivity
     }
 
     @Override
-    public void onClusterInfoWindowClick(Cluster<MarkerInfo> cluster) {
+    public void onClusterInfoWindowClick(Cluster<Photo> cluster) {
         // Does nothing, but you could go to a list of the users.
 
     }
 
     @Override
-    public boolean onClusterItemClick(final MarkerInfo markerInfo) {
+    public boolean onClusterItemClick(final Photo photo) {
         // Does nothing, but you could go into the user's profile page, for example.
-        Toast.makeText(this, markerInfo.getName()+"이 선택되었습니다.", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, photo.getPhotoFileName()+"이 선택되었습니다.", Toast.LENGTH_SHORT).show();
         mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
             @Override
             public View getInfoWindow(Marker marker) {
@@ -134,8 +144,8 @@ public class ClusterTest extends FragmentActivity
 
             @Override
             public View getInfoContents(Marker marker) {
-                View testView = getLayoutInflater().inflate(R.layout.photo_detail, null);
-                ((ImageView)testView.findViewById(R.id.photo_detail)).setImageBitmap(markerInfo.photo);
+                View testView = getLayoutInflater().inflate(R.layout.multi_photo_detail, null);
+                ((ImageView)testView.findViewById(R.id.photo_detail)).setImageBitmap(photo.getBitmap());
                 return testView;
             }
         });
@@ -143,24 +153,19 @@ public class ClusterTest extends FragmentActivity
     }
 
     @Override
-    public void onClusterItemInfoWindowClick(MarkerInfo markerInfo) {
+    public void onClusterItemInfoWindowClick(Photo photo) {
         // Does nothing, but you could go into the user's profile page, for example.
 
-    }
-
-    private LatLng position() {
-        return new LatLng(random(37.550865, 37.650865), random(126.985423, 127.285423));
-    }
-
-    private double random(double min, double max) {
-        return mRandom.nextDouble() * (max - min) + min;
     }
 
     private void addItems(final ClusterManager cm) {
         final String[] strArray = {"1_1.jpg", "1_2.jpg", "1_3.jpg","1_4.jpg","1_5.jpg"};
         final Bitmap[] bitmapArray = new Bitmap[strArray.length];
         final LatLng []latLngs = {new LatLng(51.50111,-0.122777775),new LatLng(51.524025,-0.1584639),new LatLng(51.50083,-0.122777775),new LatLng(51.531944,-0.12416667),new LatLng(51.503887,-0.07638889)};
-        final int []rank = {1,2,3,4,5};
+        SimpleDateFormat sdf = new SimpleDateFormat();
+        sdf.applyPattern("yyyy-MM-dd");
+
+        final Date[] photoDates = {};
 
         new Thread(){
             public void run() {
@@ -175,7 +180,7 @@ public class ClusterTest extends FragmentActivity
                         @Override
                         public void run() {
                             for(int i=0;i<strArray.length;i++) {
-                                cm.addItem(new MarkerInfo(latLngs[i], strArray[i], bitmapArray[i],rank[i]));
+                                cm.addItem(new Photo(bitmapArray[i], latLngs[i].latitude , latLngs[i].longitude, strArray[i]));
                             }
                             cm.cluster();
                         }
@@ -189,13 +194,14 @@ public class ClusterTest extends FragmentActivity
     }
 
 
-    private class MarkerRenderer extends DefaultClusterRenderer<MarkerInfo> {
+    private class MarkerRenderer extends DefaultClusterRenderer<Photo> {
         private final IconGenerator mIconGenerator = new IconGenerator(getApplicationContext()); //마커의 아이콘을 Generator해줌
         private final IconGenerator mClusterIconGenerator = new IconGenerator(getApplicationContext()); // 클러스트된 아이콘을 Generator해줌
         private final ImageView mImageView; // 클러스트가 되어진 마커가 아닌 일반 마커를 의미
         private final ImageView mClusterImageView; // 클러스트가 된 마커를 의미
+
         private final int mDimension;
-        View multiProfile;
+        View multiPhotoView;
         ImageView proFileInImageView;
         TextView rankTextView;
         TextView amu_text;
@@ -203,69 +209,67 @@ public class ClusterTest extends FragmentActivity
 
         public MarkerRenderer() {
             super(getApplicationContext(), mMap, cm);
-            multiProfile = getLayoutInflater().inflate(R.layout.multi_profile, null);
-            multiProfile.findViewById(R.id.rankTextView).setVisibility(View.GONE);
-
-            mClusterIconGenerator.setContentView(multiProfile); // 인플레이터한 전체레이아웃을 아이콘으로 만들어준다.
-            mClusterImageView = (ImageView) multiProfile.findViewById(R.id.image); //multiprofile안의 이미지뷰를 찾아줌
+            Drawable TRANSPARENT_DRAWABLE = new ColorDrawable(Color.TRANSPARENT);
+            multiPhotoView = getLayoutInflater().inflate(R.layout.multi_photo, null);
+            multiPhotoView.findViewById(R.id.rankTextView).setVisibility(View.GONE);
+            mClusterIconGenerator.setContentView(multiPhotoView); // 인플레이터한 전체레이아웃을 아이콘으로 만들어준다.
+            mClusterImageView = (ImageView) multiPhotoView.findViewById(R.id.image); //multiPhotoView안의 이미지뷰를 찾아줌
 
             //새로 만든 이미지뷰를 설정해줌
             mImageView = new ImageView(getApplicationContext());
             mDimension = (int) getResources().getDimension(R.dimen.custom_profile_image);
             mImageView.setLayoutParams(new ViewGroup.LayoutParams(mDimension, mDimension));
             int padding = (int) getResources().getDimension(R.dimen.custom_profile_padding);
-            mImageView.setPadding(padding,  padding, padding, padding);
+            mImageView.setPadding(padding, padding, padding, padding);
             mIconGenerator.setContentView(mImageView);
-            Drawable TRANSPARENT_DRAWABLE = new ColorDrawable(Color.TRANSPARENT);
+
             mIconGenerator.setBackground(TRANSPARENT_DRAWABLE);
-
-
-
         }
 
         @Override
-        protected void onBeforeClusterItemRendered(MarkerInfo markerInfo, MarkerOptions markerOptions) {
+        protected void onBeforeClusterItemRendered(Photo photo, MarkerOptions markerOptions) {
             // Draw a single person.
             // Set the info window to show their name.
             /*
             원본입니다.
-            mImageView.setImageBitmap(markerInfo.getPhoto());
+            mImageView.setImageBitmap(photo.getPhoto());
             Bitmap icon = mIconGenerator.makeIcon();
-            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(icon)).title(markerInfo.name);
+            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(icon)).title(photo.name);
             */
-            View newMultiProfile = getLayoutInflater().inflate(R.layout.multi_profile, null);
+            View newMultiPhotoView = getLayoutInflater().inflate(R.layout.multi_photo, null);
             //시도중입니다.
-            proFileInImageView = (ImageView)newMultiProfile.findViewById(R.id.image);
-            proFileInImageView.setImageBitmap(markerInfo.getPhoto());
-            rankTextView = (TextView)newMultiProfile.findViewById(R.id.rankTextView);
-            rankTextView.setText(markerInfo.getRank()+"");
-            amu_text = (TextView)newMultiProfile.findViewById(R.id.amu_text);
+            proFileInImageView = (ImageView)newMultiPhotoView.findViewById(R.id.image);
+            proFileInImageView.setImageBitmap(photo.getBitmap());
+            rankTextView = (TextView)newMultiPhotoView.findViewById(R.id.rankTextView);
+//            rankTextView.setText(photo.getRank()+"");
+            amu_text = (TextView)newMultiPhotoView.findViewById(R.id.amu_text);
             amu_text.setVisibility(View.GONE);
 
-            mIconGenerator.setContentView(newMultiProfile);
+            mIconGenerator.setContentView(newMultiPhotoView);
             Bitmap icon = mIconGenerator.makeIcon();
-            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(icon)).title(markerInfo.name);
+            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(icon));
+            //.title(photo.getName());
 
 
 
         }
 
         @Override
-        protected void onBeforeClusterRendered(Cluster<MarkerInfo> cluster, MarkerOptions markerOptions) {
+        protected void onBeforeClusterRendered(Cluster<Photo> cluster, MarkerOptions markerOptions) {
             // Draw multiple people.
             // Note: this method runs on the UI thread. Don't spend too much time in here (like in this example).
-            List<Drawable> profilePhotos = new ArrayList<Drawable>(Math.min(4, cluster.getSize()));
+            List<Drawable> photos = new ArrayList<Drawable>(Math.min(4, cluster.getSize()));
             int width = mDimension;
             int height = mDimension;
 
-            for (MarkerInfo p : cluster.getItems()) {
+            for (Photo p : cluster.getItems()) {
                 // Draw 4 at most.
-                if (profilePhotos.size() == 4) break;
-                Drawable bitmapDrawable = new BitmapDrawable(getResources(), p.photo);
+                if (photos.size() == 4) break;
+                Drawable bitmapDrawable = new BitmapDrawable(getResources(), p.getBitmap());
                 bitmapDrawable.setBounds(0, 0, width, height);
-                profilePhotos.add(bitmapDrawable);
+                photos.add(bitmapDrawable);
             }
-            MultiDrawable multiDrawable = new MultiDrawable(profilePhotos);
+            MultiDrawable multiDrawable = new MultiDrawable(photos);
             multiDrawable.setBounds(0, 0, width, height);
 
 

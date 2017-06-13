@@ -55,10 +55,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
         HashMap<Integer,Class> map = new HashMap<>();
-        map.put(R.id.clusterTest,ClusterTest.class);
+        map.put(R.id.clusterTest, ClusterTest.class);
         map.put(R.id.photoTest,PhotoMain.class);
         Set<Integer> keys = map.keySet();
+        //주석입니다.
         for(int key: keys){
+
             final Class clazz = map.get(key);
             Button bt = (Button) findViewById(key);
             bt.setOnClickListener(new View.OnClickListener() {

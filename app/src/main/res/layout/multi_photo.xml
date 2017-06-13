@@ -5,9 +5,10 @@
     android:orientation="vertical"
     xmlns:android="http://schemas.android.com/apk/res/android"
     >
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <FrameLayout
+        android:id="@+id/image_frame"
+        android:layout_width="@dimen/custom_profile_image"
+        android:layout_height="@dimen/custom_profile_image"
         android:orientation="vertical">
         <ImageView
             android:id="@+id/image"
@@ -18,18 +19,21 @@
             android:id="@id/amu_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textAppearance="@style/amu_Bubble.TextAppearance.Light"
+            android:background="@android:color/black"
             android:paddingLeft="@dimen/custom_profile_padding"
             android:paddingRight="@dimen/custom_profile_padding"
             android:layout_gravity="center"
             android:alpha=".8"/>
         <!--            android:textAppearance="@style/amu_Bubble.TextAppearance.Light"
             android:background="@android:color/black"-->
-    </LinearLayout>
+    </FrameLayout>
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_gravity="center">
+        android:layout_gravity="center"
+        >
   <!--      <ImageView
             android:id="@+id/imageView"
             android:layout_width="wrap_content"
