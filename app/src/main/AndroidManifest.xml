@@ -4,7 +4,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" /><!--인터넷 사용하기위한 퍼미션 -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> <!-- 1)위치 정보접근을 위한 퍼미션 -->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> <!-- 위치변경정보 접근을 위한 퍼미션 -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> <!-- 앱이 장소 선택기를 사용하는경우를 위한 퍼미션 -->
 
     <!--갤러리권한설정-->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />

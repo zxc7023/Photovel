@@ -42,11 +42,11 @@ import java.util.List;
 
 import com.kitri.photovel.R;
 
+
+public class ClusterTest
 /**
  * Created by Junki on 2017-05-31.
- */
-
-public class ClusterTest extends FragmentActivity
+ */extends FragmentActivity
         implements OnMapReadyCallback,
         ClusterManager.OnClusterClickListener<Photo>,
         ClusterManager.OnClusterInfoWindowClickListener<Photo>,
