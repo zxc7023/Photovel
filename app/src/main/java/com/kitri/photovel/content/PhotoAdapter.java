@@ -29,6 +29,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -98,7 +99,6 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         this.holder = holder;
         this.position = position;
-        Log.i("position",position+"");
 
         final Date date=mDataset.get(position).getPhotoDate();
         String date2=null;
@@ -111,6 +111,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         //사진
         holder.ivphoto.setImageBitmap(mDataset.get(position).getBitmap());
 
@@ -140,6 +141,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
         });
 
         //위치
+        Log.i("ddd address",mDataset.get(position).getAddress()+"");
         holder.tvLocation.setText(mDataset.get(position).getAddress());
         holder.tvLocation.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -147,8 +149,8 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
                 pa = new PhotoAdapter();
                 pa.setPosition(position);
                 pa.setHolder(holder);
-
                 Intent intent=new Intent(mcontext, PhotoGoogleMap.class);
+                //"주소 미확인"이 아닐시 주소 보내줘서 그 위치 켜지게 만들기
                 ((Activity)mcontext).startActivityForResult(intent,2);
             }
         });
@@ -195,7 +197,11 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
 
     //구글지도address표시해주기
     public void photoGoogleMapResult(Intent intnet) {
-        pa.getHolder().tvLocation.setText(intnet.getStringExtra("address"));
+        /*Locale systemLocale = getResources().getConfiguration().locale;
+        String strLanguage = systemLocale.getLanguage();*/
+
+        mDataset.get(pa.getPosition()).setAddress(intnet.getStringExtra("address"));
+        pa.getHolder().tvLocation.setText(mDataset.get(pa.getPosition()).getAddress());
     }
 
     //datePicker에서 날짜선택하고 확인

@@ -50,16 +50,23 @@ public class PhotoMain extends Activity {
 
     private RecyclerView mRecyclerView;
     private PhotoAdapter mAdapter;
-    //private PhotoAdapter pa;
     private RecyclerView.LayoutManager mLayoutManager;
     private ArrayList<Photo> myDataset;
     private String address;
+
+    private EditText contentSubject;
+    private EditText contentText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo_main);
         checkPermission();
+
+        contentSubject = (EditText) findViewById(R.id.contentSubject);
+        contentText = (EditText) findViewById(R.id.contentText);
+
+        //제목자동완성 해야함
 
         //recycleview사용선언
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
@@ -71,7 +78,6 @@ public class PhotoMain extends Activity {
         mRecyclerView.setAdapter(mAdapter);
 
         //갤러리에서 사진받아와서 그 사진 add
-        //iv = (LinearLayout) findViewById(R.id.ivPhotoTest3);
         btnAddPhots = (Button) findViewById(R.id.btnAddPhots);
         btnAddPhots.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -82,6 +88,7 @@ public class PhotoMain extends Activity {
                 intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
                 //공통 갤러리이기 때문에 바꾸면 안됨!!
                 intent.setAction(Intent.ACTION_GET_CONTENT);
+                Toast.makeText(getApplicationContext(),"복수 선택은 길게 꾹눌러 주숑",Toast.LENGTH_LONG).show();
                 startActivityForResult(Intent.createChooser(intent, "Select Picture"),1);
             }
         });
@@ -152,8 +159,9 @@ public class PhotoMain extends Activity {
                 address = getCurrentAddress(photo); //주소로 바꿔주기
                 photo.setAddress(address);
             }else {
-
+                photo.setAddress("주소미발견");
             }
+
             if(orig.getAttribute(ExifInterface.TAG_DATETIME) !=null){ //시간날짜
                 String datetime = orig.getAttribute(ExifInterface.TAG_DATETIME);
                 Date date = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss").parse(datetime);
@@ -161,6 +169,7 @@ public class PhotoMain extends Activity {
             }else{
                 photo.setPhotoDate(new Date());
             }
+
             exif = new ExifInterface(path);
             int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED); //회전률
             //사진보여주기 전에 용량처리해주기
