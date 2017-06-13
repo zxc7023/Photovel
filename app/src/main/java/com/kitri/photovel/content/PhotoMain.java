@@ -49,19 +49,17 @@ public class PhotoMain extends Activity {
     private final int MY_PERMISSION_REQUEST_STORAGE = 100;
 
     private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
+    private PhotoAdapter mAdapter;
+    //private PhotoAdapter pa;
     private RecyclerView.LayoutManager mLayoutManager;
     private ArrayList<Photo> myDataset;
     private String address;
-    private EditText etContent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo_main);
         checkPermission();
-
-        etContent = (EditText)findViewById(R.id.etContent);
 
         //recycleview사용선언
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
@@ -133,6 +131,8 @@ public class PhotoMain extends Activity {
                     Collections.sort(myDataset);
                     mAdapter.notifyDataSetChanged();
                 }
+            }else if(requestCode==2){
+                mAdapter.photoGoogleMapResult(data);
             }
         }
     }

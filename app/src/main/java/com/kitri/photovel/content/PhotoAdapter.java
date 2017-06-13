@@ -139,7 +139,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
             }
         });
 
-        //위치 ->주소가있다면 그 주소에 맞게 마커가 이동, 없다면 자신의 위치-->마커클릭시 주소변환(position별로)/검색
+        //위치
         holder.tvLocation.setText(mDataset.get(position).getAddress());
         holder.tvLocation.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -193,39 +193,9 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
         });
     }
 
-    protected void photoGoogleMapResult(LatLng location) {
-        double lat = location.latitude;
-        double lng = location.longitude;
-
-        Photo ph = new Photo();
-        ph.setPhotoLatitude(lat);
-        ph.setPhotoLongitude(lng);
-        String address = new PhotoMain().getCurrentAddress(ph);
-        Log.i("ddd",address+"" );
-        pa.getHolder().tvLocation.setText(mDataset.get(pa.getPosition()).getAddress());
-        /*if(resultCode == RESULT_OK && requestCode == 2){ //사진에서 지도 다시 설정시
-            String chooseLocation=data.getStringExtra("chooseLocation");
-            *//*int position=data.getIntExtra("position",0);
-            Log.i("ddd","position : "+position);*//*
-
-            String str1[] = chooseLocation.split(",");
-            String str2[] = str1[0].split("\\(");
-            String str3[] = str1[1].split("\\)");
-            double lat = Double.parseDouble(str2[str2.length-1].trim());
-            double lng = Double.parseDouble(str3[0].trim());
-            Log.i("ddd",lat+"");
-            Log.i("ddd",lng+"" );
-
-            *//*Photo ph = new Photo();
-            ph.setPhotoLatitude(lat);
-            ph.setPhotoLongitude(lng);
-            address = getCurrentAddress(ph);
-            Log.i("ddd",address+"" );*//*
-
-            *//*PhotoAdapter phoa = new PhotoAdapter();
-            phoa.setPosition(Integer.parseInt(position));
-            mRecyclerView.setAdapter(mAdapter);*//*
-        }*/
+    //구글지도address표시해주기
+    public void photoGoogleMapResult(Intent intnet) {
+        pa.getHolder().tvLocation.setText(intnet.getStringExtra("address"));
     }
 
     //datePicker에서 날짜선택하고 확인

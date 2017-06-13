@@ -64,15 +64,18 @@ public class PhotoGoogleMap extends AppCompatActivity
         //인포를 클릭했을때 위치정보값 전달
         @Override
         public void onInfoWindowClick(Marker marker) {
-            Toast.makeText(mActivity, "위치를 보냅니다." + marker.getPosition(), Toast.LENGTH_SHORT).show();
+            LatLng chooseLocation =  marker.getPosition();
+            Location location = new Location(LocationManager.GPS_PROVIDER);
+            location.setLatitude(chooseLocation.latitude);
+            location.setLongitude(chooseLocation.longitude);
 
-                /*
-                 전하라씨가 정의해서 쓰셈
-                Intent intent = new Intent(getApplicationContext());
-                LatLng currentLocation =  marker.getPosition();
-                intent
-                startActivityForResult(intent,);
-                */
+            String address = getCurrentAddress(location);
+
+            Intent intent = getIntent();
+            intent.putExtra("address",address);
+            setResult(RESULT_OK,intent);
+
+            finish();
         }
 
         //지도를 찍었을때
@@ -545,8 +548,6 @@ public class PhotoGoogleMap extends AppCompatActivity
             return "잘못된 GPS 좌표";
 
         }
-
-
         if (addresses == null || addresses.size() == 0) {
             Toast.makeText(this, "주소 미발견", Toast.LENGTH_LONG).show();
             return "주소 미발견";
