@@ -65,7 +65,6 @@ public class PhotoGoogleMap extends AppCompatActivity
         @Override
         public void onInfoWindowClick(Marker marker) {
             Toast.makeText(mActivity, "위치를 보냅니다." + marker.getPosition(), Toast.LENGTH_SHORT).show();
-
                 /*
                  전하라씨가 정의해서 쓰셈
                 Intent intent = new Intent(getApplicationContext());

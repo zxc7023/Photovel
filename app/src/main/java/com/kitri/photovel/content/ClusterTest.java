@@ -51,7 +51,7 @@ public class ClusterTest
         ClusterManager.OnClusterClickListener<Photo>,
         ClusterManager.OnClusterInfoWindowClickListener<Photo>,
         ClusterManager.OnClusterItemClickListener<Photo>,
-        ClusterManager.OnClusterItemInfoWindowClickListener<Photo> {
+        ClusterManager.OnClusterItemInfoWindowClickListener<Photo>{
 
 
 
@@ -115,6 +115,7 @@ public class ClusterTest
         cm.setRenderer(new MarkerRenderer());
 
         mMap.setOnCameraIdleListener(cm);
+        //아이콘(마커) 클릭 인식
         mMap.setOnMarkerClickListener(cm);
         mMap.setOnInfoWindowClickListener(cm);
 
