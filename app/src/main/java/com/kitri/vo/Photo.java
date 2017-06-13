@@ -19,14 +19,16 @@ public class Photo implements Comparable<Photo>, ClusterItem {
     private LatLng position;
     private Bitmap bitmap;
     private String address;
+    private String content;
 
     public Photo() {
     }
 
-    public Photo(Bitmap bitmap, Date photoDate, String address) {
+    public Photo(Bitmap bitmap, Date photoDate, String address, String content) {
         this.bitmap = bitmap;
         this.photoDate = photoDate;
         this.address = address;
+        this.content = content;
     }
 
     public Photo(Bitmap bitmap, double latitude, double longitude, String fileName) {
@@ -65,6 +67,13 @@ public class Photo implements Comparable<Photo>, ClusterItem {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getContent() {
+        return content;
+    }
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public String getPhotoFileName() {

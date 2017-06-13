@@ -1,9 +1,12 @@
 package com.kitri.photovel.content;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,7 +19,9 @@ import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.kitri.photovel.R;
 import com.kitri.vo.Photo;
 
@@ -24,6 +29,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+
+import static android.app.Activity.RESULT_OK;
 
 /**
  * Created by HARA on 2017-06-07.
@@ -34,7 +41,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
     private RadioButton lastCheckedRB = null;
     private Context mcontext;
     private ViewHolder holder;
-    private int myear, mmonth, mday, position;
+    private int myear, mmonth, mday, position, a = 0;
     PhotoAdapter pa = null;
 
     public int getPosition() {
@@ -65,7 +72,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
         public Button btnDelete;
         public RadioGroup radioG;
         public RadioButton btnRadio;
-        public EditText etTest;
+        public EditText etContent;
 
         public ViewHolder(View view) {
             super(view);
@@ -75,7 +82,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
             btnDelete = (Button) view.findViewById(R.id.btnDelete);
             radioG = (RadioGroup) view.findViewById(R.id.radioG);
             btnRadio = (RadioButton) view.findViewById(R.id.btnRadio);
-            //etTest = (EditText) view.findViewById(R.id.etTest);
+            etContent = (EditText) view.findViewById(R.id.etContent);
         }
     }
 
@@ -92,6 +99,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
         this.holder = holder;
         this.position = position;
         Log.i("position",position+"");
+
         final Date date=mDataset.get(position).getPhotoDate();
         String date2=null;
         try {
@@ -136,7 +144,30 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
         holder.tvLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mcontext.startActivity(new Intent(mcontext, PhotoGoogleMap.class));
+                pa = new PhotoAdapter();
+                pa.setPosition(position);
+                pa.setHolder(holder);
+
+                Intent intent=new Intent(mcontext, PhotoGoogleMap.class);
+                ((Activity)mcontext).startActivityForResult(intent,2);
+            }
+        });
+
+        //컨텐츠
+        holder.etContent.setTag(position);
+        holder.etContent.setText(mDataset.get(position).getContent());
+        holder.etContent.addTextChangedListener(new TextWatcher(){
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                mDataset.get((int)holder.etContent.getTag()).setContent(editable.toString());
             }
         });
 
@@ -161,7 +192,42 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
             }
         });
     }
-    
+
+    protected void photoGoogleMapResult(LatLng location) {
+        double lat = location.latitude;
+        double lng = location.longitude;
+
+        Photo ph = new Photo();
+        ph.setPhotoLatitude(lat);
+        ph.setPhotoLongitude(lng);
+        String address = new PhotoMain().getCurrentAddress(ph);
+        Log.i("ddd",address+"" );
+        pa.getHolder().tvLocation.setText(mDataset.get(pa.getPosition()).getAddress());
+        /*if(resultCode == RESULT_OK && requestCode == 2){ //사진에서 지도 다시 설정시
+            String chooseLocation=data.getStringExtra("chooseLocation");
+            *//*int position=data.getIntExtra("position",0);
+            Log.i("ddd","position : "+position);*//*
+
+            String str1[] = chooseLocation.split(",");
+            String str2[] = str1[0].split("\\(");
+            String str3[] = str1[1].split("\\)");
+            double lat = Double.parseDouble(str2[str2.length-1].trim());
+            double lng = Double.parseDouble(str3[0].trim());
+            Log.i("ddd",lat+"");
+            Log.i("ddd",lng+"" );
+
+            *//*Photo ph = new Photo();
+            ph.setPhotoLatitude(lat);
+            ph.setPhotoLongitude(lng);
+            address = getCurrentAddress(ph);
+            Log.i("ddd",address+"" );*//*
+
+            *//*PhotoAdapter phoa = new PhotoAdapter();
+            phoa.setPosition(Integer.parseInt(position));
+            mRecyclerView.setAdapter(mAdapter);*//*
+        }*/
+    }
+
     //datePicker에서 날짜선택하고 확인
     DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener(){
         private Date date;

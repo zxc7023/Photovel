@@ -21,6 +21,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -44,7 +45,6 @@ public class PhotoMain extends Activity {
     private Button btnAddPhots, btnSort;
     private String path;
     private ExifInterface exif;
-    final int PICTURE_REQUEST_CODE = 10;
     private static final String TAG = "AppPermission";
     private final int MY_PERMISSION_REQUEST_STORAGE = 100;
 
@@ -53,6 +53,7 @@ public class PhotoMain extends Activity {
     private RecyclerView.LayoutManager mLayoutManager;
     private ArrayList<Photo> myDataset;
     private String address;
+    private EditText etContent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +61,9 @@ public class PhotoMain extends Activity {
         setContentView(R.layout.activity_photo_main);
         checkPermission();
 
-        //recycleview사용
+        etContent = (EditText)findViewById(R.id.etContent);
+
+        //recycleview사용선언
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(this);
@@ -81,7 +84,7 @@ public class PhotoMain extends Activity {
                 intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
                 //공통 갤러리이기 때문에 바꾸면 안됨!!
                 intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICTURE_REQUEST_CODE);
+                startActivityForResult(Intent.createChooser(intent, "Select Picture"),1);
             }
         });
 
@@ -98,8 +101,8 @@ public class PhotoMain extends Activity {
     //갤러리에서 사진불러오기
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            if (requestCode == PICTURE_REQUEST_CODE && resultCode == RESULT_OK) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && resultCode == RESULT_OK) {
+            if (requestCode == 1) {
                 ClipData clipData = data.getClipData();
                 if (clipData != null) {     //갤러리에서 사진 여러개 클릭시
                     int  cnt=clipData.getItemCount();
@@ -118,7 +121,7 @@ public class PhotoMain extends Activity {
 
                     //ImageView에 배치 --> content_detail LinearLayout을 만들고 배치해야함
                     for (int i = 0; i < cnt; i++) {
-                        myDataset.add(new Photo(photos[i].getBitmap(), photos[i].getPhotoDate(), photos[i].getAddress()));
+                        myDataset.add(new Photo(photos[i].getBitmap(), photos[i].getPhotoDate(), photos[i].getAddress(), photos[i].getContent()));
                         Collections.sort(myDataset);    //정렬해줘야함
                         mAdapter.notifyDataSetChanged();
                     }
@@ -126,11 +129,10 @@ public class PhotoMain extends Activity {
                 }else{  //갤러리에서 사진 한개 클릭시
                     Uri uri = data.getData();   //갤러리에서 선택한 dataUri 받아오기
                     Photo photo = selectPhoto(uri);
-                    myDataset.add(new Photo(photo.getBitmap(), photo.getPhotoDate(), photo.getAddress()));
+                    myDataset.add(new Photo(photo.getBitmap(), photo.getPhotoDate(), photo.getAddress(), photo.getContent()));
                     Collections.sort(myDataset);
                     mAdapter.notifyDataSetChanged();
                 }
-                super.onActivityResult(requestCode, resultCode, data);
             }
         }
     }
