@@ -100,7 +100,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
         this.holder = holder;
         this.position = position;
 
-        final Date date=mDataset.get(position).getPhotoDate();
+        final Date date=mDataset.get(position).getPhoto_date();
         String date2=null;
         try {
             date2 = new SimpleDateFormat("yyyy.MM.dd").format(date);
@@ -124,7 +124,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
                 pa.setPosition(position);
                 pa.setHolder(holder);
 
-                final Date date=mDataset.get(pa.getPosition()).getPhotoDate();
+                final Date date=mDataset.get(pa.getPosition()).getPhoto_date();
                 String date2=null;
                 try {
                     date2 = new SimpleDateFormat("yyyy.MM.dd").format(date);
@@ -226,7 +226,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
                 e.printStackTrace();
             }
             pa.getHolder().tvDate.setText(strDate);
-            mDataset.get(pa.getPosition()).setPhotoDate(date);
+            mDataset.get(pa.getPosition()).setPhoto_date(date);
         }
     };
 

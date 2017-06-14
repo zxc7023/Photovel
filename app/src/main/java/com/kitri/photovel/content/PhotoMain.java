@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.ClipData;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -18,12 +19,16 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.widget.NestedScrollView;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.kitri.photovel.R;
@@ -41,8 +46,8 @@ import java.util.List;
 import java.util.Locale;
 
 public class PhotoMain extends Activity {
-    private Button btnSort;
-    private FloatingActionButton  btnAddPhots;
+    private Button btnSort, btnAllDelete;
+    private FloatingActionButton  btnAddPhots, btnTop;
     private String path;
     private ExifInterface exif;
     private static final String TAG = "AppPermission";
@@ -57,6 +62,7 @@ public class PhotoMain extends Activity {
     private EditText contentSubject;
     private EditText contentText;
     private int flag = 0;
+    private Switch swPrivate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,9 +83,47 @@ public class PhotoMain extends Activity {
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setNestedScrollingEnabled(false);
         myDataset = new ArrayList<>();
         mAdapter = new PhotoAdapter(myDataset, PhotoMain.this);
         mRecyclerView.setAdapter(mAdapter);
+
+        //top버튼
+        btnTop = (FloatingActionButton) findViewById(R.id.btnTop);
+        final NestedScrollView nsv = (NestedScrollView) findViewById(R.id.nestedScrollView);
+        nsv.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {   //스크롤내리면 보이게
+            @Override
+            public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                if(oldScrollY > 200){
+                    btnTop.show();
+                }else{
+                    btnTop.hide();
+                }
+            }
+        });
+        btnTop.setOnClickListener(new View.OnClickListener() {  //top으로 이동
+            @Override
+            public void onClick(View view) {
+                nsv.fullScroll(View.FOCUS_UP);
+            }
+        });
+
+        //취소버튼
+        btnAllDelete = (Button)findViewById(R.id.btnAllDelete);
+        btnAllDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
+
+        //스위치버튼
+        swPrivate = (Switch)findViewById(R.id.swPrivate);
+        swPrivate.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Log.i("ddd",""+isChecked);  //true,false
+            }
+        });
 
         //갤러리에서 사진받아와서 그 사진 add
         btnAddPhots = (FloatingActionButton) findViewById(R.id.btnAddPhots);
@@ -132,7 +176,7 @@ public class PhotoMain extends Activity {
 
                     //ImageView에 배치 --> content_detail LinearLayout을 만들고 배치해야함
                     for (int i = 0; i < cnt; i++) {
-                        myDataset.add(new Photo(photos[i].getBitmap(), photos[i].getPhotoDate(), photos[i].getAddress(), photos[i].getContent()));
+                        myDataset.add(new Photo(photos[i].getBitmap(), photos[i].getPhoto_date(), photos[i].getAddress(), photos[i].getContent()));
                         Collections.sort(myDataset);    //정렬해줘야함
                         mAdapter.notifyDataSetChanged();
                     }
@@ -143,7 +187,7 @@ public class PhotoMain extends Activity {
 
                     setSubject(photo.getAddress().toString());
 
-                    myDataset.add(new Photo(photo.getBitmap(), photo.getPhotoDate(), photo.getAddress(), photo.getContent()));
+                    myDataset.add(new Photo(photo.getBitmap(), photo.getPhoto_date(), photo.getAddress(), photo.getContent()));
                     Collections.sort(myDataset);
                     mAdapter.notifyDataSetChanged();
                 }
@@ -177,8 +221,8 @@ public class PhotoMain extends Activity {
             orig = new ExifInterface(path);
             if(orig.getAttribute(ExifInterface.TAG_GPS_LATITUDE)!=null){ //위도, 경도
                 PhotoGeoDegree geo = new PhotoGeoDegree(orig);
-                photo.setPhotoLatitude(geo.getLatitude());
-                photo.setPhotoLongitude(geo.getLongitude());
+                photo.setPhoto_latitude(geo.getLatitude());
+                photo.setPhoto_longitude(geo.getLongitude());
                 address = getCurrentAddress(photo); //주소로 바꿔주기
                 photo.setAddress(address);
             }else {
@@ -188,9 +232,9 @@ public class PhotoMain extends Activity {
             if(orig.getAttribute(ExifInterface.TAG_DATETIME) !=null){ //시간날짜
                 String datetime = orig.getAttribute(ExifInterface.TAG_DATETIME);
                 Date date = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss").parse(datetime);
-                photo.setPhotoDate(date);
+                photo.setPhoto_date(date);
             }else{
-                photo.setPhotoDate(new Date());
+                photo.setPhoto_date(new Date());
             }
 
             exif = new ExifInterface(path);
@@ -353,7 +397,7 @@ public class PhotoMain extends Activity {
         Geocoder geocoder = new Geocoder(this, Locale.getDefault());
         List<Address> addresses;
         try {
-            addresses = geocoder.getFromLocation(photo.getPhotoLatitude(), photo.getPhotoLongitude(), 1);
+            addresses = geocoder.getFromLocation(photo.getPhoto_latitude(), photo.getPhoto_longitude(), 1);
         } catch (IOException ioException) {
             //네트워크 문제
             Toast.makeText(this, "지오코더 서비스 사용불가", Toast.LENGTH_LONG).show();
@@ -370,5 +414,26 @@ public class PhotoMain extends Activity {
             Address address = addresses.get(0);
             return address.getAddressLine(0).toString();
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        AlertDialog.Builder alert_confirm = new AlertDialog.Builder(PhotoMain.this);
+        alert_confirm.setMessage("작성하신 모든 작업을 취소 하시겠습니까?").setCancelable(false).setPositiveButton("확인",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                }).setNegativeButton("취소",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        return;
+                    }
+                });
+        AlertDialog alert = alert_confirm.create();
+        alert.show();
+        //super.onBackPressed();
     }
 }
