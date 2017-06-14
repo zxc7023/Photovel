@@ -72,6 +72,8 @@ public class PhotoGoogleMap extends AppCompatActivity
             String address = getCurrentAddress(location);
 
             Intent intent = getIntent();
+            intent.putExtra("latitude",chooseLocation.latitude);
+            intent.putExtra("longitude",chooseLocation.longitude);
             intent.putExtra("address",address);
             setResult(RESULT_OK,intent);
 

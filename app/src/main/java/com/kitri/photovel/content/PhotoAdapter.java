@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.kitri.photovel.R;
+import com.kitri.vo.ContentDetail;
 import com.kitri.vo.Photo;
 
 import java.text.ParseException;
@@ -38,7 +39,7 @@ import static android.app.Activity.RESULT_OK;
  */
 
 public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
-    private ArrayList<Photo> mDataset;
+    private ArrayList<ContentDetail> mDataset;
     private RadioButton lastCheckedRB = null;
     private Context mcontext;
     private ViewHolder holder;
@@ -62,7 +63,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
     public PhotoAdapter() {
     }
 
-    public PhotoAdapter(ArrayList<Photo> myDataset, Context mycontext) {
+    public PhotoAdapter(ArrayList<ContentDetail> myDataset, Context mycontext) {
         mDataset = myDataset;
         mcontext = mycontext;
     }
@@ -100,7 +101,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
         this.holder = holder;
         this.position = position;
 
-        final Date date=mDataset.get(position).getPhoto_date();
+        final Date date=mDataset.get(position).getPhoto().getPhoto_date();
         String date2=null;
         try {
             date2 = new SimpleDateFormat("yyyy.MM.dd").format(date);
@@ -113,7 +114,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
         }
 
         //사진
-        holder.ivphoto.setImageBitmap(mDataset.get(position).getBitmap());
+        holder.ivphoto.setImageBitmap(mDataset.get(position).getPhoto().getBitmap());
 
         //날짜
         holder.tvDate.setText(date2);
@@ -124,7 +125,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
                 pa.setPosition(position);
                 pa.setHolder(holder);
 
-                final Date date=mDataset.get(pa.getPosition()).getPhoto_date();
+                final Date date=mDataset.get(pa.getPosition()).getPhoto().getPhoto_date();
                 String date2=null;
                 try {
                     date2 = new SimpleDateFormat("yyyy.MM.dd").format(date);
@@ -141,8 +142,8 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
         });
 
         //위치
-        Log.i("ddd address",mDataset.get(position).getAddress()+"");
-        holder.tvLocation.setText(mDataset.get(position).getAddress());
+        //Log.i("ddd address",mDataset.get(position).getPhoto().getAddress()+"");
+        holder.tvLocation.setText(mDataset.get(position).getPhoto().getAddress());
         holder.tvLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -157,7 +158,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
 
         //컨텐츠
         holder.etContent.setTag(position);
-        holder.etContent.setText(mDataset.get(position).getContent());
+        holder.etContent.setText(mDataset.get(position).getDetail_content());
         holder.etContent.addTextChangedListener(new TextWatcher(){
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -169,7 +170,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
 
             @Override
             public void afterTextChanged(Editable editable) {
-                mDataset.get((int)holder.etContent.getTag()).setContent(editable.toString());
+                mDataset.get((int)holder.etContent.getTag()).setDetail_content(editable.toString());
             }
         });
 
@@ -185,11 +186,18 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
         holder.radioG.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
+                int i=0;
                 RadioButton checked_rb = (RadioButton) group.findViewById(checkedId);
                 checked_rb.setChecked(true);
+                mDataset.get(position).getPhoto().setPhoto_top_flag(i++);
+                Log.i("aaa","position : "+position);
                 if (lastCheckedRB != null) {
                     lastCheckedRB.setChecked(false);
+                    mDataset.get(position).getPhoto().setPhoto_top_flag(i--);
+                    Log.i("aaa","lastCheckedRB : "+lastCheckedRB);
+                    Log.i("aaa","1----------- : ");
                 }
+                Log.i("aaa","2----------- : ");
                 lastCheckedRB = checked_rb;
             }
         });
@@ -197,11 +205,10 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
 
     //구글지도address표시해주기
     public void photoGoogleMapResult(Intent intnet) {
-        /*Locale systemLocale = getResources().getConfiguration().locale;
-        String strLanguage = systemLocale.getLanguage();*/
-
-        mDataset.get(pa.getPosition()).setAddress(intnet.getStringExtra("address"));
-        pa.getHolder().tvLocation.setText(mDataset.get(pa.getPosition()).getAddress());
+        mDataset.get(pa.getPosition()).getPhoto().setPhoto_latitude(intnet.getDoubleExtra("latitude",0));
+        mDataset.get(pa.getPosition()).getPhoto().setPhoto_longitude(intnet.getDoubleExtra("longitude",0));
+        mDataset.get(pa.getPosition()).getPhoto().setAddress(intnet.getStringExtra("address"));
+        pa.getHolder().tvLocation.setText(mDataset.get(pa.getPosition()).getPhoto().getAddress());
     }
 
     //datePicker에서 날짜선택하고 확인
@@ -219,14 +226,19 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
                 strBild.append("0");
             }
             strBild.append(dayOfMonth);
-            String strDate = strBild.toString();
+            String strDate1 = strBild.toString();
+
+            strBild.append(" ");
+            Date temp = new Date();
+            strBild.append(new SimpleDateFormat("hh:mm:ss").format(temp));
+            String strDate2 = strBild.toString();
             try {
-                date = new SimpleDateFormat("yyyy.MM.dd").parse(strDate);
+                date = new SimpleDateFormat("yyyy.MM.dd hh:mm:ss").parse(strDate2);
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            pa.getHolder().tvDate.setText(strDate);
-            mDataset.get(pa.getPosition()).setPhoto_date(date);
+            pa.getHolder().tvDate.setText(strDate1);
+            mDataset.get(pa.getPosition()).getPhoto().setPhoto_date(date);
         }
     };
 

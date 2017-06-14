@@ -32,6 +32,8 @@ import android.widget.Switch;
 import android.widget.Toast;
 
 import com.kitri.photovel.R;
+import com.kitri.vo.Content;
+import com.kitri.vo.ContentDetail;
 import com.kitri.vo.Photo;
 
 import java.io.FileInputStream;
@@ -46,7 +48,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class PhotoMain extends Activity {
-    private Button btnSort, btnAllDelete;
+    private Button btnSort, btnAllDelete, btnPhotoSave;
     private FloatingActionButton  btnAddPhots, btnTop;
     private String path;
     private ExifInterface exif;
@@ -56,13 +58,14 @@ public class PhotoMain extends Activity {
     private RecyclerView mRecyclerView;
     private PhotoAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-    private ArrayList<Photo> myDataset;
+    private ArrayList<ContentDetail> myDataset;
     private String address;
 
     private EditText contentSubject;
     private EditText contentText;
     private int flag = 0;
     private Switch swPrivate;
+    private boolean flagSwitch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,7 +124,8 @@ public class PhotoMain extends Activity {
         swPrivate = (Switch)findViewById(R.id.swPrivate);
         swPrivate.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                Log.i("ddd",""+isChecked);  //true,false
+                //Log.i("ddd",""+isChecked);  //true,false
+                flagSwitch = isChecked;
             }
         });
 
@@ -141,7 +145,8 @@ public class PhotoMain extends Activity {
             }
         });
 
-        btnSort=(Button)findViewById(R.id.btnSort);
+        //정렬버튼
+        btnSort = (Button)findViewById(R.id.btnSort);
         btnSort.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
@@ -149,9 +154,51 @@ public class PhotoMain extends Activity {
                 mAdapter.notifyDataSetChanged();
             }
         });
+
+        //저장버튼
+        btnPhotoSave = (Button)findViewById(R.id.btnPhotoSave);
+        btnPhotoSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder alert_confirm = new AlertDialog.Builder(PhotoMain.this);
+                alert_confirm.setMessage("글을 올리시겠습니까?").setCancelable(false).setPositiveButton("확인",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Log.i("ddd","-------content-------");
+                                Log.i("ddd","content_id : "+1);
+                                Log.i("ddd","Subject : "+contentSubject.getText());
+                                Log.i("ddd","content : "+contentText.getText());
+                                Log.i("ddd","Date : "+new Date().toString());
+                                Log.i("ddd","flagSwitch : "+flagSwitch);
+                                for(int i=0;i<myDataset.size();i++){
+                                    Log.i("ddd","-------content_detail-------");
+                                    Log.i("ddd","content_detail_id : "+i+1);
+                                    Log.i("ddd","getDetail_content : "+myDataset.get(i).getDetail_content());
+                                    Log.i("ddd","-------photo-------");
+                                    Log.i("ddd","getPhoto_file_name : "+1+"_"+(i+1));
+                                    Log.i("ddd","getPhoto_date : "+myDataset.get(i).getPhoto().getPhoto_date());
+                                    Log.i("ddd","getPhoto_latitude : "+myDataset.get(i).getPhoto().getPhoto_latitude());
+                                    Log.i("ddd","getPhoto_longitude : "+myDataset.get(i).getPhoto().getPhoto_longitude());
+                                    Log.i("ddd","getPhoto_top_flag : "+myDataset.get(i).getPhoto().getPhoto_top_flag());
+                                    Log.i("ddd","-------------------");
+                                }
+                            }
+                        }).setNegativeButton("취소",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                return;
+                            }
+                        });
+                AlertDialog alert = alert_confirm.create();
+                alert.show();
+            }
+        });
     }
 
-    //갤러리에서 사진불러오기
+    //requestCode == 1 -> 갤러리에서 사진불러오기
+    //requestCode == 2 -> googlemap에서받아온 주소 apapter로 전달
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && resultCode == RESULT_OK) {
@@ -174,9 +221,10 @@ public class PhotoMain extends Activity {
 
                     setSubject(photos[0].getAddress().toString());
 
-                    //ImageView에 배치 --> content_detail LinearLayout을 만들고 배치해야함
+                    //사진cnt 만큼 recyclerview추가
                     for (int i = 0; i < cnt; i++) {
-                        myDataset.add(new Photo(photos[i].getBitmap(), photos[i].getPhoto_date(), photos[i].getAddress(), photos[i].getContent()));
+                        photos[i].getPhoto_file_name();
+                        myDataset.add(new ContentDetail(photos[i]));
                         Collections.sort(myDataset);    //정렬해줘야함
                         mAdapter.notifyDataSetChanged();
                     }
@@ -187,7 +235,7 @@ public class PhotoMain extends Activity {
 
                     setSubject(photo.getAddress().toString());
 
-                    myDataset.add(new Photo(photo.getBitmap(), photo.getPhoto_date(), photo.getAddress(), photo.getContent()));
+                    myDataset.add(new ContentDetail(photo));
                     Collections.sort(myDataset);
                     mAdapter.notifyDataSetChanged();
                 }
@@ -416,6 +464,7 @@ public class PhotoMain extends Activity {
         }
     }
 
+    //back버튼 설정
     @Override
     public void onBackPressed() {
         AlertDialog.Builder alert_confirm = new AlertDialog.Builder(PhotoMain.this);

@@ -8,7 +8,7 @@ import com.google.maps.android.clustering.ClusterItem;
 
 import java.util.Date;
 
-public class Photo implements Comparable<Photo>, ClusterItem {
+public class Photo implements ClusterItem{
 
     private int content_detail_id;
     private String photo_file_name;
@@ -19,16 +19,8 @@ public class Photo implements Comparable<Photo>, ClusterItem {
     private LatLng position;
     private Bitmap bitmap;
     private String address;
-    private String content;
 
     public Photo() {
-    }
-
-    public Photo(Bitmap bitmap, Date photoDate, String address, String content) {
-        this.bitmap = bitmap;
-        this.photo_date = photoDate;
-        this.address = address;
-        this.content = content;
     }
 
     public Photo(Bitmap bitmap, double latitude, double longitude, String fileName) {
@@ -67,13 +59,6 @@ public class Photo implements Comparable<Photo>, ClusterItem {
 
     public void setAddress(String address) {
         this.address = address;
-    }
-
-    public String getContent() {
-        return content;
-    }
-    public void setContent(String content) {
-        this.content = content;
     }
 
     public String getPhoto_file_name() {
@@ -131,13 +116,6 @@ public class Photo implements Comparable<Photo>, ClusterItem {
         this.photo_date = param.getPhoto_date();
         this.photo_latitude = param.getPhoto_latitude();
         this.photo_longitude = param.getPhoto_longitude();
-    }
-
-    @Override
-    public int compareTo(@NonNull Photo comparePhoto) {
-        Date compareDate = comparePhoto.getPhoto_date();
-        //ascending order
-        return this.photo_date.compareTo(compareDate);
     }
 
 

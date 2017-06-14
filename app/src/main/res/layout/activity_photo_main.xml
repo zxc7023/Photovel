@@ -67,6 +67,7 @@
                     android:fitsSystemWindows="true"
                     >
                     <ImageView
+                        android:id="@+id/btnBack"
                         android:layout_width="40dp"
                         android:layout_height="40dp"
                         android:src="@drawable/ic_back"/>
@@ -88,6 +89,7 @@
                         android:clickable="true"
                         android:text="취소"/>
                     <Button
+                        android:id="@+id/btnPhotoSave"
                         android:layout_width="60dp"
                         android:layout_height="wrap_content"
                         android:clickable="true"
