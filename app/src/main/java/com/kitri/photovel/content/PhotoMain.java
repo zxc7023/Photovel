@@ -16,6 +16,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -40,9 +42,8 @@ import java.util.List;
 import java.util.Locale;
 
 public class PhotoMain extends Activity {
-
-    private LinearLayout iv;
-    private Button btnAddPhots, btnSort;
+    private Button btnSort;
+    private FloatingActionButton  btnAddPhots;
     private String path;
     private ExifInterface exif;
     private static final String TAG = "AppPermission";
@@ -56,17 +57,21 @@ public class PhotoMain extends Activity {
 
     private EditText contentSubject;
     private EditText contentText;
+    private int flag = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_photo_main);
+        setContentView(R.layout.activity_photo_main2);
         checkPermission();
+
+        Intent intent = new Intent(this.getIntent());
+        CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+        collapsingToolbar.setExpandedTitleTextAppearance(R.style.ExpandedAppBar);
+        collapsingToolbar.setCollapsedTitleTextAppearance(R.style.CollapsedAppBar);
 
         contentSubject = (EditText) findViewById(R.id.contentSubject);
         contentText = (EditText) findViewById(R.id.contentText);
-
-        //제목자동완성 해야함
 
         //recycleview사용선언
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
@@ -78,7 +83,7 @@ public class PhotoMain extends Activity {
         mRecyclerView.setAdapter(mAdapter);
 
         //갤러리에서 사진받아와서 그 사진 add
-        btnAddPhots = (Button) findViewById(R.id.btnAddPhots);
+        btnAddPhots = (FloatingActionButton) findViewById(R.id.btnAddPhots);
         btnAddPhots.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -93,10 +98,10 @@ public class PhotoMain extends Activity {
             }
         });
 
-        btnSort = (Button)findViewById(R.id.btnSort);
-        btnSort.setOnClickListener(new View.OnClickListener() {
+        btnSort=(Button)findViewById(R.id.btnSort);
+        btnSort.setOnClickListener(new View.OnClickListener(){
             @Override
-            public void onClick(View view) {
+            public void onClick(View v) {
                 Collections.sort(myDataset);    //정렬해줘야함
                 mAdapter.notifyDataSetChanged();
             }
@@ -124,6 +129,8 @@ public class PhotoMain extends Activity {
                         photos[i] = selectPhoto(uri);
                     }
 
+                    setSubject(photos[0].getAddress().toString());
+
                     //ImageView에 배치 --> content_detail LinearLayout을 만들고 배치해야함
                     for (int i = 0; i < cnt; i++) {
                         myDataset.add(new Photo(photos[i].getBitmap(), photos[i].getPhotoDate(), photos[i].getAddress(), photos[i].getContent()));
@@ -134,12 +141,29 @@ public class PhotoMain extends Activity {
                 }else{  //갤러리에서 사진 한개 클릭시
                     Uri uri = data.getData();   //갤러리에서 선택한 dataUri 받아오기
                     Photo photo = selectPhoto(uri);
+
+                    setSubject(photo.getAddress().toString());
+
                     myDataset.add(new Photo(photo.getBitmap(), photo.getPhotoDate(), photo.getAddress(), photo.getContent()));
                     Collections.sort(myDataset);
                     mAdapter.notifyDataSetChanged();
                 }
+
             }else if(requestCode==2){
                 mAdapter.photoGoogleMapResult(data);
+            }
+        }
+    }
+
+    //처음일때 한번만 제목 정해주기
+    private void setSubject(String address){
+        if(flag == 0){
+            flag = 1;
+            //address중에서 도시만 빼서 넣어줘야함
+            if(address.equals("주소미발견")){
+                contentSubject.setText("땡땡으로의 여행");
+            }else{
+                contentSubject.setText(address+"로의 여행");
             }
         }
     }
