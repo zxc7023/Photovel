@@ -88,7 +88,7 @@ public class PhotoMain extends Activity {
         contentText = (EditText) findViewById(R.id.contentText);
 
         //키보드 컨트롤
-        CoordinatorLayout mainLayout = (CoordinatorLayout)findViewById(R.id.main_content);
+        /*CoordinatorLayout mainLayout = (CoordinatorLayout)findViewById(R.id.main_content);
         InputMethodManager im = (InputMethodManager) getSystemService(Service.INPUT_METHOD_SERVICE);
         final SoftKeyboard softKeyboardDecector = new SoftKeyboard(this);
         addContentView(softKeyboardDecector, new FrameLayout.LayoutParams(-1, -1));
@@ -105,9 +105,7 @@ public class PhotoMain extends Activity {
                 // 키보드 사라질 때
                 btnTop.show();
             }
-        });
-
-
+        });*/
 
         //recycleview사용선언
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
@@ -521,7 +519,6 @@ public class PhotoMain extends Activity {
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-
 
         // Checks whether a hardware keyboard is available
         if (newConfig.hardKeyboardHidden == Configuration.HARDKEYBOARDHIDDEN_NO) {
