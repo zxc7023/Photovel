@@ -34,6 +34,7 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.Toast;
 
@@ -41,6 +42,10 @@ import com.kitri.photovel.R;
 import com.kitri.vo.Content;
 import com.kitri.vo.ContentDetail;
 import com.kitri.vo.Photo;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -56,6 +61,7 @@ import java.util.logging.Handler;
 
 public class PhotoMain extends Activity {
     private Button btnSort, btnAllDelete, btnPhotoSave;
+    private ImageView btnBack;
     private FloatingActionButton  btnAddPhots, btnTop;
     private String path;
     private ExifInterface exif;
@@ -87,26 +93,6 @@ public class PhotoMain extends Activity {
         contentSubject = (EditText) findViewById(R.id.contentSubject);
         contentText = (EditText) findViewById(R.id.contentText);
 
-        //키보드 컨트롤
-        /*CoordinatorLayout mainLayout = (CoordinatorLayout)findViewById(R.id.main_content);
-        InputMethodManager im = (InputMethodManager) getSystemService(Service.INPUT_METHOD_SERVICE);
-        final SoftKeyboard softKeyboardDecector = new SoftKeyboard(this);
-        addContentView(softKeyboardDecector, new FrameLayout.LayoutParams(-1, -1));
-        softKeyboardDecector.setOnShownKeyboard(new SoftKeyboard.OnShownKeyboardListener() {
-            @Override
-            public void onShowSoftKeyboard() {
-                btnTop.hide();
-                //키보드 등장할 때
-            }
-        });
-        softKeyboardDecector.setOnHiddenKeyboard(new SoftKeyboard.OnHiddenKeyboardListener() {
-            @Override
-            public void onHiddenSoftKeyboard() {
-                // 키보드 사라질 때
-                btnTop.show();
-            }
-        });*/
-
         //recycleview사용선언
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         mRecyclerView.setHasFixedSize(true);
@@ -116,7 +102,6 @@ public class PhotoMain extends Activity {
         myDataset = new ArrayList<>();
         mAdapter = new PhotoAdapter(myDataset, PhotoMain.this);
         mRecyclerView.setAdapter(mAdapter);
-
 
         //top버튼
         btnTop = (FloatingActionButton) findViewById(R.id.btnTop);
@@ -141,6 +126,13 @@ public class PhotoMain extends Activity {
         //취소버튼
         btnAllDelete = (Button)findViewById(R.id.btnAllDelete);
         btnAllDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
+        btnBack = (ImageView)findViewById(R.id.btnBack);
+        btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 onBackPressed();
@@ -193,26 +185,66 @@ public class PhotoMain extends Activity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
 
-                                Log.i("ddd","-------content-------");
-                                Log.i("ddd","content_id : "+1);
-                                Log.i("ddd","content_subject : "+contentSubject.getText());
-                                Log.i("ddd","content : "+contentText.getText());
-                                Log.i("ddd","content_written_date : "+new Date().toString());
-                                Log.i("ddd","content_private_flag : "+flagSwitch);  //true,false
-                                for(int i=0;i<myDataset.size();i++){
-                                    Log.i("ddd","-------content_detail-------");
-                                    Log.i("ddd","content_detail_id : "+i+1);
-                                    Log.i("ddd","datail_content : "+myDataset.get(i).getDetail_content());
-                                    Log.i("ddd","-------photo-------");
-                                    Log.i("ddd","photo_file_name : "+1+"_"+(i+1));
-                                    Log.i("ddd","photo_date : "+myDataset.get(i).getPhoto().getPhoto_date());
-                                    Log.i("ddd","photo_latitude : "+myDataset.get(i).getPhoto().getPhoto_latitude());
-                                    Log.i("ddd","photo_longitude : "+myDataset.get(i).getPhoto().getPhoto_longitude());
-                                    myDataset.get(mAdapter.pa2.getPosition()).getPhoto().setPhoto_top_flag(1);
-                                    Log.i("ddd","photo_top_flag : "+myDataset.get(i).getPhoto().getPhoto_top_flag());
-                                    Log.i("ddd","-------------------");
+                                //라디오버튼 선택안했을때
+                                if(mAdapter.pa2==null){
+                                    Toast.makeText(getApplicationContext(),"대표사진을 선택해주세요!",Toast.LENGTH_LONG).show();
+                                    return;
                                 }
 
+                                //완료되는 Content처리
+                                Content resultContent = new Content();
+                                resultContent.setContent_subject(contentSubject.getText().toString());
+                                if(contentText.getText().toString().equals("")){
+                                    resultContent.setContent("");
+                                }else{
+                                    resultContent.setContent(contentText.getText().toString());
+                                }
+                                resultContent.setContent_written_date(new Date());
+                                if(flagSwitch==true){
+                                    resultContent.setContent_private_flag("T");
+                                }else{
+                                    resultContent.setContent_private_flag("F");
+                                }
+                                for(int i=0;i<myDataset.size();i++){
+                                    if(myDataset.get(i).getPhoto().getPhoto_latitude()==0 && myDataset.get(i).getPhoto().getPhoto_longitude()==0){
+                                        //위치 없을때
+                                        Toast.makeText(getApplicationContext(),"위치가 지정되어있지 않은 사진이 있습니다 다시 확인해 주세요!",Toast.LENGTH_LONG).show();
+                                        return;
+                                    }
+                                    myDataset.get(i).setContent_detail_id(i+1);
+                                    if(myDataset.get(i).getDetail_content()==null){
+                                        myDataset.get(i).setDetail_content("");
+                                    }
+                                    myDataset.get(mAdapter.pa2.getPosition()).getPhoto().setPhoto_top_flag(1);
+                                }
+                                resultContent.setDetails(myDataset);
+
+                                //json 처리
+                                JSONObject obj = new JSONObject();  //결과 json
+                                try {
+                                    JSONArray jArray = new JSONArray();
+                                    for(int i=0; i<resultContent.getDetails().size(); i++){
+                                        JSONObject sObject = new JSONObject();  //배열 내에 들어갈 json
+                                        sObject.put("content_detail_id",resultContent.getDetails().get(i).getContent_detail_id());
+                                        sObject.put("datail_content",resultContent.getDetails().get(i).getDetail_content());
+                                        sObject.put("photo_file_name",resultContent.getDetails().get(i).getPhoto().getPhoto_file_name());
+                                        sObject.put("photo_date",resultContent.getDetails().get(i).getPhoto().getPhoto_date());
+                                        sObject.put("photo_latitude",resultContent.getDetails().get(i).getPhoto().getPhoto_latitude());
+                                        sObject.put("photo_longitude",resultContent.getDetails().get(i).getPhoto().getPhoto_longitude());
+                                        sObject.put("photo_top_flag",resultContent.getDetails().get(i).getPhoto().getPhoto_top_flag());
+                                        jArray.put(sObject);
+                                    }
+                                    obj.put("content_subject",resultContent.getContent_subject());
+                                    obj.put("content",resultContent.getContent());
+                                    obj.put("content_written_date",resultContent.getContent_written_date());
+                                    obj.put("content_private_flag",resultContent.getContent_private_flag());
+                                    obj.put("details",jArray);
+
+                                    Log.i("ddd",obj.toString());
+
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
                             }
                         }).setNegativeButton("취소",
                         new DialogInterface.OnClickListener() {
@@ -281,7 +313,7 @@ public class PhotoMain extends Activity {
         if(flag == 0){
             flag = 1;
             //address중에서 도시만 빼서 넣어줘야함
-            if(address.equals("주소미발견")){
+            if(address.equals("주소 미확인")){
                 contentSubject.setText("땡땡으로의 여행");
             }else{
                 contentSubject.setText(address+"로의 여행");
@@ -304,7 +336,7 @@ public class PhotoMain extends Activity {
                 address = getCurrentAddress(photo); //주소로 바꿔주기
                 photo.setAddress(address);
             }else {
-                photo.setAddress("주소미발견");
+                photo.setAddress("주소 미확인");
             }
 
             if(orig.getAttribute(ExifInterface.TAG_DATETIME) !=null){ //시간날짜
@@ -514,17 +546,5 @@ public class PhotoMain extends Activity {
         AlertDialog alert = alert_confirm.create();
         alert.show();
         //super.onBackPressed();
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-
-        // Checks whether a hardware keyboard is available
-        if (newConfig.hardKeyboardHidden == Configuration.HARDKEYBOARDHIDDEN_NO) {
-            Toast.makeText(this, "keyboard visible", Toast.LENGTH_SHORT).show();
-        } else if (newConfig.hardKeyboardHidden == Configuration.HARDKEYBOARDHIDDEN_YES) {
-            Toast.makeText(this, "keyboard hidden", Toast.LENGTH_SHORT).show();
-        }
     }
 }
