@@ -3,10 +3,12 @@ package com.kitri.photovel.content;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.Service;
 import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -16,8 +18,10 @@ import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AlertDialog;
@@ -25,9 +29,11 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.Switch;
 import android.widget.Toast;
 
@@ -46,6 +52,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.logging.Handler;
 
 public class PhotoMain extends Activity {
     private Button btnSort, btnAllDelete, btnPhotoSave;
@@ -61,8 +68,7 @@ public class PhotoMain extends Activity {
     private ArrayList<ContentDetail> myDataset;
     private String address;
 
-    private EditText contentSubject;
-    private EditText contentText;
+    private EditText contentSubject, contentText;
     private int flag = 0;
     private Switch swPrivate;
     private boolean flagSwitch;
@@ -81,6 +87,28 @@ public class PhotoMain extends Activity {
         contentSubject = (EditText) findViewById(R.id.contentSubject);
         contentText = (EditText) findViewById(R.id.contentText);
 
+        //키보드 컨트롤
+        CoordinatorLayout mainLayout = (CoordinatorLayout)findViewById(R.id.main_content);
+        InputMethodManager im = (InputMethodManager) getSystemService(Service.INPUT_METHOD_SERVICE);
+        final SoftKeyboard softKeyboardDecector = new SoftKeyboard(this);
+        addContentView(softKeyboardDecector, new FrameLayout.LayoutParams(-1, -1));
+        softKeyboardDecector.setOnShownKeyboard(new SoftKeyboard.OnShownKeyboardListener() {
+            @Override
+            public void onShowSoftKeyboard() {
+                btnTop.hide();
+                //키보드 등장할 때
+            }
+        });
+        softKeyboardDecector.setOnHiddenKeyboard(new SoftKeyboard.OnHiddenKeyboardListener() {
+            @Override
+            public void onHiddenSoftKeyboard() {
+                // 키보드 사라질 때
+                btnTop.show();
+            }
+        });
+
+
+
         //recycleview사용선언
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         mRecyclerView.setHasFixedSize(true);
@@ -90,6 +118,7 @@ public class PhotoMain extends Activity {
         myDataset = new ArrayList<>();
         mAdapter = new PhotoAdapter(myDataset, PhotoMain.this);
         mRecyclerView.setAdapter(mAdapter);
+
 
         //top버튼
         btnTop = (FloatingActionButton) findViewById(R.id.btnTop);
@@ -165,24 +194,27 @@ public class PhotoMain extends Activity {
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+
                                 Log.i("ddd","-------content-------");
                                 Log.i("ddd","content_id : "+1);
-                                Log.i("ddd","Subject : "+contentSubject.getText());
+                                Log.i("ddd","content_subject : "+contentSubject.getText());
                                 Log.i("ddd","content : "+contentText.getText());
-                                Log.i("ddd","Date : "+new Date().toString());
-                                Log.i("ddd","flagSwitch : "+flagSwitch);
+                                Log.i("ddd","content_written_date : "+new Date().toString());
+                                Log.i("ddd","content_private_flag : "+flagSwitch);  //true,false
                                 for(int i=0;i<myDataset.size();i++){
                                     Log.i("ddd","-------content_detail-------");
                                     Log.i("ddd","content_detail_id : "+i+1);
-                                    Log.i("ddd","getDetail_content : "+myDataset.get(i).getDetail_content());
+                                    Log.i("ddd","datail_content : "+myDataset.get(i).getDetail_content());
                                     Log.i("ddd","-------photo-------");
-                                    Log.i("ddd","getPhoto_file_name : "+1+"_"+(i+1));
-                                    Log.i("ddd","getPhoto_date : "+myDataset.get(i).getPhoto().getPhoto_date());
-                                    Log.i("ddd","getPhoto_latitude : "+myDataset.get(i).getPhoto().getPhoto_latitude());
-                                    Log.i("ddd","getPhoto_longitude : "+myDataset.get(i).getPhoto().getPhoto_longitude());
-                                    Log.i("ddd","getPhoto_top_flag : "+myDataset.get(i).getPhoto().getPhoto_top_flag());
+                                    Log.i("ddd","photo_file_name : "+1+"_"+(i+1));
+                                    Log.i("ddd","photo_date : "+myDataset.get(i).getPhoto().getPhoto_date());
+                                    Log.i("ddd","photo_latitude : "+myDataset.get(i).getPhoto().getPhoto_latitude());
+                                    Log.i("ddd","photo_longitude : "+myDataset.get(i).getPhoto().getPhoto_longitude());
+                                    myDataset.get(mAdapter.pa2.getPosition()).getPhoto().setPhoto_top_flag(1);
+                                    Log.i("ddd","photo_top_flag : "+myDataset.get(i).getPhoto().getPhoto_top_flag());
                                     Log.i("ddd","-------------------");
                                 }
+
                             }
                         }).setNegativeButton("취소",
                         new DialogInterface.OnClickListener() {
@@ -484,5 +516,18 @@ public class PhotoMain extends Activity {
         AlertDialog alert = alert_confirm.create();
         alert.show();
         //super.onBackPressed();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+
+        // Checks whether a hardware keyboard is available
+        if (newConfig.hardKeyboardHidden == Configuration.HARDKEYBOARDHIDDEN_NO) {
+            Toast.makeText(this, "keyboard visible", Toast.LENGTH_SHORT).show();
+        } else if (newConfig.hardKeyboardHidden == Configuration.HARDKEYBOARDHIDDEN_YES) {
+            Toast.makeText(this, "keyboard hidden", Toast.LENGTH_SHORT).show();
+        }
     }
 }
