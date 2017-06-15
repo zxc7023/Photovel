@@ -73,6 +73,7 @@ public class PhotoMain extends Activity {
     private Switch swPrivate;
     private boolean flagSwitch;
 
+    //style사라짐
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
