@@ -43,8 +43,8 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
     private RadioButton lastCheckedRB = null;
     private Context mcontext;
     private ViewHolder holder;
-    private int myear, mmonth, mday, position, a = 0;
-    PhotoAdapter pa = null;
+    private int myear, mmonth, mday, position, temp=-1, flag=1, i=0;
+    PhotoAdapter pa = null, pa2 = null;
 
     public int getPosition() {
         return position;
@@ -186,18 +186,27 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
         holder.radioG.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                int i=0;
+                pa2 = new PhotoAdapter();
                 RadioButton checked_rb = (RadioButton) group.findViewById(checkedId);
                 checked_rb.setChecked(true);
-                mDataset.get(position).getPhoto().setPhoto_top_flag(i++);
-                Log.i("aaa","position : "+position);
-                if (lastCheckedRB != null) {
-                    lastCheckedRB.setChecked(false);
-                    mDataset.get(position).getPhoto().setPhoto_top_flag(i--);
-                    Log.i("aaa","lastCheckedRB : "+lastCheckedRB);
-                    Log.i("aaa","1----------- : ");
+                if(flag==1) {
+                    temp = position;
                 }
-                Log.i("aaa","2----------- : ");
+                if (lastCheckedRB != null) {
+                    if(temp == position){
+                        pa2.setPosition(position);
+                        flag=0;
+                        i++;
+                        if(i==2){
+                            flag=1;
+                            i=0;
+                        }
+                    }else{
+                        flag=1;
+                        i--;
+                    }
+                    lastCheckedRB.setChecked(false);
+                }
                 lastCheckedRB = checked_rb;
             }
         });
