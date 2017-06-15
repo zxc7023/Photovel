@@ -84,7 +84,7 @@ public class ClusterTest
     public boolean onClusterClick(Cluster<Photo> cluster) {
         // Show a toast with some info when the cluster is clicked.
 
-        String firstName = cluster.getItems().iterator().next().getPhotoFileName();
+        String firstName = cluster.getItems().iterator().next().getPhoto_file_name();
         Toast.makeText(this, cluster.getSize() + " (including " + firstName + ")", Toast.LENGTH_SHORT).show();
 
         // Zoom in the cluster. Need to create LatLngBounds and including all the cluster items
@@ -136,7 +136,7 @@ public class ClusterTest
     @Override
     public boolean onClusterItemClick(final Photo photo) {
         // Does nothing, but you could go into the user's profile page, for example.
-        Toast.makeText(this, photo.getPhotoFileName()+"이 선택되었습니다.", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, photo.getPhoto_file_name()+"이 선택되었습니다.", Toast.LENGTH_SHORT).show();
         mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
             @Override
             public View getInfoWindow(Marker marker) {
