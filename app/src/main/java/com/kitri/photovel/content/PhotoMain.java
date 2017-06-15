@@ -516,7 +516,7 @@ public class PhotoMain extends Activity {
         //super.onBackPressed();
     }
 
-    @Override
+    /*@Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
 
@@ -526,5 +526,5 @@ public class PhotoMain extends Activity {
         } else if (newConfig.hardKeyboardHidden == Configuration.HARDKEYBOARDHIDDEN_YES) {
             Toast.makeText(this, "keyboard hidden", Toast.LENGTH_SHORT).show();
         }
-    }
+    }*/
 }
