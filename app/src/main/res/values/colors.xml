@@ -5,7 +5,9 @@
     <color name="colorAccent">#4493f8</color>
 
     <!-- 백그라운드 -->
+    <color name="bgWhite">#ffffff</color>
     <color name="bgGrey">#f5f5f5</color>
+    <color name="bgGrey2">#d8d8d8</color>
     <color name="bgDarkGrey">#BF32353e</color>
     <color name="bgBlackAlpha">#4D000000</color>
     <color name="bgprofileBeige">#fcf3ee</color>

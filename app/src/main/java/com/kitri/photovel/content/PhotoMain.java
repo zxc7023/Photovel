@@ -39,6 +39,7 @@ import android.widget.Switch;
 import android.widget.Toast;
 
 import com.kitri.photovel.R;
+import com.kitri.photovel.http.value;
 import com.kitri.vo.Content;
 import com.kitri.vo.ContentDetail;
 import com.kitri.vo.Photo;
@@ -47,9 +48,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -67,6 +74,7 @@ public class PhotoMain extends Activity {
     private ExifInterface exif;
     private static final String TAG = "AppPermission";
     private final int MY_PERMISSION_REQUEST_STORAGE = 100;
+    private final String photoURL = value.photoURL;
 
     private RecyclerView mRecyclerView;
     private PhotoAdapter mAdapter;
@@ -211,7 +219,6 @@ public class PhotoMain extends Activity {
                                         Toast.makeText(getApplicationContext(),"위치가 지정되어있지 않은 사진이 있습니다 다시 확인해 주세요!",Toast.LENGTH_LONG).show();
                                         return;
                                     }
-                                    myDataset.get(i).setContent_detail_id(i+1);
                                     if(myDataset.get(i).getDetail_content()==null){
                                         myDataset.get(i).setDetail_content("");
                                     }
@@ -220,18 +227,18 @@ public class PhotoMain extends Activity {
                                 resultContent.setDetails(myDataset);
 
                                 //json 처리
-                                JSONObject obj = new JSONObject();  //결과 json
+                                final JSONObject obj = new JSONObject();  //결과 json
                                 try {
                                     JSONArray jArray = new JSONArray();
                                     for(int i=0; i<resultContent.getDetails().size(); i++){
                                         JSONObject sObject = new JSONObject();  //배열 내에 들어갈 json
                                         sObject.put("content_detail_id",resultContent.getDetails().get(i).getContent_detail_id());
                                         sObject.put("datail_content",resultContent.getDetails().get(i).getDetail_content());
-                                        sObject.put("photo_file_name",resultContent.getDetails().get(i).getPhoto().getPhoto_file_name());
-                                        sObject.put("photo_date",resultContent.getDetails().get(i).getPhoto().getPhoto_date());
+                                        sObject.put("photo",resultContent.getDetails().get(i).getPhoto());
+                                        /*sObject.put("photo_date",resultContent.getDetails().get(i).getPhoto().getPhoto_date());
                                         sObject.put("photo_latitude",resultContent.getDetails().get(i).getPhoto().getPhoto_latitude());
                                         sObject.put("photo_longitude",resultContent.getDetails().get(i).getPhoto().getPhoto_longitude());
-                                        sObject.put("photo_top_flag",resultContent.getDetails().get(i).getPhoto().getPhoto_top_flag());
+                                        sObject.put("photo_top_flag",resultContent.getDetails().get(i).getPhoto().getPhoto_top_flag());*/
                                         jArray.put(sObject);
                                     }
                                     obj.put("content_subject",resultContent.getContent_subject());
@@ -242,6 +249,50 @@ public class PhotoMain extends Activity {
 
                                     Log.i("ddd",obj.toString());
 
+                                    new Thread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            HttpURLConnection conn = null;
+                                            //String url = photoURL;
+                                            String url = "http://192.168.12.197:8080/content/photo";
+                                            try{
+                                                URL strUrl = new URL(url);
+                                                conn = (HttpURLConnection) strUrl.openConnection();
+                                                //conn.setDoInput(true);    //서버로부터 결과값을 응답받음
+                                                conn.setDoOutput(true);     //서버로 값을 출력
+                                                conn.setRequestMethod("POST");
+                                                conn.setRequestProperty("Cache-Control","no-cache");
+                                                conn.setRequestProperty("Content-Type","application/json");
+                                                conn.setRequestProperty("Accept","application/json");
+
+                                                OutputStream os = conn.getOutputStream();
+                                                os.write(obj.toString().getBytes());
+                                                os.flush();
+                                          /*      BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+                                                bw.write(String.valueOf(obj.toString().getBytes()));
+                                                bw.flush();
+                                                bw.close();*/
+
+                                                final int responseCode =  conn.getResponseCode();
+                                                switch (responseCode){
+                                                    case HttpURLConnection.HTTP_OK:
+                                                        Log.i("status","정상");
+
+                                                        break;
+                                                    default:
+                                                        Log.i("status","비정상");
+                                                        Log.i("status",responseCode+"");
+                                                        break;
+                                                }
+                                            }catch (MalformedURLException e) {
+                                                e.printStackTrace();
+                                            } catch (IOException e) {
+                                                e.printStackTrace();
+                                            } finally {
+                                                conn.disconnect();
+                                            }
+                                        }
+                                    }).start();
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
