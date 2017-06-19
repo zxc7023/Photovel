@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="fa_icon_trash">&#xf014;</string>
+    <string name="fa_icon_pen">&#xf040;</string>
+    <string name="fa_icon_marker">&#xf041;</string>
+</resources>

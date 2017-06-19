@@ -3,7 +3,6 @@ package com.kitri.vo;
 import java.util.Date;
 import java.util.List;
 
-
 public class Content {
 	private int content_id;
 	private String content_subject;
@@ -16,12 +15,24 @@ public class Content {
 	private int good_count;
 	private int comment_count;
 	private int content_detail_count;
+	private String photo_file_name;
 	private User user;
 	private Advertisement ad;
 	private List<Comment> comments;
 	private List<ContentDetail> details;
 	
-	
+	public String getPhoto_file_name() {
+		return photo_file_name;
+	}
+	public void setPhoto_file_name(String photo_file_name) {
+		this.photo_file_name = photo_file_name;
+	}
+	public Advertisement getAd() {
+		return ad;
+	}
+	public void setAd(Advertisement ad) {
+		this.ad = ad;
+	}
 	public int getContent_id() {
 		return content_id;
 	}
@@ -94,12 +105,6 @@ public class Content {
 	public void setUser(User user) {
 		this.user = user;
 	}
-	public Advertisement getad() {
-		return ad;
-	}
-	public void setad(Advertisement ad) {
-		this.ad = ad;
-	}
 	public List<Comment> getComments() {
 		return comments;
 	}
@@ -118,8 +123,10 @@ public class Content {
 				+ ", content_written_date=" + content_written_date + ", content_private_flag=" + content_private_flag
 				+ ", content_delete_status=" + content_delete_status + ", content_warning_status="
 				+ content_warning_status + ", content_share_count=" + content_share_count + ", good_count=" + good_count
-				+ ", comment_count=" + comment_count + ", content_detail_count=" + content_detail_count + ", user="
-				+ user + ", ad=" + ad + ", comments=" + comments + ", details=" + details + "]";
+				+ ", comment_count=" + comment_count + ", content_detail_count=" + content_detail_count
+				+ ", photo_file_name=" + photo_file_name + ", user=" + user + ", ad=" + ad + ", comments=" + comments
+				+ ", details=" + details + "]";
 	}
+	
 	
 }

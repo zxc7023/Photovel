@@ -32,8 +32,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".content.ClusterTest" />
-        <activity android:name=".content.PhotoMain" />
-        <activity android:name=".content.PhotoGoogleMap"/>
+        <activity android:name=".content.ContentInsertMain" />
+        <activity android:name=".content.ContentInsertGoogleMap"/>
     </application>
 
 </manifest>

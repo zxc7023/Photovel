@@ -4,14 +4,13 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -19,32 +18,26 @@ import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.kitri.photovel.R;
 import com.kitri.vo.ContentDetail;
-import com.kitri.vo.Photo;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Locale;
-
-import static android.app.Activity.RESULT_OK;
 
 /**
  * Created by HARA on 2017-06-07.
  */
 
-public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
+public class ContentInsertAdapter extends RecyclerView.Adapter<ContentInsertAdapter.ViewHolder>{
     private ArrayList<ContentDetail> mDataset;
     private RadioButton lastCheckedRB = null;
     private Context mcontext;
     private ViewHolder holder;
     private int myear, mmonth, mday, position, temp=-1, flag=1, i=0;
-    PhotoAdapter pa = null, pa2 = null;
+    ContentInsertAdapter pa = null, pa2 = null;
 
     public int getPosition() {
         return position;
@@ -60,10 +53,10 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
         this.holder = holder;
     }
 
-    public PhotoAdapter() {
+    public ContentInsertAdapter() {
     }
 
-    public PhotoAdapter(ArrayList<ContentDetail> myDataset, Context mycontext) {
+    public ContentInsertAdapter(ArrayList<ContentDetail> myDataset, Context mycontext) {
         mDataset = myDataset;
         mcontext = mycontext;
     }
@@ -75,6 +68,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
         public RadioGroup radioG;
         public RadioButton btnRadio;
         public EditText etContent;
+        public TextView icmarker, ictrash, icpen1, icpen2;
 
         public ViewHolder(View view) {
             super(view);
@@ -85,13 +79,41 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
             radioG = (RadioGroup) view.findViewById(R.id.radioG);
             btnRadio = (RadioButton) view.findViewById(R.id.btnRadio);
             etContent = (EditText) view.findViewById(R.id.etContent);
+            etContent.addTextChangedListener(new TextWatcher() {    //5줄로제한하기
+                String previousString = "";
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count)
+                {
+                }
+
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after)
+                {
+                    previousString= s.toString();
+                }
+
+                @Override
+                public void afterTextChanged(Editable s)
+                {
+                    if (etContent.getLineCount() >= 6)
+                    {
+                        etContent.setText(previousString);
+                        etContent.setSelection(etContent.length());
+                    }
+                }
+            });
+            icmarker = (TextView) view.findViewById(R.id.icmarker);
+            ictrash = (TextView) view.findViewById(R.id.ictrash);
+            icpen1 = (TextView) view.findViewById(R.id.icpen1);
+            icpen2 = (TextView) view.findViewById(R.id.icpen2);
         }
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // create a new view
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_photo_list_adapter, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_content_insert_list_adapter, parent, false);
         ViewHolder vh = new ViewHolder(v);
         return vh;
     }
@@ -100,6 +122,13 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         this.holder = holder;
         this.position = position;
+
+        //imageView를 font로 바꿔주기
+        Typeface fontAwesomeFont = Typeface.createFromAsset(mcontext.getAssets(), "fontawesome-webfont.ttf");
+        holder.icmarker.setTypeface(fontAwesomeFont);
+        holder.ictrash.setTypeface(fontAwesomeFont);
+        holder.icpen1.setTypeface(fontAwesomeFont);
+        holder.icpen2.setTypeface(fontAwesomeFont);
 
         final Date date=mDataset.get(position).getPhoto().getPhoto_date();
         String date2=null;
@@ -121,7 +150,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
         holder.tvDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                pa = new PhotoAdapter();
+                pa = new ContentInsertAdapter();
                 pa.setPosition(position);
                 pa.setHolder(holder);
 
@@ -147,10 +176,10 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
         holder.tvLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                pa = new PhotoAdapter();
+                pa = new ContentInsertAdapter();
                 pa.setPosition(position);
                 pa.setHolder(holder);
-                Intent intent=new Intent(mcontext, PhotoGoogleMap.class);
+                Intent intent=new Intent(mcontext, ContentInsertGoogleMap.class);
                 //"주소 미확인"이 아닐시 주소 보내줘서 그 위치 켜지게 만들기
                 ((Activity)mcontext).startActivityForResult(intent,2);
             }
@@ -186,7 +215,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
         holder.radioG.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                pa2 = new PhotoAdapter();
+                pa2 = new ContentInsertAdapter();
                 RadioButton checked_rb = (RadioButton) group.findViewById(checkedId);
                 checked_rb.setChecked(true);
                 if(flag==1) {

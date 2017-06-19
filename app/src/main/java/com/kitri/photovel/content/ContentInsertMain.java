@@ -3,37 +3,34 @@ package com.kitri.photovel.content;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.Service;
 import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.graphics.Typeface;
 import android.location.Address;
 import android.location.Geocoder;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Looper;
 import android.provider.MediaStore;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.Toast;
@@ -48,12 +45,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -64,10 +59,9 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.logging.Handler;
 
-public class PhotoMain extends Activity {
-    private Button btnSort, btnAllDelete, btnPhotoSave;
+public class ContentInsertMain extends Activity {
+    private Button btnSort, btnPhotoSave;
     private ImageView btnBack;
     private FloatingActionButton  btnAddPhots, btnTop;
     private String path;
@@ -77,7 +71,7 @@ public class PhotoMain extends Activity {
     private final String photoURL = value.photoURL;
 
     private RecyclerView mRecyclerView;
-    private PhotoAdapter mAdapter;
+    private ContentInsertAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private ArrayList<ContentDetail> myDataset;
     private String address;
@@ -90,7 +84,7 @@ public class PhotoMain extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_photo_main);
+        setContentView(R.layout.activity_content_insert_main);
         checkPermission();
 
         Intent intent = new Intent(this.getIntent());
@@ -100,6 +94,30 @@ public class PhotoMain extends Activity {
 
         contentSubject = (EditText) findViewById(R.id.contentSubject);
         contentText = (EditText) findViewById(R.id.contentText);
+        contentText.addTextChangedListener(new TextWatcher() {  //5줄로 제한하기
+            String previousString = "";
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count)
+            {
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after)
+            {
+                previousString= s.toString();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s)
+            {
+                if (contentText.getLineCount() >= 6)
+                {
+                    contentText.setText(previousString);
+                    contentText.setSelection(contentText.length());
+                }
+            }
+        });
 
         //recycleview사용선언
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
@@ -108,7 +126,7 @@ public class PhotoMain extends Activity {
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setNestedScrollingEnabled(false);
         myDataset = new ArrayList<>();
-        mAdapter = new PhotoAdapter(myDataset, PhotoMain.this);
+        mAdapter = new ContentInsertAdapter(myDataset, ContentInsertMain.this);
         mRecyclerView.setAdapter(mAdapter);
 
         //top버튼
@@ -132,13 +150,6 @@ public class PhotoMain extends Activity {
         });
 
         //취소버튼
-        btnAllDelete = (Button)findViewById(R.id.btnAllDelete);
-        btnAllDelete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onBackPressed();
-            }
-        });
         btnBack = (ImageView)findViewById(R.id.btnBack);
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -187,7 +198,7 @@ public class PhotoMain extends Activity {
         btnPhotoSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AlertDialog.Builder alert_confirm = new AlertDialog.Builder(PhotoMain.this);
+                AlertDialog.Builder alert_confirm = new AlertDialog.Builder(ContentInsertMain.this);
                 alert_confirm.setMessage("글을 올리시겠습니까?").setCancelable(false).setPositiveButton("확인",
                         new DialogInterface.OnClickListener() {
                             @Override
@@ -232,13 +243,13 @@ public class PhotoMain extends Activity {
                                     JSONArray jArray = new JSONArray();
                                     for(int i=0; i<resultContent.getDetails().size(); i++){
                                         JSONObject sObject = new JSONObject();  //배열 내에 들어갈 json
-                                        sObject.put("content_detail_id",resultContent.getDetails().get(i).getContent_detail_id());
                                         sObject.put("datail_content",resultContent.getDetails().get(i).getDetail_content());
-                                        sObject.put("photo",resultContent.getDetails().get(i).getPhoto());
-                                        /*sObject.put("photo_date",resultContent.getDetails().get(i).getPhoto().getPhoto_date());
-                                        sObject.put("photo_latitude",resultContent.getDetails().get(i).getPhoto().getPhoto_latitude());
-                                        sObject.put("photo_longitude",resultContent.getDetails().get(i).getPhoto().getPhoto_longitude());
-                                        sObject.put("photo_top_flag",resultContent.getDetails().get(i).getPhoto().getPhoto_top_flag());*/
+                                        JSONObject sbObject = new JSONObject();
+                                        sbObject.put("photo_date",resultContent.getDetails().get(i).getPhoto().getPhoto_date());
+                                        sbObject.put("photo_latitude",resultContent.getDetails().get(i).getPhoto().getPhoto_latitude());
+                                        sbObject.put("photo_longitude",resultContent.getDetails().get(i).getPhoto().getPhoto_longitude());
+                                        sbObject.put("photo_top_flag",resultContent.getDetails().get(i).getPhoto().getPhoto_top_flag());
+                                        sObject.put("photo",sbObject);
                                         jArray.put(sObject);
                                     }
                                     obj.put("content_subject",resultContent.getContent_subject());
@@ -580,7 +591,7 @@ public class PhotoMain extends Activity {
     //back버튼 설정
     @Override
     public void onBackPressed() {
-        AlertDialog.Builder alert_confirm = new AlertDialog.Builder(PhotoMain.this);
+        AlertDialog.Builder alert_confirm = new AlertDialog.Builder(ContentInsertMain.this);
         alert_confirm.setMessage("작성하신 모든 작업을 취소 하시겠습니까?").setCancelable(false).setPositiveButton("확인",
                 new DialogInterface.OnClickListener() {
                     @Override

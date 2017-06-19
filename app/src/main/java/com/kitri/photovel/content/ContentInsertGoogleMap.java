@@ -1,6 +1,5 @@
 package com.kitri.photovel.content;
 
-import android.*;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.DialogInterface;
@@ -14,8 +13,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -31,9 +28,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.Places;
-import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
-import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -53,7 +48,7 @@ import java.util.Locale;
  * Created by Junki on 2017-06-11.
  */
 
-public class PhotoGoogleMap extends AppCompatActivity
+public class ContentInsertGoogleMap extends AppCompatActivity
         implements OnMapReadyCallback/*맵이 동기화 될때까지 기다려줌*/
         , GoogleApiClient.ConnectionCallbacks /*GoogleApiClient.connect()를 호출하면 자동으로 호출될 메소드를 정의*/
         , GoogleApiClient.OnConnectionFailedListener/*연결이 끊겼을때 호출할 메소드를 정의 */
@@ -145,7 +140,7 @@ public class PhotoGoogleMap extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_photo_googlemap);
+        setContentView(R.layout.activity_content_insert_googlemap);
 
 
         //현재 액티비티의 컨텍스트를 받아오기 위함.
@@ -313,7 +308,7 @@ public class PhotoGoogleMap extends AppCompatActivity
      */
     private void showDialogForLocationServiceSetting() {
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(PhotoGoogleMap.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(ContentInsertGoogleMap.this);
         builder.setTitle("위치 서비스 비활성화");
         builder.setMessage("앱을 사용하기 위해서는 위치 서비스가 필요합니다.\n"
                 + "위치 설정을 수정하실래요?");
@@ -375,7 +370,7 @@ public class PhotoGoogleMap extends AppCompatActivity
     @TargetApi(Build.VERSION_CODES.M)
     private void showDialogForPermission(String msg) {
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(PhotoGoogleMap.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(ContentInsertGoogleMap.this);
         builder.setTitle("알림");
         builder.setMessage(msg);
         builder.setCancelable(false);
@@ -402,7 +397,7 @@ public class PhotoGoogleMap extends AppCompatActivity
      */
     private void showDialogForPermissionSetting(String msg) {
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(PhotoGoogleMap.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(ContentInsertGoogleMap.this);
         builder.setTitle("알림");
         builder.setMessage(msg);
         builder.setCancelable(true);
