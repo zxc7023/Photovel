@@ -34,6 +34,7 @@
         <activity android:name=".content.ClusterTest" />
         <activity android:name=".content.ContentInsertMain" />
         <activity android:name=".content.ContentInsertGoogleMap"/>
+        <activity android:name=".content.SlideShow"/>
     </application>
 
 </manifest>
