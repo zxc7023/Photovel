@@ -22,4 +22,10 @@
         android:id="@+id/photoTest"
         android:text="photoTest" />
 
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/slideShowTest"
+        android:text="slideShowTest"/>
+
 </LinearLayout>

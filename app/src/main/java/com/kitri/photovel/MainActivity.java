@@ -18,6 +18,7 @@ import android.widget.Button;
 
 import com.kitri.photovel.content.ClusterTest;
 import com.kitri.photovel.content.ContentInsertMain;
+import com.kitri.photovel.content.SlideShow;
 
 import java.util.HashMap;
 import java.util.Set;
@@ -57,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         HashMap<Integer,Class> map = new HashMap<>();
         map.put(R.id.clusterTest, ClusterTest.class);
         map.put(R.id.photoTest,ContentInsertMain.class);
+        map.put(R.id.slideShowTest, SlideShow.class);
         Set<Integer> keys = map.keySet();
         //주석입니다.
         for(int key: keys){
