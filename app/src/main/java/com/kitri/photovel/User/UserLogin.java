@@ -1,4 +1,4 @@
-package com.kitri.photovel.User;
+package com.kitri.photovel.user;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;

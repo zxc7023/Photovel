@@ -11,22 +11,28 @@
     tools:context="com.kitri.photovel.MainActivity">
 
     <Button
-        android:layout_width="368dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/clusterTest"
         android:text="clusterTest" />
 
     <Button
-        android:layout_width="368dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/contentInsert"
         android:text="contentInsert" />
 
     <Button
-        android:layout_width="368dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/contentUpdate"
         android:text="contentUpdate" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/photoTest"
+        android:text="photoTest" />
 
     <Button
         android:layout_width="match_parent"
