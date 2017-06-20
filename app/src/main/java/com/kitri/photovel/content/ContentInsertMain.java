@@ -299,14 +299,14 @@ public class ContentInsertMain extends Activity {
                                                 conn.setRequestProperty("Content-Type","multipart/form-data;boundary=" + boundary);
                                                 dos = new DataOutputStream(conn.getOutputStream());
 
-                                                dos.writeBytes("\r\n--" + boundary + "\r\n");
-                                                dos.writeBytes("Content-Disposition: form-data; name=\"content\"\r\n\r\n"+ URLEncoder.encode(obj.toString(),"UTF-8"));
+                                                dos.writeBytes(lineEnd + twoHyphens + boundary + lineEnd);
+                                                dos.writeBytes("Content-Disposition: form-data; name=\"content\""+lineEnd+lineEnd+ URLEncoder.encode(obj.toString(),"UTF-8"));
                                                 //dos.writeBytes("Content-Type: application/json;charset=\"UTF-8\"\r\n\r\n");
 
                                                 for(int i=0; i < tmp.size(); i++){
-                                                    dos.writeBytes("\r\n--" + boundary + "\r\n");
-                                                    dos.writeBytes("Content-Disposition: form-data; name=\"uploadFile\"; filename=\"uploadFile\"\r\n");
-                                                    dos.writeBytes("Content-Type: image/jpg\r\n\r\n");
+                                                    dos.writeBytes(lineEnd + twoHyphens + boundary + lineEnd);
+                                                    dos.writeBytes("Content-Disposition: form-data; name=\"uploadFile\"; filename=\"uploadFile\""+lineEnd);
+                                                    dos.writeBytes("Content-Type: image/jpg"+lineEnd+lineEnd);
                                                     /*dos.writeBytes("Content-Type: application/octet-stream\r\n\r\n");*/
 
                                                     ByteArrayOutputStream outPutStream = new ByteArrayOutputStream();
@@ -330,7 +330,7 @@ public class ContentInsertMain extends Activity {
                                                 }
 
 
-                                                dos.writeBytes("\r\n--" + boundary + "--\r\n");
+                                                dos.writeBytes(lineEnd + twoHyphens + boundary + twoHyphens + lineEnd);
                                                 dos.flush();
 
                                                 int responseCode = conn.getResponseCode();
