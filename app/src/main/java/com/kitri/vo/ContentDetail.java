@@ -17,6 +17,9 @@ public class ContentDetail implements Comparable<ContentDetail> {
 	public ContentDetail(){
 	}
 
+	public ContentDetail(){
+
+	}
 	public ContentDetail(Photo photo) {
 		this.photo = photo;
 	}

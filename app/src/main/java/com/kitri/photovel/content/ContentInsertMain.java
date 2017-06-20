@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.ClipData;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -47,13 +48,18 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -62,11 +68,17 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutionException;
 
 public class ContentInsertMain extends FontActivity{
     private Button btnSort, btnPhotoSave;
+<<<<<<< HEAD
     private TextView btnBack;
     private FloatingActionButton  btnAddPhots, btnTop;
+=======
+    private ImageView btnBack;
+    private FloatingActionButton btnAddPhots, btnTop;
+>>>>>>> 2ffa535b58b5c308de2ec1a00a37238e9ba2ac24
     private String path;
     private ExifInterface exif;
     private static final String TAG = "AppPermission";
@@ -84,10 +96,14 @@ public class ContentInsertMain extends FontActivity{
     private Switch swPrivate;
     private boolean flagSwitch;
 
+    //준기가 추가하는 부분
+    Context mContext;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_content_insert_main);
+        mContext = this;
         checkPermission();
 
         Intent intent = new Intent(this.getIntent());
@@ -101,21 +117,17 @@ public class ContentInsertMain extends FontActivity{
             String previousString = "";
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count)
-            {
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
             }
 
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after)
-            {
-                previousString= s.toString();
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                previousString = s.toString();
             }
 
             @Override
-            public void afterTextChanged(Editable s)
-            {
-                if (contentText.getLineCount() >= 6)
-                {
+            public void afterTextChanged(Editable s) {
+                if (contentText.getLineCount() >= 6) {
                     contentText.setText(previousString);
                     contentText.setSelection(contentText.length());
                 }
@@ -148,9 +160,9 @@ public class ContentInsertMain extends FontActivity{
         nsv.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {   //스크롤내리면 보이게
             @Override
             public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-                if(oldScrollY > 200){
+                if (oldScrollY > 200) {
                     btnTop.show();
-                }else{
+                } else {
                     btnTop.hide();
                 }
             }
@@ -163,6 +175,10 @@ public class ContentInsertMain extends FontActivity{
         });
 
         //취소버튼
+<<<<<<< HEAD
+=======
+        btnBack = (ImageView) findViewById(R.id.btnBack);
+>>>>>>> 2ffa535b58b5c308de2ec1a00a37238e9ba2ac24
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -171,7 +187,7 @@ public class ContentInsertMain extends FontActivity{
         });
 
         //스위치버튼
-        swPrivate = (Switch)findViewById(R.id.swPrivate);
+        swPrivate = (Switch) findViewById(R.id.swPrivate);
         swPrivate.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 //Log.i("ddd",""+isChecked);  //true,false
@@ -190,14 +206,14 @@ public class ContentInsertMain extends FontActivity{
                 intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
                 //공통 갤러리이기 때문에 바꾸면 안됨!!
                 intent.setAction(Intent.ACTION_GET_CONTENT);
-                Toast.makeText(getApplicationContext(),"복수 선택은 길게 꾹눌러 주숑",Toast.LENGTH_LONG).show();
-                startActivityForResult(Intent.createChooser(intent, "Select Picture"),1);
+                Toast.makeText(getApplicationContext(), "복수 선택은 길게 꾹눌러 주숑", Toast.LENGTH_LONG).show();
+                startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);
             }
         });
 
         //정렬버튼
-        btnSort = (Button)findViewById(R.id.btnSort);
-        btnSort.setOnClickListener(new View.OnClickListener(){
+        btnSort = (Button) findViewById(R.id.btnSort);
+        btnSort.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Collections.sort(myDataset);    //정렬해줘야함
@@ -206,7 +222,7 @@ public class ContentInsertMain extends FontActivity{
         });
 
         //저장버튼
-        btnPhotoSave = (Button)findViewById(R.id.btnPhotoSave);
+        btnPhotoSave = (Button) findViewById(R.id.btnPhotoSave);
         btnPhotoSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -217,32 +233,37 @@ public class ContentInsertMain extends FontActivity{
                             public void onClick(DialogInterface dialog, int which) {
 
                                 //라디오버튼 선택안했을때
+<<<<<<< HEAD
                                 if(mAdapter.pa2==null || mAdapter.pa2.getHolder().radioG.getCheckedRadioButtonId()==-1){
                                     Toast.makeText(getApplicationContext(),"대표사진을 선택해주세요!",Toast.LENGTH_LONG).show();
+=======
+                                if (mAdapter.pa2 == null) {
+                                    Toast.makeText(getApplicationContext(), "대표사진을 선택해주세요!", Toast.LENGTH_LONG).show();
+>>>>>>> 2ffa535b58b5c308de2ec1a00a37238e9ba2ac24
                                     return;
                                 }
 
                                 //완료되는 Content처리
                                 Content resultContent = new Content();
                                 resultContent.setContent_subject(contentSubject.getText().toString());
-                                if(contentText.getText().toString().equals("")){
+                                if (contentText.getText().toString().equals("")) {
                                     resultContent.setContent("");
-                                }else{
+                                } else {
                                     resultContent.setContent(contentText.getText().toString());
                                 }
                                 resultContent.setContent_written_date(new Date());
-                                if(flagSwitch==true){
+                                if (flagSwitch == true) {
                                     resultContent.setContent_private_flag("T");
-                                }else{
+                                } else {
                                     resultContent.setContent_private_flag("F");
                                 }
-                                for(int i=0;i<myDataset.size();i++){
-                                    if(myDataset.get(i).getPhoto().getPhoto_latitude()==0 && myDataset.get(i).getPhoto().getPhoto_longitude()==0){
+                                for (int i = 0; i < myDataset.size(); i++) {
+                                    if (myDataset.get(i).getPhoto().getPhoto_latitude() == 0 && myDataset.get(i).getPhoto().getPhoto_longitude() == 0) {
                                         //위치 없을때
-                                        Toast.makeText(getApplicationContext(),"위치가 지정되어있지 않은 사진이 있습니다 다시 확인해 주세요!",Toast.LENGTH_LONG).show();
+                                        Toast.makeText(getApplicationContext(), "위치가 지정되어있지 않은 사진이 있습니다 다시 확인해 주세요!", Toast.LENGTH_LONG).show();
                                         return;
                                     }
-                                    if(myDataset.get(i).getDetail_content()==null){
+                                    if (myDataset.get(i).getDetail_content() == null) {
                                         myDataset.get(i).setDetail_content("");
                                     }
                                 }
@@ -279,50 +300,100 @@ public class ContentInsertMain extends FontActivity{
 
                                     Log.i("ddd",obj.toString());
 
+
+                                    //final String url = "http://192.168.12.44:8888/photovel/content/photo";
+                                    final String url ="http://192.168.12.197:8080/content/photo";
+
+
+                                    final List<Bitmap> tmp = new ArrayList<Bitmap>();
+                                    for(int i=0; i<myDataset.size(); i++){
+                                        tmp.add(myDataset.get(i).getPhoto().getBitmap());
+                                    }
                                     new Thread(new Runnable() {
                                         @Override
                                         public void run() {
+                                            DataOutputStream dos = null;
                                             HttpURLConnection conn = null;
-                                            //String url = photoURL;
-                                            String url = "http://192.168.12.197:8080/content/photo";
-                                            try{
-                                                URL strUrl = new URL(url);
-                                                conn = (HttpURLConnection) strUrl.openConnection();
-                                                //conn.setDoInput(true);    //서버로부터 결과값을 응답받음
-                                                conn.setDoOutput(true);     //서버로 값을 출력
+                                            try {
+                                                String lineEnd = "\r\n";
+                                                String twoHyphens = "--";
+                                                String boundary = "**##**";
+
+                                                URL connectURL = new URL(url);
+
+                                                conn = (HttpURLConnection) connectURL.openConnection();
+                                                conn.setDoInput(true);
+                                                conn.setDoOutput(true);
+                                                conn.setUseCaches(false);
                                                 conn.setRequestMethod("POST");
-                                                conn.setRequestProperty("Cache-Control","no-cache");
-                                                conn.setRequestProperty("Content-Type","application/json");
-                                                conn.setRequestProperty("Accept","application/json");
 
-                                                OutputStream os = conn.getOutputStream();
-                                                os.write(obj.toString().getBytes());
-                                                os.flush();
-                                          /*      BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-                                                bw.write(String.valueOf(obj.toString().getBytes()));
-                                                bw.flush();
-                                                bw.close();*/
+                                                conn.setRequestProperty("Connection", "Keep-Alive");
+                                                conn.setRequestProperty("Content-Type","multipart/form-data;boundary=" + boundary);
+                                                dos = new DataOutputStream(conn.getOutputStream());
 
-                                                final int responseCode =  conn.getResponseCode();
+                                                dos.writeBytes(lineEnd + twoHyphens + boundary + lineEnd);
+                                                dos.writeBytes("Content-Disposition: form-data; name=\"content\""+lineEnd+lineEnd+ URLEncoder.encode(obj.toString(),"UTF-8"));
+                                                //dos.writeBytes("Content-Type: application/json;charset=\"UTF-8\"\r\n\r\n");
+
+                                                for(int i=0; i < tmp.size(); i++){
+                                                    dos.writeBytes(lineEnd + twoHyphens + boundary + lineEnd);
+                                                    dos.writeBytes("Content-Disposition: form-data; name=\"uploadFile\"; filename=\"uploadFile\""+lineEnd);
+                                                    dos.writeBytes("Content-Type: image/jpg"+lineEnd+lineEnd);
+                                                    /*dos.writeBytes("Content-Type: application/octet-stream\r\n\r\n");*/
+
+                                                    ByteArrayOutputStream outPutStream = new ByteArrayOutputStream();
+                                                    tmp.get(i).compress(Bitmap.CompressFormat.JPEG, 100, outPutStream);
+                                                    byte[] byteArray = outPutStream.toByteArray();
+                                                    ByteArrayInputStream inputStream = new ByteArrayInputStream(byteArray);
+                                                    int bytesAvailable = inputStream.available();
+                                                    int maxBufferSize = 1024;
+                                                    int bufferSize = Math.min(bytesAvailable, maxBufferSize);
+                                                    byte[] buffer = new byte[bufferSize];
+
+                                                    int bytesRead = inputStream.read(buffer, 0, bufferSize);
+                                                    while (bytesRead > 0)
+                                                    {
+                                                        dos.write(buffer, 0, bufferSize);
+                                                        bytesAvailable = inputStream.available();
+                                                        bufferSize = Math.min(bytesAvailable, maxBufferSize);
+                                                        bytesRead = inputStream.read(buffer, 0, bufferSize);
+                                                    }
+                                                    inputStream.close();
+                                                }
+
+
+                                                dos.writeBytes(lineEnd + twoHyphens + boundary + twoHyphens + lineEnd);
+                                                dos.flush();
+
+                                                int responseCode = conn.getResponseCode();
+                                                Log.i("responseCode",responseCode+"");
+
                                                 switch (responseCode){
-                                                    case HttpURLConnection.HTTP_OK:
-                                                        Log.i("status","정상");
-
-                                                        break;
-                                                    default:
-                                                        Log.i("status","비정상");
-                                                        Log.i("status",responseCode+"");
+                                                    case HttpURLConnection.HTTP_OK :
+                                                        dos.close();
+                                                        conn.disconnect();
                                                         break;
                                                 }
-                                            }catch (MalformedURLException e) {
+
+                                            } catch (ProtocolException e) {
+                                                e.printStackTrace();
+                                            } catch (MalformedURLException e) {
                                                 e.printStackTrace();
                                             } catch (IOException e) {
                                                 e.printStackTrace();
-                                            } finally {
-                                                conn.disconnect();
+                                            }finally {
+                                                try {
+                                                    dos.close();
+                                                    conn.disconnect();
+                                                } catch (IOException e) {
+                                                    e.printStackTrace();
+                                                }
+
                                             }
                                         }
                                     }).start();
+
+
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -348,10 +419,10 @@ public class ContentInsertMain extends FontActivity{
             if (requestCode == 1) {
                 ClipData clipData = data.getClipData();
                 if (clipData != null) {     //갤러리에서 사진 여러개 클릭시
-                    int  cnt=clipData.getItemCount();
-                    if(clipData.getItemCount()>20){     //20이상 클릭시 제한주기
-                        Toast.makeText(getApplicationContext(),"사진은 20개까지만 선택할 수 있습니다.",Toast.LENGTH_SHORT).show();
-                        cnt=20;
+                    int cnt = clipData.getItemCount();
+                    if (clipData.getItemCount() > 20) {     //20이상 클릭시 제한주기
+                        Toast.makeText(getApplicationContext(), "사진은 20개까지만 선택할 수 있습니다.", Toast.LENGTH_SHORT).show();
+                        cnt = 20;
                     }
                     Photo[] photos = new Photo[cnt];
 
@@ -372,7 +443,7 @@ public class ContentInsertMain extends FontActivity{
                         mAdapter.notifyDataSetChanged();
                     }
 
-                }else{  //갤러리에서 사진 한개 클릭시
+                } else {  //갤러리에서 사진 한개 클릭시
                     Uri uri = data.getData();   //갤러리에서 선택한 dataUri 받아오기
                     Photo photo = selectPhoto(uri);
 
@@ -383,49 +454,53 @@ public class ContentInsertMain extends FontActivity{
                     mAdapter.notifyDataSetChanged();
                 }
 
-            }else if(requestCode==2){
+            } else if (requestCode == 2) {
                 mAdapter.photoGoogleMapResult(data);
             }
         }
     }
 
     //처음일때 한번만 제목 정해주기
-    private void setSubject(String address){
-        if(flag == 0){
+    private void setSubject(String address) {
+        if (flag == 0) {
             flag = 1;
             //address중에서 도시만 빼서 넣어줘야함
-            if(address.equals("주소 미확인")){
+            if (address.equals("주소 미확인")) {
                 contentSubject.setText("땡땡으로의 여행");
-            }else{
-                contentSubject.setText(address+"로의 여행");
+            } else {
+                contentSubject.setText(address + "로의 여행");
             }
         }
     }
 
     //사진선택
+<<<<<<< HEAD
     private Photo selectPhoto(Uri uri){
         mRecyclerView.setBackgroundResource(R.color.bgGrey);
+=======
+    private Photo selectPhoto(Uri uri) {
+>>>>>>> 2ffa535b58b5c308de2ec1a00a37238e9ba2ac24
         path = PhotoRealPathUtil.getRealPath(this, uri);
         //사진의 정보 받받
         ExifInterface orig = null;
         Photo photo = new Photo();
         try {
             orig = new ExifInterface(path);
-            if(orig.getAttribute(ExifInterface.TAG_GPS_LATITUDE)!=null){ //위도, 경도
+            if (orig.getAttribute(ExifInterface.TAG_GPS_LATITUDE) != null) { //위도, 경도
                 PhotoGeoDegree geo = new PhotoGeoDegree(orig);
                 photo.setPhoto_latitude(geo.getLatitude());
                 photo.setPhoto_longitude(geo.getLongitude());
                 address = getCurrentAddress(photo); //주소로 바꿔주기
                 photo.setAddress(address);
-            }else {
+            } else {
                 photo.setAddress("주소 미확인");
             }
 
-            if(orig.getAttribute(ExifInterface.TAG_DATETIME) !=null){ //시간날짜
+            if (orig.getAttribute(ExifInterface.TAG_DATETIME) != null) { //시간날짜
                 String datetime = orig.getAttribute(ExifInterface.TAG_DATETIME);
                 Date date = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss").parse(datetime);
                 photo.setPhoto_date(date);
-            }else{
+            } else {
                 photo.setPhoto_date(new Date());
             }
 
@@ -435,7 +510,7 @@ public class ContentInsertMain extends FontActivity{
             Bitmap bitmap = getBitmap(path);
 
             //사진보여주기 전에 회전처리해주기
-            photo.setBitmap(rotateBitmap(bitmap,orientation));
+            photo.setBitmap(rotateBitmap(bitmap, orientation));
             return photo;
         } catch (IOException e) {
             e.printStackTrace();
@@ -536,8 +611,7 @@ public class ContentInsertMain extends FontActivity{
             Bitmap bmRotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
             bitmap.recycle();
             return bmRotated;
-        }
-        catch (OutOfMemoryError e) {
+        } catch (OutOfMemoryError e) {
             e.printStackTrace();
             return null;
         }
@@ -584,7 +658,7 @@ public class ContentInsertMain extends FontActivity{
     }
 
     //위도,경도 -> address
-    public String getCurrentAddress(Photo photo){
+    public String getCurrentAddress(Photo photo) {
         // GPS를 주소로 변환후 반환
         Geocoder geocoder = new Geocoder(this, Locale.getDefault());
         List<Address> addresses;
