@@ -280,8 +280,9 @@ public class ContentInsertMain extends Activity {
                                     new Thread(new Runnable() {
                                         @Override
                                         public void run() {
+                                            DataOutputStream dos = null;
+                                            HttpURLConnection conn = null;
                                             try {
-                                                HttpURLConnection conn = null;
                                                 String lineEnd = "\r\n";
                                                 String twoHyphens = "--";
                                                 String boundary = "**##**";
@@ -296,16 +297,16 @@ public class ContentInsertMain extends Activity {
 
                                                 conn.setRequestProperty("Connection", "Keep-Alive");
                                                 conn.setRequestProperty("Content-Type","multipart/form-data;boundary=" + boundary);
-                                                DataOutputStream dos = new DataOutputStream(conn.getOutputStream());
+                                                dos = new DataOutputStream(conn.getOutputStream());
 
-                                                dos.writeBytes(lineEnd + twoHyphens +boundary + lineEnd);
-                                                dos.writeBytes("Content-Disposition: form-data; name=\"content\""+lineEnd+lineEnd+ URLEncoder.encode(obj.toString(),"UTF-8"));
+                                                dos.writeBytes("\r\n--" + boundary + "\r\n");
+                                                dos.writeBytes("Content-Disposition: form-data; name=\"content\"\r\n\r\n"+ URLEncoder.encode(obj.toString(),"UTF-8"));
                                                 //dos.writeBytes("Content-Type: application/json;charset=\"UTF-8\"\r\n\r\n");
 
                                                 for(int i=0; i < tmp.size(); i++){
-                                                    dos.writeBytes(lineEnd + twoHyphens +boundary + lineEnd);
-                                                    dos.writeBytes("Content-Disposition: form-data; name=\"uploadFile\"; filename=\"uploadFile\""+lineEnd+lineEnd);
-                                                    dos.writeBytes("Content-Type: image/jpg"+lineEnd+lineEnd);
+                                                    dos.writeBytes("\r\n--" + boundary + "\r\n");
+                                                    dos.writeBytes("Content-Disposition: form-data; name=\"uploadFile\"; filename=\"uploadFile\"\r\n");
+                                                    dos.writeBytes("Content-Type: image/jpg\r\n\r\n");
                                                     /*dos.writeBytes("Content-Type: application/octet-stream\r\n\r\n");*/
 
                                                     ByteArrayOutputStream outPutStream = new ByteArrayOutputStream();
@@ -332,9 +333,15 @@ public class ContentInsertMain extends Activity {
                                                 dos.writeBytes("\r\n--" + boundary + "--\r\n");
                                                 dos.flush();
 
-
                                                 int responseCode = conn.getResponseCode();
                                                 Log.i("responseCode",responseCode+"");
+
+                                                switch (responseCode){
+                                                    case HttpURLConnection.HTTP_OK :
+                                                        dos.close();
+                                                        conn.disconnect();
+                                                        break;
+                                                }
 
                                             } catch (ProtocolException e) {
                                                 e.printStackTrace();
@@ -342,8 +349,15 @@ public class ContentInsertMain extends Activity {
                                                 e.printStackTrace();
                                             } catch (IOException e) {
                                                 e.printStackTrace();
-                                            }
+                                            }finally {
+                                                try {
+                                                    dos.close();
+                                                    conn.disconnect();
+                                                } catch (IOException e) {
+                                                    e.printStackTrace();
+                                                }
 
+                                            }
                                         }
                                     }).start();
 
