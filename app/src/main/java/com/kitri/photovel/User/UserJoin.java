@@ -1,4 +1,4 @@
-package com.kitri.photovel.User;
+package com.kitri.photovel.user;
 
 /**
  * Created by Junki on 2017-06-19.

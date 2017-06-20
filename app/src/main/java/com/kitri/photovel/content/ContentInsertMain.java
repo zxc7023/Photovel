@@ -34,8 +34,10 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.kitri.photovel.FontActivity;
 import com.kitri.photovel.R;
 import com.kitri.photovel.http.value;
 import com.kitri.vo.Content;
@@ -68,10 +70,15 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 
-public class ContentInsertMain extends Activity {
+public class ContentInsertMain extends FontActivity{
     private Button btnSort, btnPhotoSave;
+<<<<<<< HEAD
+    private TextView btnBack;
+    private FloatingActionButton  btnAddPhots, btnTop;
+=======
     private ImageView btnBack;
     private FloatingActionButton btnAddPhots, btnTop;
+>>>>>>> 2ffa535b58b5c308de2ec1a00a37238e9ba2ac24
     private String path;
     private ExifInterface exif;
     private static final String TAG = "AppPermission";
@@ -127,6 +134,12 @@ public class ContentInsertMain extends Activity {
             }
         });
 
+        btnBack = (TextView)findViewById(R.id.btnBack);
+
+        //imageView를 font로 바꿔주기
+        Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
+        btnBack.setTypeface(fontAwesomeFont);
+
         //recycleview사용선언
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         mRecyclerView.setHasFixedSize(true);
@@ -136,6 +149,10 @@ public class ContentInsertMain extends Activity {
         myDataset = new ArrayList<>();
         mAdapter = new ContentInsertAdapter(myDataset, ContentInsertMain.this);
         mRecyclerView.setAdapter(mAdapter);
+
+        if(myDataset.size()==0) {
+            mRecyclerView.setBackgroundResource(R.drawable.bg_content_insert_main);
+        }
 
         //top버튼
         btnTop = (FloatingActionButton) findViewById(R.id.btnTop);
@@ -158,7 +175,10 @@ public class ContentInsertMain extends Activity {
         });
 
         //취소버튼
+<<<<<<< HEAD
+=======
         btnBack = (ImageView) findViewById(R.id.btnBack);
+>>>>>>> 2ffa535b58b5c308de2ec1a00a37238e9ba2ac24
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -213,8 +233,13 @@ public class ContentInsertMain extends Activity {
                             public void onClick(DialogInterface dialog, int which) {
 
                                 //라디오버튼 선택안했을때
+<<<<<<< HEAD
+                                if(mAdapter.pa2==null || mAdapter.pa2.getHolder().radioG.getCheckedRadioButtonId()==-1){
+                                    Toast.makeText(getApplicationContext(),"대표사진을 선택해주세요!",Toast.LENGTH_LONG).show();
+=======
                                 if (mAdapter.pa2 == null) {
                                     Toast.makeText(getApplicationContext(), "대표사진을 선택해주세요!", Toast.LENGTH_LONG).show();
+>>>>>>> 2ffa535b58b5c308de2ec1a00a37238e9ba2ac24
                                     return;
                                 }
 
@@ -241,9 +266,16 @@ public class ContentInsertMain extends Activity {
                                     if (myDataset.get(i).getDetail_content() == null) {
                                         myDataset.get(i).setDetail_content("");
                                     }
-                                    myDataset.get(mAdapter.pa2.getPosition()).getPhoto().setPhoto_top_flag(1);
                                 }
+                                myDataset.get(mAdapter.pa2.getPosition()).getPhoto().setPhoto_top_flag(1);
                                 resultContent.setDetails(myDataset);
+
+                                //Bitmap처리
+                                ArrayList<Bitmap> resultBitmap = new ArrayList<Bitmap>();
+                                for(int i=0; i<myDataset.size(); i++){
+                                    resultBitmap.add(myDataset.get(i).getPhoto().getBitmap());
+                                    Log.i("Bitmap",resultBitmap+"");
+                                }
 
                                 //json 처리
                                 final JSONObject obj = new JSONObject();  //결과 json
@@ -442,7 +474,12 @@ public class ContentInsertMain extends Activity {
     }
 
     //사진선택
+<<<<<<< HEAD
+    private Photo selectPhoto(Uri uri){
+        mRecyclerView.setBackgroundResource(R.color.bgGrey);
+=======
     private Photo selectPhoto(Uri uri) {
+>>>>>>> 2ffa535b58b5c308de2ec1a00a37238e9ba2ac24
         path = PhotoRealPathUtil.getRealPath(this, uri);
         //사진의 정보 받받
         ExifInterface orig = null;

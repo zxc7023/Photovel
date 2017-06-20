@@ -12,6 +12,10 @@ public class ContentDetail implements Comparable<ContentDetail> {
 	private String content_detail_id;
 	private String detail_content;
 	private Photo photo;
+	private String detail_delete_status;
+
+	public ContentDetail(){
+	}
 
 	public ContentDetail(){
 
@@ -46,6 +50,13 @@ public class ContentDetail implements Comparable<ContentDetail> {
 	}
 	public void setPhoto(Photo photo) {
 		this.photo = photo;
+	}
+
+	public String getDetail_delete_status() {
+		return detail_content;
+	}
+	public void setDetail_delete_status(String detail_delete_status) {
+		this.detail_delete_status = detail_delete_status;
 	}
 
 	@Override

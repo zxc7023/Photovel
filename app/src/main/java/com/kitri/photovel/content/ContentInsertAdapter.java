@@ -8,6 +8,7 @@ import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -212,18 +213,20 @@ public class ContentInsertAdapter extends RecyclerView.Adapter<ContentInsertAdap
         });
 
         //라디오버튼
+        pa2 = new ContentInsertAdapter();
+        pa2.setHolder(holder);
         holder.radioG.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                pa2 = new ContentInsertAdapter();
                 RadioButton checked_rb = (RadioButton) group.findViewById(checkedId);
                 checked_rb.setChecked(true);
                 if(flag==1) {
                     temp = position;
+                    pa2.setPosition(position);
+                    pa2.setHolder(holder);
                 }
                 if (lastCheckedRB != null) {
                     if(temp == position){
-                        pa2.setPosition(position);
                         flag=0;
                         i++;
                         if(i==2){
