@@ -15,8 +15,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        android:name=".FontApp">
+        android:theme="@style/AppTheme" >
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAoropfQgcXeJI0nf6iyz36wDc9pZIBJUw" />
@@ -32,12 +31,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".FontActivity" />
-        <activity android:name=".FontActivity2" />
         <activity android:name=".content.ClusterTest" />
         <activity android:name=".content.ContentInsertMain" />
         <activity android:name=".content.ContentInsertGoogleMap"/>
-        <activity android:name=".content.ContentUpdateMain" />
+        <activity android:name=".content.SlideShow"/>
     </application>
 
 </manifest>

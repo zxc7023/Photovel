@@ -18,12 +18,12 @@ import android.widget.Button;
 
 import com.kitri.photovel.content.ClusterTest;
 import com.kitri.photovel.content.ContentInsertMain;
-import com.kitri.photovel.content.ContentUpdateMain;
+import com.kitri.photovel.content.SlideShow;
 
 import java.util.HashMap;
 import java.util.Set;
 
-public class MainActivity extends FontActivity2 implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private SearchView searchView;
     Toolbar toolbar;
     @Override
@@ -54,12 +54,13 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+
         HashMap<Integer,Class> map = new HashMap<>();
         map.put(R.id.clusterTest, ClusterTest.class);
-        map.put(R.id.contentInsert,ContentInsertMain.class);
-        map.put(R.id.contentUpdate, ContentUpdateMain.class);
-
+        map.put(R.id.photoTest,ContentInsertMain.class);
+        map.put(R.id.slideShowTest, SlideShow.class);
         Set<Integer> keys = map.keySet();
+        //주석입니다.
         for(int key: keys){
 
             final Class clazz = map.get(key);
@@ -74,6 +75,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         }
     }
 
+
     //Android BackButton EventListener
     @Override
     public void onBackPressed() {
@@ -84,6 +86,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
             super.onBackPressed();
         }
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
