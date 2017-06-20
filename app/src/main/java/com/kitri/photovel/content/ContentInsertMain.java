@@ -72,13 +72,8 @@ import java.util.concurrent.ExecutionException;
 
 public class ContentInsertMain extends FontActivity{
     private Button btnSort, btnPhotoSave;
-<<<<<<< HEAD
     private TextView btnBack;
     private FloatingActionButton  btnAddPhots, btnTop;
-=======
-    private ImageView btnBack;
-    private FloatingActionButton btnAddPhots, btnTop;
->>>>>>> 2ffa535b58b5c308de2ec1a00a37238e9ba2ac24
     private String path;
     private ExifInterface exif;
     private static final String TAG = "AppPermission";
@@ -175,10 +170,6 @@ public class ContentInsertMain extends FontActivity{
         });
 
         //취소버튼
-<<<<<<< HEAD
-=======
-        btnBack = (ImageView) findViewById(R.id.btnBack);
->>>>>>> 2ffa535b58b5c308de2ec1a00a37238e9ba2ac24
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -233,13 +224,8 @@ public class ContentInsertMain extends FontActivity{
                             public void onClick(DialogInterface dialog, int which) {
 
                                 //라디오버튼 선택안했을때
-<<<<<<< HEAD
                                 if(mAdapter.pa2==null || mAdapter.pa2.getHolder().radioG.getCheckedRadioButtonId()==-1){
                                     Toast.makeText(getApplicationContext(),"대표사진을 선택해주세요!",Toast.LENGTH_LONG).show();
-=======
-                                if (mAdapter.pa2 == null) {
-                                    Toast.makeText(getApplicationContext(), "대표사진을 선택해주세요!", Toast.LENGTH_LONG).show();
->>>>>>> 2ffa535b58b5c308de2ec1a00a37238e9ba2ac24
                                     return;
                                 }
 
@@ -474,12 +460,8 @@ public class ContentInsertMain extends FontActivity{
     }
 
     //사진선택
-<<<<<<< HEAD
     private Photo selectPhoto(Uri uri){
         mRecyclerView.setBackgroundResource(R.color.bgGrey);
-=======
-    private Photo selectPhoto(Uri uri) {
->>>>>>> 2ffa535b58b5c308de2ec1a00a37238e9ba2ac24
         path = PhotoRealPathUtil.getRealPath(this, uri);
         //사진의 정보 받받
         ExifInterface orig = null;
