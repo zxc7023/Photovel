@@ -82,8 +82,7 @@ public class ContentInsertGoogleMap extends AppCompatActivity
             location.setLatitude(latLng.latitude);
             location.setLongitude(latLng.longitude);
             String markerTitle = getCurrentAddress(location);
-            String markerSnippet = "위도:" + String.valueOf(location.getLatitude())
-                    + " 경도:" + String.valueOf(location.getLongitude());
+            String markerSnippet = "위도:" + String.valueOf(location.getLatitude()) + " 경도:" + String.valueOf(location.getLongitude());
             setCurrentLocation(location, markerTitle, markerSnippet);
         }
 
@@ -340,14 +339,11 @@ public class ContentInsertGoogleMap extends AppCompatActivity
         int hasFineLocationPermission = ContextCompat.checkSelfPermission(this,
                 android.Manifest.permission.ACCESS_FINE_LOCATION);
 
-        if (hasFineLocationPermission == PackageManager
-                .PERMISSION_DENIED && fineLocationRationale)
+        if (hasFineLocationPermission == PackageManager.PERMISSION_DENIED && fineLocationRationale)
             showDialogForPermission("앱을 실행하려면 퍼미션을 허가하셔야합니다.");
 
-        else if (hasFineLocationPermission
-                == PackageManager.PERMISSION_DENIED && !fineLocationRationale) {
-            showDialogForPermissionSetting("퍼미션 거부 + Don't ask again(다시 묻지 않음) " +
-                    "체크 박스를 설정한 경우로 설정에서 퍼미션 허가해야합니다.");
+        else if (hasFineLocationPermission == PackageManager.PERMISSION_DENIED && !fineLocationRationale) {
+            showDialogForPermissionSetting("퍼미션 거부 + Don't ask again(다시 묻지 않음) " + "체크 박스를 설정한 경우로 설정에서 퍼미션 허가해야합니다.");
         } else if (hasFineLocationPermission == PackageManager.PERMISSION_GRANTED) {
 
             if (mGoogleApiClient == null) {
@@ -356,8 +352,6 @@ public class ContentInsertGoogleMap extends AppCompatActivity
             }
 
             mGoogleMap.setMyLocationEnabled(true);
-
-
         }
     }
 
@@ -613,10 +607,7 @@ public class ContentInsertGoogleMap extends AppCompatActivity
                             buildGoogleApiClient();
                         }
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            if (ActivityCompat.checkSelfPermission(this,
-                                    Manifest.permission.ACCESS_FINE_LOCATION)
-                                    == PackageManager.PERMISSION_GRANTED) {
-
+                            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                                 mGoogleMap.setMyLocationEnabled(true);
                             }
                         } else mGoogleMap.setMyLocationEnabled(true);
@@ -624,8 +615,7 @@ public class ContentInsertGoogleMap extends AppCompatActivity
                         return;
                     }
                 } else {
-                    setCurrentLocation(null, "위치정보 가져올 수 없음",
-                            "위치 퍼미션과 GPS 활성 요부 확인하세요");
+                    setCurrentLocation(null, "위치정보 가져올 수 없음", "위치 퍼미션과 GPS 활성 요부 확인하세요");
                 }
 
                 break;

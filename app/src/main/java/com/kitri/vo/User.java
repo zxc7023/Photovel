@@ -8,7 +8,7 @@ public class User {
 	private String user_nick_name;
 	private String user_gender;
 	private int user_phone1;
-	private int user_phone2;
+	private String user_phone2;
 	private String user_profile_photo;
 	private Date user_sign_date;
 	private String user_state_flag;
@@ -47,10 +47,10 @@ public class User {
 	public void setUser_phone1(int user_phone1) {
 		this.user_phone1 = user_phone1;
 	}
-	public int getUser_phone2() {
+	public String getUser_phone2() {
 		return user_phone2;
 	}
-	public void setUser_phone2(int user_phone2) {
+	public void setUser_phone2(String user_phone2) {
 		this.user_phone2 = user_phone2;
 	}
 	public String getUser_profile_photo() {

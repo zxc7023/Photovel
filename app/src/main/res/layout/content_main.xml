@@ -19,7 +19,13 @@
     <Button
         android:layout_width="368dp"
         android:layout_height="wrap_content"
-        android:id="@+id/photoTest"
-        android:text="photoTest" />
+        android:id="@+id/contentInsert"
+        android:text="contentInsert" />
+
+    <Button
+        android:layout_width="368dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/contentUpdate"
+        android:text="contentUpdate" />
 
 </LinearLayout>
