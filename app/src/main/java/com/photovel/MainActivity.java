@@ -21,12 +21,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-<<<<<<< HEAD
-import com.photovel.R;
 import com.photovel.User.UserLogin;
-=======
 import com.alibaba.fastjson.JSON;
->>>>>>> origin/eundi
 import com.photovel.content.ClusterTest;
 import com.photovel.content.ContentDetailListMain;
 import com.photovel.content.ContentInsertMain;
