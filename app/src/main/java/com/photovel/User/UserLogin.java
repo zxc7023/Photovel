@@ -119,7 +119,7 @@ public class UserLogin extends FontActivity2 {
                     connectURL = new URL(url);
                     conn = (HttpURLConnection) connectURL.openConnection();
                     conn.setDoOutput(true);
-                    conn.setRequestMethod("POST");
+                    conn.setRequestMethod("GET");
                     conn.setRequestProperty("Connection", "Keep-Alive");
                     conn.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
                     dos = conn.getOutputStream();

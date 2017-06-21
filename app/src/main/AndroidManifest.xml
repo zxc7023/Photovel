@@ -43,6 +43,7 @@
         <activity android:name=".User.UserLogin"/>
         <activity android:name=".TestActivity"/>
         <activity android:name=".content.ContentDetailListMain" android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".User.UserJoin"/>
     </application>
 
 </manifest>
