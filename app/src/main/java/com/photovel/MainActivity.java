@@ -11,6 +11,8 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -30,6 +32,7 @@ import com.photovel.content.ContentUpdateMain;
 import com.photovel.content.SlideShow;
 import com.synnapps.carouselview.CarouselView;
 import com.synnapps.carouselview.ImageListener;
+import com.vo.Content;
 import com.vo.MainImage;
 
 import java.io.BufferedReader;
@@ -48,11 +51,17 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
     private static final String TAG = "Image";
     private SearchView searchView;
     Toolbar toolbar;
+    //메인 이미지 케러셀뷰
     CarouselView carouselView;
     private final String imgURL = "http://192.168.12.197:8080/main_image";
     List<MainImage> images;
 
-    int[] sampleImages = {R.drawable.slide01, R.drawable.slide02, R.drawable.slide03};
+    //추천 게시글 가로스크롤
+    private RecyclerView mRecyclerView;
+    private MainAdapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
+    private List<Content> myDataset;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,24 +70,52 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         //메인이미지 캐러셀뷰 부분
         carouselView = (CarouselView) findViewById(R.id.carouselView);
 
-        //db에 있는 contentId별 content정보 받아오기
-        Thread thread1 = new Thread(){
+        //db에 있는 메인이미지 받아오기
+        Thread getMainImage = new Thread(){
             @Override
             public void run() {
                 super.run();
                 images = getMainImage();
             }
         };
-        thread1.start();
+        getMainImage.start();
         try {
-            thread1.join();  //모든처리 thread처리 기다리기
+            getMainImage.join();  //모든처리 thread처리 기다리기
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        getImage(); //content Image받아오기
+        getMainBitmap(); //메인 Image받아오기
 
         carouselView.setPageCount(images.size());
         carouselView.setImageListener(imageListener);
+
+        //추천 게시글 가로스크롤
+        //db에 있는 contentId별 content정보 받아오기
+        Thread getChoochun = new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                myDataset = getChoochunData();
+            }
+        };
+        getChoochun.start();
+        try {
+            getChoochun.join();  //모든처리 thread처리 기다리기
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        getChoochunBitmap(); //content Image받아오기
+
+
+        //recycleview사용선언
+        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        mRecyclerView.setHasFixedSize(true);
+        mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setNestedScrollingEnabled(false);
+        mAdapter = new MainAdapter(myDataset, MainActivity.this);
+        mRecyclerView.setAdapter(mAdapter);
+
 
         // Adding Toolbar to the activity
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -105,7 +142,6 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
 
         HashMap<Integer,Class> map = new HashMap<>();
         map.put(R.id.loginModuel, UserLogin.class);
-        map.put(R.id.mainListTest, MainListMain.class);
         map.put(R.id.clusterTest, ClusterTest.class);
         map.put(R.id.contentInsert,ContentInsertMain.class);
         map.put(R.id.contentUpdate, ContentUpdateMain.class);
@@ -207,11 +243,10 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
     ImageListener imageListener = new ImageListener() {
         @Override
         public void setImageForPosition(int position, ImageView imageView) {
-            //imageView.setImageResource(sampleImages[position]);
             imageView.setImageBitmap(images.get(position).getBitmap());
         }
     };
-
+    //
     public List<MainImage> getMainImage(){
         HttpURLConnection conn = null;
         String qry = imgURL;
@@ -271,9 +306,8 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         }
         return null;
     }
-
     //DB에서 bitmap정보 받아오기
-    public void getImage(){
+    public void getMainBitmap(){
         Thread thread2 = new Thread(){
             @Override
             public void run() {
@@ -283,6 +317,99 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
                         Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL("http://192.168.12.197:8080/app/images/main/"+images.get(i).getImage_file_name()).getContent());
                         images.get(i).setBitmap(bitmap);
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        thread2.start();
+        try {
+            thread2.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    //추천게시글 가로스크롤
+    public List<Content> getChoochunData(){
+        List<Content> content = null;
+        HttpURLConnection conn = null;
+
+        String qry = "http://192.168.12.197:8080/content/photo/";
+        Log.i(TAG, "1.getPhotoData의 qry= " + qry);
+
+        try {
+            URL strUrl = new URL(qry);
+            conn = (HttpURLConnection) strUrl.openConnection();
+            conn.setDoInput(true);//서버로부터 결과값을 응답받음
+            conn.setRequestMethod("GET");
+            Log.i(TAG, "2.getPhotoData의 qry= " + qry);
+
+
+            final int responseCode = conn.getResponseCode(); //정상인 경우 200번, 그 외 오류있는 경우 오류 번호 반환
+            Log.i(TAG, "getPhotoData의 responseCode= " + responseCode);
+            switch (responseCode){
+                case HttpURLConnection.HTTP_OK:
+
+                    InputStream is = conn.getInputStream();
+                    Reader reader = new InputStreamReader(is, "UTF-8");
+                    BufferedReader br = new BufferedReader(reader);
+                    String responseData = null;
+
+                    responseData = br.readLine();
+                    Log.i(TAG, "getPhotoData의 response data= " + responseData);
+
+                    content = JSON.parseArray(responseData, Content.class);
+                    Log.i(TAG, "getPhotoData의 content= " + content);
+
+                    br.close();
+                    reader.close();
+                    is.close();
+
+                    break;
+                case HttpURLConnection.HTTP_NOT_FOUND:
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), "페이지를 찾을 수 없습니다.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                    break;
+                default:
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), "response code: " + responseCode, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    break;
+            }
+
+            return content;
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            conn.disconnect();
+        }
+
+        return null;
+    }
+    //DB에서 bitmap정보 받아오기
+    public void getChoochunBitmap(){
+        Thread thread2 = new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                try {
+                    for (int i = 0; i < myDataset.size(); i++) {
+                        Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL("http://192.168.12.197:8080/upload/" + myDataset.get(i).getContent_id() + "/" + myDataset.get(i).getPhoto_file_name()).getContent());
+                        myDataset.get(i).setBitmap(bitmap);
+                    }
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

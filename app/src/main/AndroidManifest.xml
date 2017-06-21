@@ -42,7 +42,6 @@
         <activity android:name=".content.SlideShow"/>
         <activity android:name=".User.UserLogin"/>
         <activity android:name=".TestActivity"/>
-        <activity android:name=".MainListMain"></activity>
         <activity android:name=".content.ContentDetailListMain" android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 

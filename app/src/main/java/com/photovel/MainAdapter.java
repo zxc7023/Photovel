@@ -100,6 +100,34 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder>{
             subject = temp.toString();
         }
         holder.contentSubject.setText(subject);
+
+        holder.main_icthumb.setText(holder.main_icthumb.getText()+" "+mDataset.get(position).getGood_count());
+        holder.main_iccomment.setText(holder.main_iccomment.getText()+" "+mDataset.get(position).getComment_count());
+        holder.main_icshare.setText(holder.main_icshare.getText()+" "+mDataset.get(position).getContent_share_count());
+
+        //좋아요 클릭
+        holder.main_icthumb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        //댓글 클릭
+        holder.main_iccomment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        //공유 클릭
+        holder.main_icshare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
     }
     @Override
     public int getItemCount() {
