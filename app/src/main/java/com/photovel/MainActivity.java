@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.photovel.R;
+import com.photovel.User.UserLogin;
 import com.photovel.content.ClusterTest;
 import com.photovel.content.ContentInsertMain;
 import com.photovel.content.ContentUpdateMain;
@@ -57,11 +58,14 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         navigationView.setNavigationItemSelectedListener(this);
 
         HashMap<Integer,Class> map = new HashMap<>();
+        map.put(R.id.loginModuel, UserLogin.class);
         map.put(R.id.clusterTest, ClusterTest.class);
         map.put(R.id.contentInsert,ContentInsertMain.class);
         map.put(R.id.contentUpdate, ContentUpdateMain.class);
         map.put(R.id.photoTest,ContentInsertMain.class);
         map.put(R.id.slideShowTest, SlideShow.class);
+        map.put(R.id.cok,TestActivity.class);
+
 
         Set<Integer> keys = map.keySet();
         for(int key: keys){

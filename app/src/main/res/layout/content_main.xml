@@ -8,8 +8,13 @@
     android:orientation="vertical"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/app_bar_main"
-    tools:context="com.kitri.photovel.MainActivity">
+    tools:context="com.photovel.MainActivity">
 
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/loginModuel"
+        android:text="loginModuel"/>
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -37,7 +42,14 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:text="testCok"
+        android:id="@+id/cok"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:id="@+id/slideShowTest"
         android:text="slideShowTest"/>
+
 
 </LinearLayout>

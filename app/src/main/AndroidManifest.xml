@@ -19,7 +19,7 @@
         android:name=".FontApp">
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAoropfQgcXeJI0nf6iyz36wDc9pZIBJUw" />
+            android:value="AIzaSyDHhbAmLoQolRIfA6C2Xdm-NzKa9naq3XA" />
         <!-- AIzaSyDHhbAmLoQolRIfA6C2Xdm-NzKa9naq3XA
         준기키-->
         <activity
@@ -39,6 +39,8 @@
         <activity android:name=".content.ContentInsertGoogleMap"/>
         <activity android:name=".content.ContentUpdateMain" />
         <activity android:name=".content.SlideShow"/>
+        <activity android:name=".User.UserLogin"/>
+        <activity android:name=".TestActivity"/>
     </application>
 
 </manifest>
