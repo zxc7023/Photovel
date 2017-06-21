@@ -264,7 +264,7 @@ public class ContentInsertMain extends FontActivity {
                                     JSONArray jArray = new JSONArray();
                                     for(int i=0; i<resultContent.getDetails().size(); i++){
                                         JSONObject sObject = new JSONObject();  //배열 내에 들어갈 json
-                                        sObject.put("datail_content",resultContent.getDetails().get(i).getDetail_content());
+                                        sObject.put("detail_content",resultContent.getDetails().get(i).getDetail_content());
                                         JSONObject sbObject = new JSONObject();
                                         sbObject.put("photo_date",new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(resultContent.getDetails().get(i).getPhoto().getPhoto_date()));
                                         sbObject.put("photo_latitude",resultContent.getDetails().get(i).getPhoto().getPhoto_latitude());

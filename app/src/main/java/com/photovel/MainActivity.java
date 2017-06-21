@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.photovel.content.ClusterTest;
+import com.photovel.content.ContentDetailListMain;
 import com.photovel.content.ContentInsertMain;
 import com.photovel.content.ContentUpdateMain;
 import com.photovel.content.SlideShow;
@@ -105,8 +106,8 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         map.put(R.id.clusterTest, ClusterTest.class);
         map.put(R.id.contentInsert,ContentInsertMain.class);
         map.put(R.id.contentUpdate, ContentUpdateMain.class);
-        map.put(R.id.photoTest,ContentInsertMain.class);
         map.put(R.id.slideShowTest, SlideShow.class);
+        map.put(R.id.deatilList, ContentDetailListMain.class);
 
         Set<Integer> keys = map.keySet();
         for(int key: keys){
@@ -142,9 +143,9 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        /*if (id == R.id.action_settings) {
             return true;
-        }
+        }*/
 
         return super.onOptionsItemSelected(item);
     }
@@ -291,5 +292,4 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         }
 
     }
-
 }

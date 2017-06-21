@@ -33,14 +33,14 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/photoTest"
-        android:text="photoTest" />
+        android:id="@+id/slideShowTest"
+        android:text="slideShowTest"/>
 
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/slideShowTest"
-        android:text="slideShowTest"/>
+        android:id="@+id/deatilList"
+        android:text="DeatilList"/>
 
 
 </LinearLayout>

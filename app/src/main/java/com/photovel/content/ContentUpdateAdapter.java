@@ -8,7 +8,6 @@ import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -114,7 +113,7 @@ public class ContentUpdateAdapter extends RecyclerView.Adapter<ContentUpdateAdap
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // create a new view
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_content_insert_list_adapter, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_content_insert_adapter, parent, false);
         ViewHolder vh = new ViewHolder(v);
         return vh;
     }
@@ -298,12 +297,8 @@ public class ContentUpdateAdapter extends RecyclerView.Adapter<ContentUpdateAdap
     }
     
     public void removeAt(int position) {
-        //mDataset.remove(position);
-        //notifyItemRemoved(position);
-        mDataset.get(position).setDetail_delete_status("T");
-        Log.i("ddd","position : "+position+"");
-        Log.i("ddd","getItemCount : "+getItemCount()+"");
-        notifyItemMoved(position, getItemCount()-1);
-        //notifyItemRangeChanged(position, mDataset.size());
+        mDataset.remove(position);
+        notifyItemRemoved(position);
+        notifyItemRangeChanged(position, mDataset.size());
     }
 }
