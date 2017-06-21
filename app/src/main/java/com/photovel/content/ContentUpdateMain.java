@@ -89,7 +89,7 @@ public class ContentUpdateMain extends FontActivity {
     private EditText contentSubject, contentText;
     private Switch swPrivate;
     private boolean flagSwitch;
-    private int id=33;
+    private int id=1;
 
     private Content content;
 

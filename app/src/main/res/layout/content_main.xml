@@ -15,6 +15,12 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/mainListTest"
+        android:text="mainListTest" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:id="@+id/clusterTest"
         android:text="clusterTest" />
 
