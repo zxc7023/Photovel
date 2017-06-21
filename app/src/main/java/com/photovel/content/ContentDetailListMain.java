@@ -1,5 +1,6 @@
 package com.photovel.content;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -108,6 +109,9 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         tvShareCount = (TextView) findViewById(R.id.tvShareCount);
         tvdetailcount = (TextView) findViewById(R.id.tvdetailcount);
 
+        btnLookMap = (Button) findViewById(R.id.btnLookMap);
+        btnLookPlay = (Button) findViewById(R.id.btnLookPlay);
+
         //imageView를 font로 바꿔주기
         Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
         icglobe.setTypeface(fontAwesomeFont);
@@ -195,15 +199,46 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         navigationView.setNavigationItemSelectedListener(this);
     }
 
-    //Android BackButton EventListener
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
+    //onClick
+    public void goLook(View v){
+        switch (v.getId()){
+            case R.id.btnLookMap:
+                Intent intent=new Intent(this, ClusterTest.class);
+                this.startActivity(intent);
+                break;
+            case R.id.btnLookPlay:
+                break;
         }
+    }
+
+    //메뉴클릭시
+    public void ContentMenuClick(View v){
+        Context wrapper = new ContextThemeWrapper(this, R.style.MenuStyle);
+        PopupMenu popup = new PopupMenu(wrapper, v);
+        MenuInflater inflater = popup.getMenuInflater();
+        inflater.inflate(R.menu.content_setting, popup.getMenu());
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()){
+                    case R.id.action_update:
+                        Intent intent=new Intent(ContentDetailListMain.this, ContentUpdateMain.class);
+                        intent.putExtra("id",id);
+                        ContentDetailListMain.this.startActivity(intent);
+                        Toast.makeText(getApplicationContext(),"수정",Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.action_delete:
+                        Toast.makeText(getApplicationContext(),"삭제",Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.action_report:
+                        Toast.makeText(getApplicationContext(),"신고",Toast.LENGTH_SHORT).show();
+                        break;
+                }
+
+                return false;
+            }
+        });
+        popup.show();
     }
 
     @Override
@@ -268,33 +303,6 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
             }
         });
         return true;
-    }
-
-    //메뉴클릭시
-    public void ContentMenuClick(View v){
-        Context wrapper = new ContextThemeWrapper(this, R.style.MenuStyle);
-        PopupMenu popup = new PopupMenu(wrapper, v);
-        MenuInflater inflater = popup.getMenuInflater();
-        inflater.inflate(R.menu.content_setting, popup.getMenu());
-        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()){
-                    case R.id.action_update:
-                        Toast.makeText(getApplicationContext(),"수정",Toast.LENGTH_SHORT).show();
-                        break;
-                    case R.id.action_delete:
-                        Toast.makeText(getApplicationContext(),"삭제",Toast.LENGTH_SHORT).show();
-                        break;
-                    case R.id.action_report:
-                        Toast.makeText(getApplicationContext(),"신고",Toast.LENGTH_SHORT).show();
-                        break;
-                }
-
-                return false;
-            }
-        });
-        popup.show();
     }
 
     //DB에서 content정보 받아오기
@@ -403,5 +411,16 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
             e.printStackTrace();
         }
 
+    }
+
+    //Android BackButton EventListener
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
     }
 }

@@ -89,7 +89,7 @@ public class ContentUpdateMain extends FontActivity {
     private EditText contentSubject, contentText;
     private Switch swPrivate;
     private boolean flagSwitch;
-    private int id=1;
+    private int id=-1;
 
     private Content content;
 
@@ -99,10 +99,15 @@ public class ContentUpdateMain extends FontActivity {
         setContentView(R.layout.activity_content_insert_main);
         checkPermission();
 
-        tvTitle = (TextView)findViewById(R.id.tvTitle);
-        tvTitle.setText("수정하기");
+        Intent intent = getIntent();
+        id = intent.getIntExtra("id",-1);
+        if(id==-1){
+            Log.i("id","id를 못받아옴!!!");
+        }
 
-        Intent intent = new Intent(this.getIntent());
+        tvTitle = (TextView)findViewById(R.id.tvTitle);
+        tvTitle.setText("여행 편집");
+
         CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setExpandedTitleTextAppearance(R.style.ExpandedAppBar);
         collapsingToolbar.setCollapsedTitleTextAppearance(R.style.CollapsedAppBar);

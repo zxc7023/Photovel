@@ -62,7 +62,7 @@
             android:layout_height="100dp"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:background="@drawable/xml_border2"
+            android:background="@drawable/xml_border"
             android:layout_below="@+id/lldetailInfo">
             <TextView
                 android:id="@+id/tvDetailContent"
