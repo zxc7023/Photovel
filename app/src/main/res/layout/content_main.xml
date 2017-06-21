@@ -8,7 +8,7 @@
     android:orientation="vertical"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/app_bar_main"
-    tools:context="com.kitri.photovel.MainActivity">
+    tools:context="com.photovel.MainActivity">
 
     <Button
         android:layout_width="match_parent"
@@ -31,13 +31,13 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/photoTest"
-        android:text="photoTest" />
+        android:id="@+id/slideShowTest"
+        android:text="slideShowTest"/>
 
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/slideShowTest"
-        android:text="slideShowTest"/>
+        android:id="@+id/deatilList"
+        android:text="DeatilList"/>
 
 </LinearLayout>

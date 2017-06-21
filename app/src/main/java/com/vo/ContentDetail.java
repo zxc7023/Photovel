@@ -47,7 +47,7 @@ public class ContentDetail implements Comparable<ContentDetail> {
 	}
 
 	public String getDetail_delete_status() {
-		return detail_content;
+		return detail_delete_status;
 	}
 	public void setDetail_delete_status(String detail_delete_status) {
 		this.detail_delete_status = detail_delete_status;

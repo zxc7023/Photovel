@@ -113,7 +113,7 @@ public class ContentInsertAdapter extends RecyclerView.Adapter<ContentInsertAdap
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // create a new view
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_content_insert_list_adapter, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_content_insert_adapter, parent, false);
         ViewHolder vh = new ViewHolder(v);
         return vh;
     }

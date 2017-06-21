@@ -4,4 +4,15 @@
     <string name="fa_icon_pen">&#xf040;</string>
     <string name="fa_icon_marker">&#xf041;</string>
     <string name="fa_chevron_left">&#xf053;</string>
+    <string name="fa_globe">&#xf0ac;</string>
+    <string name="fa_flag">&#xf024;</string>
+    <string name="fa_video_camera">&#xf03d;</string>
+    <string name="fa_calendar">&#xf073;</string>
+    <string name="fa_thumbs_o_up">&#xf087;</string>
+    <string name="fa_user">&#xf007;</string>
+    <string name="fa_comments">&#xf086;</string>
+    <string name="fa_share">&#xf064;</string>
+    <string name="fa_bookmark">&#xf02e;</string>
+    <string name="fa_ellipsis_v">&#xf142;</string>
+    <string name="fa_minus">&#xf068;&#xf068;&#xf068;&#xf068;&#xf068;&#xf068;&#xf068;&#xf068;</string>
 </resources>
