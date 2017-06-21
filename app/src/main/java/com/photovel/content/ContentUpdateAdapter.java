@@ -24,15 +24,15 @@ import com.vo.ContentDetail;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by HARA on 2017-06-07.
  */
 
 public class ContentUpdateAdapter extends RecyclerView.Adapter<ContentUpdateAdapter.ViewHolder>{
-    private ArrayList<ContentDetail> mDataset;
+    private List<ContentDetail> mDataset;
     private RadioButton lastCheckedRB = null;
     private Context mcontext;
     private ViewHolder holder;
@@ -56,7 +56,7 @@ public class ContentUpdateAdapter extends RecyclerView.Adapter<ContentUpdateAdap
     public ContentUpdateAdapter() {
     }
 
-    public ContentUpdateAdapter(ArrayList<ContentDetail> myDataset, Context mycontext) {
+    public ContentUpdateAdapter(List<ContentDetail> myDataset, Context mycontext) {
         mDataset = myDataset;
         mcontext = mycontext;
     }

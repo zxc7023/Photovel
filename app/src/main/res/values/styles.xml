@@ -1,7 +1,7 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.Design">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
@@ -27,9 +27,8 @@
     </style>
 
     <style name="MenuStyle" parent="ThemeOverlay.AppCompat.Light">
-        <item name="android:minWidth">50dp</item>
-        <item name="android:maxWidth">50dp</item>
-        <item name="android:padding">0dp</item>
+        <item name="android:dropDownWidth">10dp</item>
+        <item name="android:textSize">10dp</item>
         <item name="android:colorBackground">@color/bgDarkGrey</item>
         <item name="android:textColor">@color/bgWhite</item>
     </style>

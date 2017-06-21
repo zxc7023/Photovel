@@ -109,6 +109,15 @@
                 android:textColor="@color/textBlue"
                 android:gravity="center"
                 android:layout_gravity="center"/>
+            <TextView
+                android:id="@+id/tvDate"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="2"
+                android:text="2017/06/06"
+                android:textSize="14dp"
+                android:gravity="center_vertical"
+                android:layout_marginLeft="10dp"/>
         </LinearLayout>
         <LinearLayout
             android:id="@+id/lldetailContent"

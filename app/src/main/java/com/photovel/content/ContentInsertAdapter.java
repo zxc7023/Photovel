@@ -8,6 +8,7 @@ import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,13 +27,14 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by HARA on 2017-06-07.
  */
 
 public class ContentInsertAdapter extends RecyclerView.Adapter<ContentInsertAdapter.ViewHolder>{
-    private ArrayList<ContentDetail> mDataset;
+    private List<ContentDetail> mDataset;
     private RadioButton lastCheckedRB = null;
     private Context mcontext;
     private ViewHolder holder;
@@ -56,7 +58,7 @@ public class ContentInsertAdapter extends RecyclerView.Adapter<ContentInsertAdap
     public ContentInsertAdapter() {
     }
 
-    public ContentInsertAdapter(ArrayList<ContentDetail> myDataset, Context mycontext) {
+    public ContentInsertAdapter(List<ContentDetail> myDataset, Context mycontext) {
         mDataset = myDataset;
         mcontext = mycontext;
     }
@@ -153,7 +155,6 @@ public class ContentInsertAdapter extends RecyclerView.Adapter<ContentInsertAdap
                 pa = new ContentInsertAdapter();
                 pa.setPosition(position);
                 pa.setHolder(holder);
-
                 final Date date=mDataset.get(pa.getPosition()).getPhoto().getPhoto_date();
                 String date2=null;
                 try {
@@ -286,7 +287,7 @@ public class ContentInsertAdapter extends RecyclerView.Adapter<ContentInsertAdap
     public int getItemCount() {
         return mDataset.size();
     }
-    
+
     public void removeAt(int position) {
         mDataset.remove(position);
         notifyItemRemoved(position);

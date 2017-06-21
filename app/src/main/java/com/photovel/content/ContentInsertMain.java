@@ -78,7 +78,7 @@ public class ContentInsertMain extends FontActivity {
     private RecyclerView mRecyclerView;
     private ContentInsertAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-    private ArrayList<ContentDetail> myDataset;
+    private List<ContentDetail> myDataset;
     private String address;
 
     private EditText contentSubject, contentText;
@@ -251,13 +251,6 @@ public class ContentInsertMain extends FontActivity {
                                 myDataset.get(mAdapter.pa2.getPosition()).getPhoto().setPhoto_top_flag(1);
                                 resultContent.setDetails(myDataset);
 
-                                //Bitmap처리
-                                ArrayList<Bitmap> resultBitmap = new ArrayList<Bitmap>();
-                                for(int i=0; i<myDataset.size(); i++){
-                                    resultBitmap.add(myDataset.get(i).getPhoto().getBitmap());
-                                    Log.i("Bitmap",resultBitmap+"");
-                                }
-
                                 //json 처리
                                 final JSONObject obj = new JSONObject();  //결과 json
                                 try {
@@ -285,7 +278,7 @@ public class ContentInsertMain extends FontActivity {
                                     //final String url = "http://192.168.12.44:8888/photovel/content/photo";
                                     final String url ="http://192.168.12.197:8080/content/photo";
 
-
+                                    //Bitmap처리
                                     final List<Bitmap> tmp = new ArrayList<Bitmap>();
                                     for(int i=0; i<myDataset.size(); i++){
                                         tmp.add(myDataset.get(i).getPhoto().getBitmap());
@@ -414,7 +407,7 @@ public class ContentInsertMain extends FontActivity {
                         photos[i] = selectPhoto(uri);
                     }
 
-                    setSubject(photos[0].getAddress().toString());
+                    setSubject(photos[cnt-1].getAddress().toString());
 
                     //사진cnt 만큼 recyclerview추가
                     for (int i = 0; i < cnt; i++) {
@@ -467,7 +460,8 @@ public class ContentInsertMain extends FontActivity {
                 PhotoGeoDegree geo = new PhotoGeoDegree(orig);
                 photo.setPhoto_latitude(geo.getLatitude());
                 photo.setPhoto_longitude(geo.getLongitude());
-                address = getCurrentAddress(photo); //주소로 바꿔주기
+                GetCurrentAddress getAddress = new GetCurrentAddress();
+                address = getAddress.getAddress(photo); //주소로 바꿔주기
                 photo.setAddress(address);
             } else {
                 photo.setAddress("주소 미확인");
@@ -631,31 +625,6 @@ public class ContentInsertMain extends FontActivity {
 
                 }
                 break;
-        }
-    }
-
-    //위도,경도 -> address
-    public String getCurrentAddress(Photo photo) {
-        // GPS를 주소로 변환후 반환
-        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-        List<Address> addresses;
-        try {
-            addresses = geocoder.getFromLocation(photo.getPhoto_latitude(), photo.getPhoto_longitude(), 1);
-        } catch (IOException ioException) {
-            //네트워크 문제
-            Toast.makeText(this, "지오코더 서비스 사용불가", Toast.LENGTH_LONG).show();
-            return "지오코더 서비스 사용불가";
-        } catch (IllegalArgumentException illegalArgumentException) {
-            Toast.makeText(this, "잘못된 GPS 좌표", Toast.LENGTH_LONG).show();
-            return "잘못된 GPS 좌표";
-        }
-        if (addresses == null || addresses.size() == 0) {
-            Toast.makeText(this, "주소 미발견", Toast.LENGTH_LONG).show();
-            return "주소 미발견";
-
-        } else {
-            Address address = addresses.get(0);
-            return address.getAddressLine(0).toString();
         }
     }
 

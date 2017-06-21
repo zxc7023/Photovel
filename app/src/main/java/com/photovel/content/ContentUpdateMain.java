@@ -83,13 +83,13 @@ public class ContentUpdateMain extends FontActivity {
     private RecyclerView mRecyclerView;
     private ContentUpdateAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-    private ArrayList<ContentDetail> myDataset, originData, sumData;
+    private List<ContentDetail> myDataset, originData, sumData;
     private String address;
 
     private EditText contentSubject, contentText;
     private Switch swPrivate;
     private boolean flagSwitch;
-    private int id=33;
+    private int id=1;
 
     private Content content;
 
@@ -165,7 +165,9 @@ public class ContentUpdateMain extends FontActivity {
             Photo ph = new Photo();
             ph.setPhoto_latitude(content.getDetails().get(i).getPhoto().getPhoto_latitude());
             ph.setPhoto_longitude(content.getDetails().get(i).getPhoto().getPhoto_longitude());
-            String address = getCurrentAddress(ph);
+
+            GetCurrentAddress getAddress = new GetCurrentAddress();
+            String address = getAddress.getAddress(ph);
             content.getDetails().get(i).getPhoto().setAddress(address);
             myDataset.add(content.getDetails().get(i));
             originData.add(content.getDetails().get(i));
@@ -328,12 +330,6 @@ public class ContentUpdateMain extends FontActivity {
 
                                 resultContent.setDetails(sumData);
 
-                                //Bitmap처리
-                                ArrayList<Bitmap> resultBitmap = new ArrayList<Bitmap>();
-                                for(int i=0; i<sumData.size(); i++){
-                                    resultBitmap.add(sumData.get(i).getPhoto().getBitmap());
-                                }
-
                                 //json 처리
                                 final JSONObject obj = new JSONObject();  //결과 json
                                 try {
@@ -366,10 +362,12 @@ public class ContentUpdateMain extends FontActivity {
                                     //final String url = "http://192.168.12.44:8888/photovel/content/photo";
                                     final String url ="http://192.168.12.197:8080/content/photo/"+id;
 
+                                    //Bitmap처리
                                     final List<Bitmap> tmp = new ArrayList<Bitmap>();
-                                    for(int i=0; i<myDataset.size(); i++){
-                                        tmp.add(myDataset.get(i).getPhoto().getBitmap());
+                                    for(int i=0; i<sumData.size(); i++){
+                                        tmp.add(sumData.get(i).getPhoto().getBitmap());
                                     }
+
                                     new Thread(new Runnable() {
                                         @Override
                                         public void run() {
@@ -637,7 +635,8 @@ public class ContentUpdateMain extends FontActivity {
                 PhotoGeoDegree geo = new PhotoGeoDegree(orig);
                 photo.setPhoto_latitude(geo.getLatitude());
                 photo.setPhoto_longitude(geo.getLongitude());
-                address = getCurrentAddress(photo); //주소로 바꿔주기
+                GetCurrentAddress getAddress = new GetCurrentAddress();
+                address = getAddress.getAddress(photo); //주소로 바꿔주기
                 photo.setAddress(address);
             }else {
                 photo.setAddress("주소 미확인");
@@ -802,31 +801,6 @@ public class ContentUpdateMain extends FontActivity {
 
                 }
                 break;
-        }
-    }
-
-    //위도,경도 -> address
-    public String getCurrentAddress(Photo photo){
-        // GPS를 주소로 변환후 반환
-        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-        List<Address> addresses;
-        try {
-            addresses = geocoder.getFromLocation(photo.getPhoto_latitude(), photo.getPhoto_longitude(), 1);
-        } catch (IOException ioException) {
-            //네트워크 문제
-            Toast.makeText(this, "지오코더 서비스 사용불가", Toast.LENGTH_LONG).show();
-            return "지오코더 서비스 사용불가";
-        } catch (IllegalArgumentException illegalArgumentException) {
-            Toast.makeText(this, "잘못된 GPS 좌표", Toast.LENGTH_LONG).show();
-            return "잘못된 GPS 좌표";
-        }
-        if (addresses == null || addresses.size() == 0) {
-            Toast.makeText(this, "주소 미발견", Toast.LENGTH_LONG).show();
-            return "주소 미발견";
-
-        } else {
-            Address address = addresses.get(0);
-            return address.getAddressLine(0).toString();
         }
     }
 
