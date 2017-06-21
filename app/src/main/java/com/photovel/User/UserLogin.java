@@ -3,6 +3,7 @@ package com.photovel.User;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.os.Bundle;
 
 import com.photovel.R;
@@ -50,12 +51,18 @@ public class UserLogin extends FontActivity2 {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_login);
-
         mContext = this;
+
+        TextView emailIconView = (TextView)findViewById(R.id.emailIcon);
+        TextView passIconView = (TextView)findViewById(R.id.passwordIcon);
 
         emailText = (EditText) findViewById(R.id.emailText);
         passwordTextView = (EditText) findViewById(R.id.passwordText);
 
+
+        Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
+        emailIconView.setTypeface(fontAwesomeFont);
+        passIconView.setTypeface(fontAwesomeFont);
 
         Button loginButton = (Button) findViewById(R.id.loginButton);
         loginButton.setOnClickListener(new View.OnClickListener() {
