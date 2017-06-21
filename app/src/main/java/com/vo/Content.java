@@ -1,5 +1,7 @@
 package com.vo;
 
+import android.graphics.Bitmap;
+
 import java.util.Date;
 import java.util.List;
 
@@ -20,7 +22,14 @@ public class Content {
 	private Advertisement ad;
 	private List<Comment> comments;
 	private List<ContentDetail> details;
-	
+	private Bitmap bitmap;
+
+	public Bitmap getBitmap() {
+		return bitmap;
+	}
+	public void setBitmap(Bitmap bitmap) {
+		this.bitmap = bitmap;
+	}
 	public String getPhoto_file_name() {
 		return photo_file_name;
 	}

@@ -20,11 +20,9 @@
         android:theme="@style/AppTheme">
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAiudYhFEK-5EW9nzlu8Tbv1FoUNyLRWz8" />
-        <!--
-        AIzaSyDHhbAmLoQolRIfA6C2Xdm-NzKa9naq3XA
-        준기키
-        -->
+            android:value="AIzaSyDHhbAmLoQolRIfA6C2Xdm-NzKa9naq3XA" />
+        <!-- AIzaSyDHhbAmLoQolRIfA6C2Xdm-NzKa9naq3XA
+        준기키-->
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
@@ -41,8 +39,9 @@
         <activity android:name=".content.ContentInsertMain" />
         <activity android:name=".content.ContentInsertGoogleMap" />
         <activity android:name=".content.ContentUpdateMain" />
-        <activity android:name=".content.SlideShow" />
-        <activity android:name=".MainTestActivity"></activity>
+        <activity android:name=".content.SlideShow"/>
+        <activity android:name=".User.UserLogin"/>
+        <activity android:name=".TestActivity"/>
         <activity android:name=".content.ContentDetailListMain" android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 

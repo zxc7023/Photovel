@@ -321,7 +321,7 @@ public class SlideShow extends AppCompatActivity {
         for(int i=0, size=contentData.getDetails().size(); i<size; i++){
             ImageView iView = new ImageView(this);
             iView.setImageBitmap(contentData.getDetails().get(i).getPhoto().getBitmap());
-            mViewFlipper.addView(iView);
+            mViewFlipper.addView(iView,mViewFlipper.getWidth(),mViewFlipper.getHeight());
         }
     }
 
