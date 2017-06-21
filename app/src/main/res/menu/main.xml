@@ -8,8 +8,4 @@
         android:title="찾기"
         app:actionViewClass="android.support.v7.widget.SearchView"
         app:showAsAction="always" />
-    <item android:id="@+id/action_settings"
-        android:title="@string/action_settings"
-        android:orderInCategory="100"
-        app:showAsAction="never" />
 </menu>

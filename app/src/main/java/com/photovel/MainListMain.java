@@ -1,40 +1,20 @@
 package com.photovel;
-
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.Toast;
 
-<<<<<<< HEAD
-import com.photovel.R;
-import com.photovel.User.UserLogin;
-=======
 import com.alibaba.fastjson.JSON;
->>>>>>> origin/eundi
-import com.photovel.content.ClusterTest;
-import com.photovel.content.ContentDetailListMain;
-import com.photovel.content.ContentInsertMain;
-import com.photovel.content.ContentUpdateMain;
-import com.photovel.content.SlideShow;
-import com.synnapps.carouselview.CarouselView;
-import com.synnapps.carouselview.ImageListener;
-import com.vo.MainImage;
+import com.vo.Content;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -44,33 +24,28 @@ import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 
-public class MainActivity extends FontActivity2 implements NavigationView.OnNavigationItemSelectedListener {
-    private static final String TAG = "Image";
-    private SearchView searchView;
-    Toolbar toolbar;
-    CarouselView carouselView;
-    private final String imgURL = "http://192.168.12.197:8080/main_image";
-    List<MainImage> images;
+public class MainListMain extends FontActivity2 implements NavigationView.OnNavigationItemSelectedListener {
+    private static final String TAG = "MainListMain";
+    private RecyclerView mRecyclerView;
+    private MainAdapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
+    private List<Content> myDataset;
 
-    int[] sampleImages = {R.drawable.slide01, R.drawable.slide02, R.drawable.slide03};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        //메인이미지 캐러셀뷰 부분
-        carouselView = (CarouselView) findViewById(R.id.carouselView);
+        setContentView(R.layout.activity_main_list_main);
 
         //db에 있는 contentId별 content정보 받아오기
         Thread thread1 = new Thread(){
             @Override
             public void run() {
                 super.run();
-                images = getMainImage();
+                myDataset = getContentData();
+                Log.i(TAG, "myDataset= "+ myDataset);
+
             }
         };
         thread1.start();
@@ -80,56 +55,17 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
             e.printStackTrace();
         }
         getImage(); //content Image받아오기
+        Log.i(TAG, "getImage()완료 "+ myDataset.get(0).getBitmap());
 
-        carouselView.setPageCount(images.size());
-        carouselView.setImageListener(imageListener);
 
-        // Adding Toolbar to the activity
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        // Adding FloatingActionButton to the activity
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
-        HashMap<Integer,Class> map = new HashMap<>();
-        map.put(R.id.loginModuel, UserLogin.class);
-        map.put(R.id.mainListTest, MainListMain.class);
-        map.put(R.id.clusterTest, ClusterTest.class);
-        map.put(R.id.contentInsert,ContentInsertMain.class);
-        map.put(R.id.contentUpdate, ContentUpdateMain.class);
-        map.put(R.id.slideShowTest, SlideShow.class);
-        map.put(R.id.cok,TestActivity.class);
-        map.put(R.id.deatilList, ContentDetailListMain.class);
-
-        Set<Integer> keys = map.keySet();
-        for(int key: keys){
-
-            final Class clazz = map.get(key);
-            Button bt = (Button) findViewById(key);
-            bt.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(getApplicationContext(),clazz);
-                    startActivity(intent);
-                }
-            });
-        }
+        //recycleview사용선언
+        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        mRecyclerView.setHasFixedSize(true);
+        mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setNestedScrollingEnabled(false);
+        mAdapter = new MainAdapter(myDataset, MainListMain.this);
+        mRecyclerView.setAdapter(mAdapter);
     }
 
     //Android BackButton EventListener
@@ -187,7 +123,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
+        /*getMenuInflater().inflate(R.menu.main, menu);
         searchView = (SearchView) toolbar.getMenu().findItem(R.id.menu_search).getActionView();
         MenuItem searchItem = menu.findItem(R.id.menu_search);
         searchView = (SearchView) searchItem.getActionView();
@@ -203,44 +139,40 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
             public boolean onQueryTextChange(String s) {
                 return false;
             }
-        });
+        });*/
         return true;
     }
 
-    //메인이미지 캐러셀뷰 부분
-    ImageListener imageListener = new ImageListener() {
-        @Override
-        public void setImageForPosition(int position, ImageView imageView) {
-            //imageView.setImageResource(sampleImages[position]);
-            imageView.setImageBitmap(images.get(position).getBitmap());
-        }
-    };
-
-    public List<MainImage> getMainImage(){
+    public List<Content> getContentData(){
+        List<Content> content = null;
         HttpURLConnection conn = null;
-        String qry = imgURL;
-        Log.i(TAG, "1.getMainImage qry= " + qry);
+
+        String qry = "http://192.168.12.197:8080/content/photo/";
+        Log.i(TAG, "1.getPhotoData의 qry= " + qry);
+
         try {
             URL strUrl = new URL(qry);
             conn = (HttpURLConnection) strUrl.openConnection();
             conn.setDoInput(true);//서버로부터 결과값을 응답받음
-
             conn.setRequestMethod("GET");
-            Log.i(TAG, "2.getMainImage qry= " + qry);
+            Log.i(TAG, "2.getPhotoData의 qry= " + qry);
+
 
             final int responseCode = conn.getResponseCode(); //정상인 경우 200번, 그 외 오류있는 경우 오류 번호 반환
-            Log.i(TAG, "3.getMainImage responseCode= " + responseCode);
+            Log.i(TAG, "getPhotoData의 responseCode= " + responseCode);
             switch (responseCode){
                 case HttpURLConnection.HTTP_OK:
 
                     InputStream is = conn.getInputStream();
                     Reader reader = new InputStreamReader(is, "UTF-8");
                     BufferedReader br = new BufferedReader(reader);
+                    String responseData = null;
 
-                    String responseData = br.readLine();
-                    Log.i(TAG, "4.getMainImage response data= " + responseData);
+                    responseData = br.readLine();
+                    Log.i(TAG, "getPhotoData의 response data= " + responseData);
 
-                    images =  JSON.parseArray(responseData, MainImage.class);
+                    content = JSON.parseArray(responseData, Content.class);
+                    Log.i(TAG, "getPhotoData의 content= " + content);
 
                     br.close();
                     reader.close();
@@ -265,7 +197,8 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
                     });
                     break;
             }
-            return images;
+
+            return content;
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -273,6 +206,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         } finally {
             conn.disconnect();
         }
+
         return null;
     }
 
@@ -283,10 +217,11 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
             public void run() {
                 super.run();
                 try {
-                    for (int i = 0; i < images.size(); i++) {
-                        Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL("http://192.168.12.197:8080/app/images/main/"+images.get(i).getImage_file_name()).getContent());
-                        images.get(i).setBitmap(bitmap);
+                    for (int i = 0; i < myDataset.size(); i++) {
+                        Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL("http://192.168.12.197:8080/upload/" + myDataset.get(i).getContent_id() + "/" + myDataset.get(i).getPhoto_file_name()).getContent());
+                        myDataset.get(i).setBitmap(bitmap);
                     }
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

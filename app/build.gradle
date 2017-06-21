@@ -50,10 +50,15 @@ dependencies {
 
     //font라이브러리
     compile 'com.tsengvn:typekit:1.0.1'
-    
+
     //slide Show
     compile 'com.alibaba:fastjson:1.2.33'
     compile 'com.alibaba:fastjson:1.1.58.android'
     compile 'com.akexorcist:RoundCornerProgressBar:2.0.3'
 
+    //캐러셀뷰
+    compile 'com.synnapps:carouselview:0.1.4'
+
+    //프로필사진 동그랗게
+    compile 'com.mikhaellopez:circularimageview:3.0.2'
 }

@@ -47,6 +47,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -55,7 +58,9 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -78,12 +83,13 @@ public class ContentUpdateMain extends FontActivity {
     private RecyclerView mRecyclerView;
     private ContentUpdateAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-    private ArrayList<ContentDetail> myDataset;
+    private ArrayList<ContentDetail> myDataset, originData, sumData;
     private String address;
 
     private EditText contentSubject, contentText;
     private Switch swPrivate;
     private boolean flagSwitch;
+    private int id=1;
 
     private Content content;
 
@@ -139,7 +145,7 @@ public class ContentUpdateMain extends FontActivity {
             @Override
             public void run() {
                 super.run();
-                content = getContentData(1);
+                content = getContentData(id);
             }
         };
         thread1.start();
@@ -154,6 +160,7 @@ public class ContentUpdateMain extends FontActivity {
         contentSubject.setText(content.getContent_subject());
         contentText.setText(content.getContent());
         myDataset = new ArrayList<>();
+        originData = new ArrayList<>();
         for(int i=0; i<content.getDetails().size(); i++){
             Photo ph = new Photo();
             ph.setPhoto_latitude(content.getDetails().get(i).getPhoto().getPhoto_latitude());
@@ -161,6 +168,7 @@ public class ContentUpdateMain extends FontActivity {
             String address = getCurrentAddress(ph);
             content.getDetails().get(i).getPhoto().setAddress(address);
             myDataset.add(content.getDetails().get(i));
+            originData.add(content.getDetails().get(i));
         }
 
         //recycleview사용선언
@@ -257,12 +265,12 @@ public class ContentUpdateMain extends FontActivity {
 
                                 //라디오버튼 선택안했을때
                                 if(mAdapter.pa2==null || mAdapter.pa2.getHolder().radioG.getCheckedRadioButtonId()==-1){
-                                    Toast.makeText(getApplicationContext(),"대표사진을 선택해주세요!",Toast.LENGTH_LONG).show();
+                                    Toast.makeText(getApplicationContext(),"대표사진을 다시 선택해주세요!",Toast.LENGTH_LONG).show();
                                     return;
                                 }
 
                                 //완료되는 Content처리
-                                Content resultContent = new Content();
+                                Content resultContent = content;
                                 resultContent.setContent_subject(contentSubject.getText().toString());
                                 if(contentText.getText().toString().equals("")){
                                     resultContent.setContent("");
@@ -275,7 +283,12 @@ public class ContentUpdateMain extends FontActivity {
                                 }else{
                                     resultContent.setContent_private_flag("F");
                                 }
+
                                 //완료되는 Content_detail처리
+                                for(int j=0; j<originData.size(); j++){
+                                    //원재 DB에있는것인데 지워진것인지 아닌지 판단
+                                    originData.get(j).setDetail_delete_status("T");
+                                }
                                 for(int i=0;i<myDataset.size();i++){
                                     if(myDataset.get(i).getPhoto().getPhoto_latitude()==0 && myDataset.get(i).getPhoto().getPhoto_longitude()==0){
                                         //위치 없을때
@@ -287,19 +300,38 @@ public class ContentUpdateMain extends FontActivity {
                                     }
                                     if(myDataset.get(i).getContent_detail_id()==null){
                                         myDataset.get(i).setContent_detail_id("");
+                                    }else{
+                                        //원재 DB에있는것인데 지워진것인지 아닌지 판단2
+                                        myDataset.get(i).setDetail_delete_status("F");
+                                        for(int j=0; j<originData.size(); j++){
+                                            if(myDataset.get(i).getContent_detail_id() == originData.get(j).getContent_detail_id()){
+                                                originData.get(j).setDetail_delete_status("F");
+                                            }
+                                        }
                                     }
                                     if(myDataset.get(i).getPhoto().getPhoto_top_flag()==1){ //원래 photo_top_flag없애기
                                         myDataset.get(i).getPhoto().setPhoto_top_flag(0);
                                     }
                                 }
                                 myDataset.get(mAdapter.pa2.getPosition()).getPhoto().setPhoto_top_flag(1);  //바뀐 photo_top_flag설정
-                                resultContent.setDetails(myDataset);
+
+                                //sumData에 합치기
+                               sumData = new ArrayList<ContentDetail>();
+                                for(int i=0; i<myDataset.size(); i++){
+                                    sumData.add(myDataset.get(i));
+                                }
+                                for(int j=0; j<originData.size(); j++){
+                                    if(originData.get(j).getDetail_delete_status().equals("T")){
+                                        sumData.add(originData.get(j));
+                                    }
+                                }
+
+                                resultContent.setDetails(sumData);
 
                                 //Bitmap처리
                                 ArrayList<Bitmap> resultBitmap = new ArrayList<Bitmap>();
-                                for(int i=0; i<myDataset.size(); i++){
-                                    resultBitmap.add(myDataset.get(i).getPhoto().getBitmap());
-                                    Log.i("Bitmap",resultBitmap+"");
+                                for(int i=0; i<sumData.size(); i++){
+                                    resultBitmap.add(sumData.get(i).getPhoto().getBitmap());
                                 }
 
                                 //json 처리
@@ -308,68 +340,120 @@ public class ContentUpdateMain extends FontActivity {
                                     JSONArray jArray = new JSONArray();
                                     for(int i=0; i<resultContent.getDetails().size(); i++){
                                         JSONObject sObject = new JSONObject();  //배열 내에 들어갈 json
+                                        sObject.put("content_id",resultContent.getDetails().get(i).getContent_id());
                                         sObject.put("content_detail_id",resultContent.getDetails().get(i).getContent_detail_id());
-                                        sObject.put("datail_content",resultContent.getDetails().get(i).getDetail_content());
+                                        sObject.put("detail_content",resultContent.getDetails().get(i).getDetail_content());
+                                        sObject.put("detail_delete_status",resultContent.getDetails().get(i).getDetail_delete_status());
                                         JSONObject sbObject = new JSONObject();
-                                        sbObject.put("photo_date",resultContent.getDetails().get(i).getPhoto().getPhoto_date());
+                                        sbObject.put("content_id",resultContent.getDetails().get(i).getPhoto().getContent_id());
+                                        sbObject.put("content_detail_id",resultContent.getDetails().get(i).getPhoto().getContent_detail_id());
+                                        sbObject.put("photo_date",new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(resultContent.getDetails().get(i).getPhoto().getPhoto_date()));
                                         sbObject.put("photo_latitude",resultContent.getDetails().get(i).getPhoto().getPhoto_latitude());
                                         sbObject.put("photo_longitude",resultContent.getDetails().get(i).getPhoto().getPhoto_longitude());
                                         sbObject.put("photo_top_flag",resultContent.getDetails().get(i).getPhoto().getPhoto_top_flag());
                                         sObject.put("photo",sbObject);
                                         jArray.put(sObject);
                                     }
+                                    obj.put("content_id",resultContent.getContent_id());
                                     obj.put("content_subject",resultContent.getContent_subject());
                                     obj.put("content",resultContent.getContent());
-                                    obj.put("content_written_date",resultContent.getContent_written_date());
+                                    obj.put("content_written_date",new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(resultContent.getContent_written_date()));
                                     obj.put("content_private_flag",resultContent.getContent_private_flag());
                                     obj.put("details",jArray);
 
                                     Log.i("ddd",obj.toString());
 
+                                    //final String url = "http://192.168.12.44:8888/photovel/content/photo";
+                                    final String url ="http://192.168.12.197:8080/content/photo/"+id;
+
+                                    final List<Bitmap> tmp = new ArrayList<Bitmap>();
+                                    for(int i=0; i<myDataset.size(); i++){
+                                        tmp.add(myDataset.get(i).getPhoto().getBitmap());
+                                    }
                                     new Thread(new Runnable() {
                                         @Override
                                         public void run() {
+                                            DataOutputStream dos = null;
                                             HttpURLConnection conn = null;
-                                            //String url = photoURL;
-                                            String url = "http://192.168.12.197:8080/content/photo";
-                                            try{
-                                                URL strUrl = new URL(url);
-                                                conn = (HttpURLConnection) strUrl.openConnection();
-                                                //conn.setDoInput(true);    //서버로부터 결과값을 응답받음
-                                                conn.setDoOutput(true);     //서버로 값을 출력
+                                            try {
+                                                String lineEnd = "\r\n";
+                                                String twoHyphens = "--";
+                                                String boundary = "**##**";
+
+                                                URL connectURL = new URL(url);
+
+                                                conn = (HttpURLConnection) connectURL.openConnection();
+                                                conn.setDoInput(true);
+                                                conn.setDoOutput(true);
+                                                conn.setUseCaches(false);
                                                 conn.setRequestMethod("POST");
-                                                conn.setRequestProperty("Cache-Control","no-cache");
-                                                conn.setRequestProperty("Content-Type","application/json");
-                                                conn.setRequestProperty("Accept","application/json");
 
-                                                OutputStream os = conn.getOutputStream();
-                                                os.write(obj.toString().getBytes());
-                                                os.flush();
-                                          /*      BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-                                                bw.write(String.valueOf(obj.toString().getBytes()));
-                                                bw.flush();
-                                                bw.close();*/
+                                                conn.setRequestProperty("Connection", "Keep-Alive");
+                                                conn.setRequestProperty("Content-Type","multipart/form-data;boundary=" + boundary);
+                                                dos = new DataOutputStream(conn.getOutputStream());
 
-                                                final int responseCode =  conn.getResponseCode();
+                                                dos.writeBytes(lineEnd + twoHyphens + boundary + lineEnd);
+                                                dos.writeBytes("Content-Disposition: form-data; name=\"content\""+lineEnd+lineEnd+ URLEncoder.encode(obj.toString(),"UTF-8"));
+                                                //dos.writeBytes("Content-Type: application/json;charset=\"UTF-8\"\r\n\r\n");
+
+                                                for(int i=0; i < tmp.size(); i++){
+                                                    dos.writeBytes(lineEnd + twoHyphens + boundary + lineEnd);
+                                                    dos.writeBytes("Content-Disposition: form-data; name=\"uploadFile\"; filename=\"uploadFile\""+lineEnd);
+                                                    dos.writeBytes("Content-Type: image/jpg"+lineEnd+lineEnd);
+                                                    /*dos.writeBytes("Content-Type: application/octet-stream\r\n\r\n");*/
+
+                                                    ByteArrayOutputStream outPutStream = new ByteArrayOutputStream();
+                                                    tmp.get(i).compress(Bitmap.CompressFormat.JPEG, 100, outPutStream);
+                                                    byte[] byteArray = outPutStream.toByteArray();
+                                                    ByteArrayInputStream inputStream = new ByteArrayInputStream(byteArray);
+                                                    int bytesAvailable = inputStream.available();
+                                                    int maxBufferSize = 1024;
+                                                    int bufferSize = Math.min(bytesAvailable, maxBufferSize);
+                                                    byte[] buffer = new byte[bufferSize];
+
+                                                    int bytesRead = inputStream.read(buffer, 0, bufferSize);
+                                                    while (bytesRead > 0)
+                                                    {
+                                                        dos.write(buffer, 0, bufferSize);
+                                                        bytesAvailable = inputStream.available();
+                                                        bufferSize = Math.min(bytesAvailable, maxBufferSize);
+                                                        bytesRead = inputStream.read(buffer, 0, bufferSize);
+                                                    }
+                                                    inputStream.close();
+                                                }
+
+
+                                                dos.writeBytes(lineEnd + twoHyphens + boundary + twoHyphens + lineEnd);
+                                                dos.flush();
+
+                                                int responseCode = conn.getResponseCode();
+                                                Log.i("responseCode",responseCode+"");
+
                                                 switch (responseCode){
-                                                    case HttpURLConnection.HTTP_OK:
-                                                        Log.i("status","정상");
-
-                                                        break;
-                                                    default:
-                                                        Log.i("status","비정상");
-                                                        Log.i("status",responseCode+"");
+                                                    case HttpURLConnection.HTTP_OK :
+                                                        dos.close();
+                                                        conn.disconnect();
                                                         break;
                                                 }
-                                            }catch (MalformedURLException e) {
+
+                                            } catch (ProtocolException e) {
+                                                e.printStackTrace();
+                                            } catch (MalformedURLException e) {
                                                 e.printStackTrace();
                                             } catch (IOException e) {
                                                 e.printStackTrace();
-                                            } finally {
-                                                conn.disconnect();
+                                            }finally {
+                                                try {
+                                                    dos.close();
+                                                    conn.disconnect();
+                                                } catch (IOException e) {
+                                                    e.printStackTrace();
+                                                }
+
                                             }
                                         }
                                     }).start();
+
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -437,8 +521,11 @@ public class ContentUpdateMain extends FontActivity {
         Content content = null;
         HttpURLConnection conn = null;
         Log.i(TAG, "getPhotoData의 id= " + id);
-        String qry = photoURL + "/" + id;
+
+        //String qry = photoURL + "/" + id;
+        String qry = "http://192.168.12.197:8080/content/photo/" + id;
         Log.i(TAG, "1.getPhotoData의 qry= " + qry);
+
         try {
             URL strUrl = new URL(qry);
             conn = (HttpURLConnection) strUrl.openConnection();
@@ -516,7 +603,8 @@ public class ContentUpdateMain extends FontActivity {
                 super.run();
                 try {
                     for (int i = 0; i < content.getDetails().size(); i++) {
-                        Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL("http://photovel.com/upload/" + content.getContent_id() + "/" + content.getDetails().get(i).getPhoto().getPhoto_file_name()).getContent());
+                        //Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL("http://photovel.com/upload/" + content.getContent_id() + "/" + content.getDetails().get(i).getPhoto().getPhoto_file_name()).getContent());
+                        Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL("http://192.168.12.197:8080/upload/" + content.getContent_id() + "/" + content.getDetails().get(i).getPhoto().getPhoto_file_name()).getContent());
                         content.getDetails().get(i).getPhoto().setBitmap(bitmap);
                         //File filePath = new File(Environment.getExternalStorageDirectory());
                         //FileUtils.copyURLToFile(new URL("http://photovel.com/upload/" + contentData.getContent_id() + "/" + contentData.getDetails().get(i).getPhoto().getPhotoFileName()), );

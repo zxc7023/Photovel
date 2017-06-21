@@ -1,10 +1,19 @@
 package com.vo;
 
+import android.graphics.Bitmap;
+
 public class MainImage {
 	private String image_file_name;
 	private String image_url_link;
 	private String image_subject;
 	private String image_content;
+	private Bitmap bitmap;
+	public Bitmap getBitmap() {
+		return bitmap;
+	}
+	public void setBitmap(Bitmap bitmap) {
+		this.bitmap = bitmap;
+	}
 	public String getImage_file_name() {
 		return image_file_name;
 	}
@@ -31,7 +40,7 @@ public class MainImage {
 	}
 	@Override
 	public String toString() {
-		return "MainImage [image_file_name=" + image_file_name + ", image_url_link=" + image_url_link
+		return "MainImageActivity [image_file_name=" + image_file_name + ", image_url_link=" + image_url_link
 				+ ", image_subject=" + image_subject + ", image_content=" + image_content + "]";
 	}
 	
