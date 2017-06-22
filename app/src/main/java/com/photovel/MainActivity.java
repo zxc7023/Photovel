@@ -30,6 +30,7 @@ import com.photovel.content.ContentDetailListMain;
 import com.photovel.content.ContentInsertMain;
 import com.photovel.content.ContentUpdateMain;
 import com.photovel.content.SlideShow;
+import com.photovel.http.Value;
 import com.synnapps.carouselview.CarouselView;
 import com.synnapps.carouselview.ImageListener;
 import com.vo.Content;
@@ -53,7 +54,6 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
     Toolbar toolbar;
     //메인 이미지 케러셀뷰
     CarouselView carouselView;
-    private final String imgURL = "http://192.168.12.197:8080/main_image";
     List<MainImage> images;
 
     //추천 게시글 가로스크롤
@@ -91,20 +91,20 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
 
         //추천 게시글 가로스크롤
         //db에 있는 contentId별 content정보 받아오기
-        Thread getChoochun = new Thread(){
+        Thread getRecommend = new Thread(){
             @Override
             public void run() {
                 super.run();
-                myDataset = getChoochunData();
+                myDataset = getRecommendData();
             }
         };
-        getChoochun.start();
+        getRecommend.start();
         try {
-            getChoochun.join();  //모든처리 thread처리 기다리기
+            getRecommend.join();  //모든처리 thread처리 기다리기
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        getChoochunBitmap(); //content Image받아오기
+        getRecommendBitmap(); //content Image받아오기
 
 
         //recycleview사용선언
@@ -249,7 +249,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
     //
     public List<MainImage> getMainImage(){
         HttpURLConnection conn = null;
-        String qry = imgURL;
+        String qry = Value.mainImageURL;
         Log.i(TAG, "1.getMainImage qry= " + qry);
         try {
             URL strUrl = new URL(qry);
@@ -314,7 +314,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
                 super.run();
                 try {
                     for (int i = 0; i < images.size(); i++) {
-                        Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL("http://192.168.12.197:8080/app/images/main/"+images.get(i).getImage_file_name()).getContent());
+                        Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL(Value.mainImagePhotoURL+"/"+images.get(i).getImage_file_name()).getContent());
                         images.get(i).setBitmap(bitmap);
                     }
                 } catch (Exception e) {
@@ -332,11 +332,11 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
     }
 
     //추천게시글 가로스크롤
-    public List<Content> getChoochunData(){
+    public List<Content> getRecommendData(){
         List<Content> content = null;
         HttpURLConnection conn = null;
 
-        String qry = "http://192.168.12.197:8080/content/photo/";
+        String qry = Value.contentURL+"/recommend";
         Log.i(TAG, "1.getPhotoData의 qry= " + qry);
 
         try {
@@ -399,14 +399,14 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         return null;
     }
     //DB에서 bitmap정보 받아오기
-    public void getChoochunBitmap(){
+    public void getRecommendBitmap(){
         Thread thread2 = new Thread(){
             @Override
             public void run() {
                 super.run();
                 try {
                     for (int i = 0; i < myDataset.size(); i++) {
-                        Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL("http://192.168.12.197:8080/upload/" + myDataset.get(i).getContent_id() + "/" + myDataset.get(i).getPhoto_file_name()).getContent());
+                        Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL(Value.contentPhotoURL+"/" + myDataset.get(i).getContent_id() + "/" + myDataset.get(i).getPhoto_file_name()).getContent());
                         myDataset.get(i).setBitmap(bitmap);
                     }
 
