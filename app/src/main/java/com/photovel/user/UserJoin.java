@@ -1,10 +1,8 @@
-package com.photovel.User;
+package com.photovel.user;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 
 import com.photovel.FontActivity2;
-import com.photovel.R;
 
 /**
  * Created by Junki on 2017-06-19.

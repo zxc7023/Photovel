@@ -35,37 +35,21 @@
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/clusterTest"
-                android:text="clusterTest" />
-
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:id="@+id/contentInsert"
                 android:text="contentInsert" />
 
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/contentUpdate"
-                android:text="contentUpdate" />
-
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/slideShowTest"
-                android:text="slideShowTest"/>
-
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:id="@+id/deatilList"
                 android:text="DeatilList"/>
+
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/loginModuel"
                 android:text="loginModuel"/>
+
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

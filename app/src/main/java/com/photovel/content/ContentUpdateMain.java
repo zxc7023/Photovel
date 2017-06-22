@@ -37,7 +37,7 @@ import android.widget.Toast;
 import com.alibaba.fastjson.JSON;
 import com.photovel.R;
 import com.photovel.FontActivity;
-import com.photovel.http.value;
+import com.photovel.http.Value;
 import com.vo.Content;
 import com.vo.ContentDetail;
 import com.vo.Photo;
@@ -78,7 +78,9 @@ public class ContentUpdateMain extends FontActivity {
     private ExifInterface exif;
     private static final String TAG = "AppPermission";
     private final int MY_PERMISSION_REQUEST_STORAGE = 100;
-    private final String photoURL = value.photoURL;
+
+    private final String contentURL = Value.contentURL;
+    private final String contentPhotoURL = Value.contentPhotoURL;
 
     private RecyclerView mRecyclerView;
     private ContentUpdateAdapter mAdapter;
@@ -364,8 +366,7 @@ public class ContentUpdateMain extends FontActivity {
 
                                     Log.i("ddd",obj.toString());
 
-                                    //final String url = "http://192.168.12.44:8888/photovel/content/photo";
-                                    final String url ="http://192.168.12.197:8080/content/photo/"+id;
+                                    final String url = contentURL+"/"+id;
 
                                     //Bitmap처리
                                     final List<Bitmap> tmp = new ArrayList<Bitmap>();
@@ -526,7 +527,7 @@ public class ContentUpdateMain extends FontActivity {
         Log.i(TAG, "getPhotoData의 id= " + id);
 
         //String qry = photoURL + "/" + id;
-        String qry = "http://192.168.12.197:8080/content/photo/" + id;
+        String qry = contentURL+"/" + id;
         Log.i(TAG, "1.getPhotoData의 qry= " + qry);
 
         try {
@@ -606,8 +607,7 @@ public class ContentUpdateMain extends FontActivity {
                 super.run();
                 try {
                     for (int i = 0; i < content.getDetails().size(); i++) {
-                        //Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL("http://photovel.com/upload/" + content.getContent_id() + "/" + content.getDetails().get(i).getPhoto().getPhoto_file_name()).getContent());
-                        Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL("http://192.168.12.197:8080/upload/" + content.getContent_id() + "/" + content.getDetails().get(i).getPhoto().getPhoto_file_name()).getContent());
+                        Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL(contentPhotoURL+"/" + content.getContent_id() + "/" + content.getDetails().get(i).getPhoto().getPhoto_file_name()).getContent());
                         content.getDetails().get(i).getPhoto().setBitmap(bitmap);
                         //File filePath = new File(Environment.getExternalStorageDirectory());
                         //FileUtils.copyURLToFile(new URL("http://photovel.com/upload/" + contentData.getContent_id() + "/" + contentData.getDetails().get(i).getPhoto().getPhotoFileName()), );
