@@ -31,10 +31,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder>{
+public class MainRecommendAdapter extends RecyclerView.Adapter<MainRecommendAdapter.ViewHolder>{
     private List<Content> mDataset;
     private Context mcontext;
-    private MainAdapter.ViewHolder holder;
+    private MainRecommendAdapter.ViewHolder holder;
     private int position;
 
     public int getPosition() {
@@ -44,17 +44,17 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder>{
         this.position = position;
     }
 
-    public MainAdapter.ViewHolder getHolder() {
+    public MainRecommendAdapter.ViewHolder getHolder() {
         return holder;
     }
-    public void setHolder(MainAdapter.ViewHolder holder) {
+    public void setHolder(MainRecommendAdapter.ViewHolder holder) {
         this.holder = holder;
     }
 
-    public MainAdapter() {
+    public MainRecommendAdapter() {
     }
 
-    public MainAdapter(List<Content> myDataset, Context mycontext) {
+    public MainRecommendAdapter(List<Content> myDataset, Context mycontext) {
         mDataset = myDataset;
         mcontext = mycontext;
     }
@@ -76,10 +76,10 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder>{
     }
 
     @Override
-    public MainAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public MainRecommendAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // create a new view
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_main_list_adapter, parent, false);
-        MainAdapter.ViewHolder vh = new MainAdapter.ViewHolder(v);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_main_recommend_list_adapter, parent, false);
+        MainRecommendAdapter.ViewHolder vh = new MainRecommendAdapter.ViewHolder(v);
         return vh;
     }
 

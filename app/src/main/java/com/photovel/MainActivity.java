@@ -55,7 +55,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
 
     //추천 게시글 가로스크롤
     private RecyclerView mRecyclerView;
-    private MainAdapter mAdapter;
+    private MainRecommendAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private List<Content> myDataset;
 
@@ -110,7 +110,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setNestedScrollingEnabled(false);
-        mAdapter = new MainAdapter(myDataset, MainActivity.this);
+        mAdapter = new MainRecommendAdapter(myDataset, MainActivity.this);
         mRecyclerView.setAdapter(mAdapter);
 
 
@@ -243,6 +243,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
     //
     public List<MainImage> getMainImage(){
         HttpURLConnection conn = null;
+        List<MainImage> imgs = null;
         String qry = Value.mainImageURL;
         Log.i(TAG, "1.getMainImage qry= " + qry);
         try {
@@ -265,7 +266,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
                     String responseData = br.readLine();
                     Log.i(TAG, "4.getMainImage response data= " + responseData);
 
-                    images =  JSON.parseArray(responseData, MainImage.class);
+                    imgs =  JSON.parseArray(responseData, MainImage.class);
 
                     br.close();
                     reader.close();
@@ -290,7 +291,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
                     });
                     break;
             }
-            return images;
+            return imgs;
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -310,6 +311,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
                     for (int i = 0; i < images.size(); i++) {
                         Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL(Value.mainImagePhotoURL+"/"+images.get(i).getImage_file_name()).getContent());
                         images.get(i).setBitmap(bitmap);
+                        Log.i(TAG, "getMainBitmap bitmap= " + bitmap);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -330,7 +332,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         List<Content> content = null;
         HttpURLConnection conn = null;
 
-        String qry = Value.contentURL+"/recommend";
+        String qry = Value.contentURL;//+"/recommend";
         Log.i(TAG, "1.getPhotoData의 qry= " + qry);
 
         try {

@@ -10,5 +10,5 @@ public class Value {
     //mainImage
     public static String mainImageURL = "http://www.photovel.com/main_image";
     //mainImage에 따른 photo
-    public static String mainImagePhotoURL = "http://www.photovel.com/app/image/main";
+    public static String mainImagePhotoURL = "http://www.photovel.com/app/images/main";
 }
