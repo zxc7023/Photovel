@@ -233,9 +233,9 @@ public class ContentInsertMain extends FontActivity {
                                 }
                                 resultContent.setContent_written_date(new Date());
                                 if (flagSwitch == true) {
-                                    resultContent.setContent_private_flag("T");
-                                } else {
                                     resultContent.setContent_private_flag("F");
+                                } else {
+                                    resultContent.setContent_private_flag("T");
                                 }
                                 for (int i = 0; i < myDataset.size(); i++) {
                                     if (myDataset.get(i).getPhoto().getPhoto_latitude() == 0 && myDataset.get(i).getPhoto().getPhoto_longitude() == 0) {

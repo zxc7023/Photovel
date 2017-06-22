@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/show_profile"
+        android:title="프로필보기"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+    <item android:id="@+id/show_other_content"
+        android:title="다른컨텐츠보기"
+        android:orderInCategory="100"
+        app:showAsAction="never"/>
+</menu>

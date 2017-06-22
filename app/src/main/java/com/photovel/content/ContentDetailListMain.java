@@ -7,9 +7,11 @@ import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
@@ -22,7 +24,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -61,11 +62,13 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
     private LinearLayout RLdetailDate, LLmenu;
     private TextView icglobe, icflag, icvideo, iccal, icline, icmarker, icpow, icthumb, iccomment, icshare, btnDetailMenu;
     private TextView tvContentInsertDate, tvContentSubject, tvContentLocation, tvUsername, tvDuring, tvdetailcount, tvdetailstate, tvContent;
-    private TextView tvLikeCount, tvCommentCount, tvShareCount, btnLookMap, btnLookPlay;
+    private TextView tvLikeCount, tvCommentCount, tvShareCount;
+    private LinearLayout btnLookMap, btnLookPlay;
     private ImageView ivTopPhoto;
+    private FloatingActionButton btnTop;
     private List<ContentDetail> myDataset;
     private Content content;
-    private int id=1;
+    private int id=0;
 
     private final String contentURL = Value.contentURL;
     private final String contentPhotoURL = Value.contentPhotoURL;
@@ -75,11 +78,13 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_content_detail_list_main);
 
-        /*Intent intent = getIntent();
-        id = intent.getIntExtra("content_id",-1);
+        Intent intent = getIntent();
+        id = intent.getIntExtra("content_id",1);
         if(id==-1){
             Log.i("id","id를 못받아옴!!!");
-        }*/
+        }else {
+            Log.i("id","id : "+id);
+        }
 
         // Adding Toolbar to the activity
         toolbar = (Toolbar) findViewById(R.id.detailListToolbar);
@@ -110,8 +115,8 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         tvShareCount = (TextView) findViewById(R.id.tvShareCount);
         tvdetailcount = (TextView) findViewById(R.id.tvdetailcount);
 
-        btnLookMap = (TextView) findViewById(R.id.btnLookMap);
-        btnLookPlay = (TextView) findViewById(R.id.btnLookPlay);
+        btnLookMap = (LinearLayout) findViewById(R.id.btnLookMap);
+        btnLookPlay = (LinearLayout) findViewById(R.id.btnLookPlay);
 
         //imageView를 font로 바꿔주기
         Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
@@ -198,30 +203,54 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        //top버튼
+        btnTop = (FloatingActionButton) findViewById(R.id.btnTop);
+        final NestedScrollView nsv = (NestedScrollView) findViewById(R.id.nestedScrollView);
+        nsv.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {   //스크롤내리면 보이게
+            @Override
+            public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                if (oldScrollY > 200) {
+                    btnTop.show();
+                } else {
+                    btnTop.hide();
+                }
+            }
+        });
+        btnTop.setOnClickListener(new View.OnClickListener() {  //top으로 이동
+            @Override
+            public void onClick(View view) {
+                nsv.fullScroll(View.FOCUS_UP);
+            }
+        });
     }
 
     //onClick
     public void goLook(View v){
         switch (v.getId()){
             case R.id.btnLookMap:
+                Toast.makeText(getApplicationContext(),"지도로보기",Toast.LENGTH_SHORT).show();
+                Log.i("ddd","지도로 보기 클릭");
                 Intent intent=new Intent(this, ContentClusterMain.class);
                 intent.putExtra("id",id);
                 this.startActivity(intent);
+                finish();
                 break;
             case R.id.btnLookPlay:
                 Intent intent2=new Intent(this, ContentSlideShowMain.class);
                 intent2.putExtra("id",id);
                 this.startActivity(intent2);
+                finish();
                 break;
         }
     }
 
-    //메뉴클릭시
+    //디테일 설정 메뉴클릭시
     public void ContentMenuClick(View v){
         Context wrapper = new ContextThemeWrapper(this, R.style.MenuStyle);
         PopupMenu popup = new PopupMenu(wrapper, v);
         MenuInflater inflater = popup.getMenuInflater();
-        inflater.inflate(R.menu.content_setting, popup.getMenu());
+        inflater.inflate(R.menu.content_setting_menu, popup.getMenu());
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -237,6 +266,30 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
                         break;
                     case R.id.action_report:
                         Toast.makeText(getApplicationContext(),"신고",Toast.LENGTH_SHORT).show();
+                        break;
+                }
+
+                return false;
+            }
+        });
+        popup.show();
+    }
+
+    //프로파일 클릭시
+    public void ProFileMenuClick(View v){
+        Context wrapper = new ContextThemeWrapper(this, R.style.MenuStyle);
+        PopupMenu popup = new PopupMenu(wrapper, v);
+        MenuInflater inflater = popup.getMenuInflater();
+        inflater.inflate(R.menu.user_menu, popup.getMenu());
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()){
+                    case R.id.show_profile:
+                        Toast.makeText(getApplicationContext(),"프로필보기",Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.show_other_content:
+                        Toast.makeText(getApplicationContext(),"다른컨텐트보기",Toast.LENGTH_SHORT).show();
                         break;
                 }
 

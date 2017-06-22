@@ -170,7 +170,6 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         map.put(R.id.loginModuel, UserLogin.class);
         map.put(R.id.contentInsert,ContentInsertMain.class);
         map.put(R.id.cok,TestActivity.class);
-        map.put(R.id.deatilList, ContentDetailListMain.class);
 
         Set<Integer> keys = map.keySet();
         for(int key: keys){

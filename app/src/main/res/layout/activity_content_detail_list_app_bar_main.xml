@@ -73,7 +73,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginTop="50dp">
+                    android:layout_marginTop="60dp">
                     <TextView
                         android:id="@+id/icline"
                         android:layout_width="wrap_content"
@@ -138,10 +138,12 @@
                     android:background="@color/bgToMeong"
                     android:gravity="center">
                     <LinearLayout
+                        android:id="@+id/btnLookMap"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
-                        android:layout_marginLeft="@dimen/most_left_tv_margin">
+                        android:layout_marginLeft="@dimen/most_left_tv_margin"
+                        android:onClick="goLook">
                         <TextView
                             android:id="@+id/icflag"
                             android:layout_width="wrap_content"
@@ -153,7 +155,6 @@
                             android:gravity="center_vertical"
                             android:layout_marginRight="@dimen/between_tv_margin"/>
                         <TextView
-                            android:id="@+id/btnLookMap"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:background="@color/bgNo"
@@ -161,8 +162,7 @@
                             android:textSize="@dimen/content_text_size"
                             android:textColor="@color/bgWhite"
                             android:includeFontPadding="false"
-                            android:gravity="center_vertical"
-                            android:onClick="goLook"/>
+                            android:gravity="center_vertical"/>
                     </LinearLayout>
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -170,29 +170,33 @@
                         android:layout_gravity="center"
                         android:gravity="right"
                         android:layout_marginRight="@dimen/most_rignt_tv_margin">
-                        <TextView
-                            android:id="@+id/icvideo"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:text="@string/fa_video_camera"
-                            android:textSize="@dimen/icon_size"
-                            android:textColor="@color/bgWhite"
-                            android:layout_gravity="center"
-                            android:gravity="center"
-                            android:includeFontPadding="false"
-                            android:layout_marginRight="@dimen/between_tv_margin"/>
-                        <TextView
+                        <LinearLayout
                             android:id="@+id/btnLookPlay"
                             android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:background="@color/bgNo"
-                            android:text="슬라이드로 보기"
-                            android:textSize="@dimen/content_text_size"
-                            android:textColor="@color/bgWhite"
-                            android:layout_gravity="center"
-                            android:gravity="center_vertical"
-                            android:includeFontPadding="false"
-                            android:onClick="goLook"/>
+                            android:layout_height="wrap_content"
+                            android:onClick="goLook">
+                            <TextView
+                                android:id="@+id/icvideo"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:text="@string/fa_video_camera"
+                                android:textSize="@dimen/icon_size"
+                                android:textColor="@color/bgWhite"
+                                android:layout_gravity="center"
+                                android:gravity="center"
+                                android:includeFontPadding="false"
+                                android:layout_marginRight="@dimen/between_tv_margin"/>
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:background="@color/bgNo"
+                                android:text="슬라이드로 보기"
+                                android:textSize="@dimen/content_text_size"
+                                android:textColor="@color/bgWhite"
+                                android:layout_gravity="center"
+                                android:gravity="center_vertical"
+                                android:includeFontPadding="false" />
+                        </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
                 <RelativeLayout
@@ -206,6 +210,7 @@
                         android:layout_width="70dp"
                         android:layout_height="70dp"
                         android:src="@drawable/ic_profile_circle"
+                        android:onClick="ProFileMenuClick"
                         app:civ_border_width="1dp" />
                 </RelativeLayout>
                 <LinearLayout
@@ -225,7 +230,7 @@
                         android:textSize="20dp"
                         android:textColor="@color/bgDarkGrey"
                         android:layout_gravity="center"
-                        android:layout_marginTop="20dp"
+                        android:layout_marginTop="30dp"
                         android:includeFontPadding="false"/>
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -404,7 +409,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:layout_weight="0.5"
-                            android:gravity="center">
+                            android:gravity="center"
+                            android:layout_marginRight="@dimen/most_rignt_tv_margin">
                             <TextView
                                 android:layout_width="30dp"
                                 android:layout_height="wrap_content"
@@ -434,6 +440,7 @@
                     android:background="@drawable/xml_border"
                     android:layout_below="@+id/lldetailDataCount">
                     <LinearLayout
+                        android:id="@+id/btnLike"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
@@ -451,7 +458,6 @@
                             android:layout_marginRight="@dimen/between_tv_margin"
                             android:includeFontPadding="false"/>
                         <TextView
-                            android:id="@+id/btnLike"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:background="@color/bgNo"
@@ -491,6 +497,7 @@
                             android:includeFontPadding="false"/>
                     </LinearLayout>
                     <LinearLayout
+                        android:id="@+id/btnShare"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
@@ -507,7 +514,6 @@
                             android:layout_marginRight="@dimen/between_tv_margin"
                             android:includeFontPadding="false"/>
                         <TextView
-                            android:id="@+id/btnShare"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:background="@color/bgNo"
@@ -547,4 +553,16 @@
             android:layout_height="wrap_content"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
     </android.support.v4.widget.NestedScrollView>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/btnTop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        android:layout_marginRight="@dimen/most_rignt_tv_margin"
+        android:layout_marginBottom="10dp"
+        android:clickable="true"
+        android:visibility="gone"
+        android:src="@drawable/btn_up"
+        app:backgroundTint="@color/bgWhite"/>
 </android.support.design.widget.CoordinatorLayout>

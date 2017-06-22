@@ -58,10 +58,11 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
     private TextView tvContentInsertDate, tvContentSubject, tvContentLocation, tvUsername, tvDuring, tvdetailcount, tvdetailstate, tvContent;
     private TextView tvLikeCount, tvCommentCount, tvShareCount;
     private ImageView ivTopPhoto;
-    private Button btnLookMap, btnLookPlay, btnLike, btnComment, btnShare;
+    private LinearLayout btnLookPhoto, btnLookPlay;
+    private Button btnLike, btnComment, btnShare;
     private List<ContentDetail> myDataset;
     private Content content;
-    private int id=-1;
+    private int id=0;
 
     private final String contentURL = Value.contentURL;
     private final String contentPhotoURL = Value.contentPhotoURL;
@@ -72,13 +73,15 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         setContentView(R.layout.activity_content_slide_show_main);
 
         Intent intent = getIntent();
-        id = intent.getIntExtra("id",-1);
+        id = intent.getIntExtra("id",1);
         if(id==-1){
             Log.i("id","id를 못받아옴!!!");
+        }else {
+            Log.i("id","id : "+id);
         }
 
         // Adding Toolbar to the activity
-        toolbar = (Toolbar) findViewById(R.id.detailListToolbar);
+        toolbar = (Toolbar) findViewById(R.id.slideToolbar);
         setSupportActionBar(toolbar);
 
         icglobe = (TextView)findViewById(R.id.icglobe);
@@ -106,8 +109,8 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         tvShareCount = (TextView) findViewById(R.id.tvShareCount);
         tvdetailcount = (TextView) findViewById(R.id.tvdetailcount);
 
-        btnLookMap = (Button) findViewById(R.id.btnLookMap);
-        btnLookPlay = (Button) findViewById(R.id.btnLookPlay);
+        btnLookPhoto = (LinearLayout) findViewById(R.id.btnLookPhoto);
+        btnLookPlay = (LinearLayout) findViewById(R.id.btnLookPlay);
 
         //imageView를 font로 바꿔주기
         Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
@@ -189,15 +192,17 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
     //onClick
     public void goLook(View v){
         switch (v.getId()){
-            case R.id.btnLookMap:
-                Intent intent=new Intent(this, ContentCluster.class);
+            case R.id.btnLookPhoto:
+                Intent intent=new Intent(this, ContentDetailListMain.class);
                 intent.putExtra("id",id);
                 this.startActivity(intent);
+                finish();
                 break;
-            case R.id.btnLookPlay:
-                Intent intent2=new Intent(this, ContentSlideShow.class);
+            case R.id.btnLookMap:
+                Intent intent2=new Intent(this, ContentClusterMain.class);
                 intent2.putExtra("id",id);
                 this.startActivity(intent2);
+                finish();
                 break;
         }
     }
@@ -207,7 +212,7 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         Context wrapper = new ContextThemeWrapper(this, R.style.MenuStyle);
         PopupMenu popup = new PopupMenu(wrapper, v);
         MenuInflater inflater = popup.getMenuInflater();
-        inflater.inflate(R.menu.content_setting, popup.getMenu());
+        inflater.inflate(R.menu.content_setting_menu, popup.getMenu());
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -223,6 +228,30 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
                         break;
                     case R.id.action_report:
                         Toast.makeText(getApplicationContext(),"신고",Toast.LENGTH_SHORT).show();
+                        break;
+                }
+
+                return false;
+            }
+        });
+        popup.show();
+    }
+
+    //프로파일 클릭시
+    public void ProFileMenuClick(View v){
+        Context wrapper = new ContextThemeWrapper(this, R.style.MenuStyle);
+        PopupMenu popup = new PopupMenu(wrapper, v);
+        MenuInflater inflater = popup.getMenuInflater();
+        inflater.inflate(R.menu.user_menu, popup.getMenu());
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()){
+                    case R.id.show_profile:
+                        Toast.makeText(getApplicationContext(),"프로필보기",Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.show_other_content:
+                        Toast.makeText(getApplicationContext(),"다른컨텐트보기",Toast.LENGTH_SHORT).show();
                         break;
                 }
 
