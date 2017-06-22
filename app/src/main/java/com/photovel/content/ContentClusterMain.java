@@ -11,9 +11,7 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -49,13 +47,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ContentDetailListMain extends FontActivity2 implements NavigationView.OnNavigationItemSelectedListener {
+public class ContentClusterMain extends FontActivity2 implements NavigationView.OnNavigationItemSelectedListener {
     private SearchView searchView;
     private static final String TAG = "AppPermission";
     Toolbar toolbar;
-    private RecyclerView mRecyclerView;
-    private RecyclerView.LayoutManager mLayoutManager;
-    private ContentDetailListAdapter mAdapter;
 
     private RelativeLayout RLdetailProfile, RldetailData;
     private LinearLayout RLdetailDate, LLmenu;
@@ -66,7 +61,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
     private Button btnLookMap, btnLookPlay, btnLike, btnComment, btnShare;
     private List<ContentDetail> myDataset;
     private Content content;
-    private int id=1;
+    private int id=-1;
 
     private final String contentURL = Value.contentURL;
     private final String contentPhotoURL = Value.contentPhotoURL;
@@ -74,7 +69,13 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_content_detail_list_main);
+        setContentView(R.layout.activity_content_cluster_main);
+
+        Intent intent = getIntent();
+        id = intent.getIntExtra("id",-1);
+        if(id==-1){
+            Log.i("id","id를 못받아옴!!!");
+        }
 
         // Adding Toolbar to the activity
         toolbar = (Toolbar) findViewById(R.id.detailListToolbar);
@@ -175,16 +176,6 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         tvDuring.setText(from+" ~ "+to);
 
 
-        //recycleview사용선언
-        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        mRecyclerView.setHasFixedSize(true);
-        mLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.setNestedScrollingEnabled(false);
-        mAdapter = new ContentDetailListAdapter(myDataset, ContentDetailListMain.this);
-        mRecyclerView.setAdapter(mAdapter);
-
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -199,12 +190,12 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
     public void goLook(View v){
         switch (v.getId()){
             case R.id.btnLookMap:
-                Intent intent=new Intent(this, ContentClusterMain.class);
+                Intent intent=new Intent(this, ContentCluster.class);
                 intent.putExtra("id",id);
                 this.startActivity(intent);
                 break;
             case R.id.btnLookPlay:
-                Intent intent2=new Intent(this, ContentSlideShowMain.class);
+                Intent intent2=new Intent(this, ContentSlideShow.class);
                 intent2.putExtra("id",id);
                 this.startActivity(intent2);
                 break;
@@ -222,9 +213,9 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()){
                     case R.id.action_update:
-                        Intent intent=new Intent(ContentDetailListMain.this, ContentUpdateMain.class);
+                        Intent intent=new Intent(ContentClusterMain.this, ContentUpdateMain.class);
                         intent.putExtra("id",id);
-                        ContentDetailListMain.this.startActivity(intent);
+                        ContentClusterMain.this.startActivity(intent);
                         Toast.makeText(getApplicationContext(),"수정",Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.action_delete:

@@ -41,7 +41,7 @@ import java.util.Date;
 import java.util.List;
 
 
-public class ClusterTest
+public class ContentCluster
 /**
  * Created by Junki on 2017-05-31.
  */extends FragmentActivity
@@ -52,7 +52,6 @@ public class ClusterTest
         ClusterManager.OnClusterItemInfoWindowClickListener<Photo>{
 
 
-
     private ClusterManager<Photo> cm;
     private GoogleMap mMap;
 
@@ -60,7 +59,7 @@ public class ClusterTest
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_cluster_test);
+        setContentView(R.layout.activity_content_cluster);
 
         //프래그먼트에 지도를 보여주기위해 싱크
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);

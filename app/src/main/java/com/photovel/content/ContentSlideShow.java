@@ -37,13 +37,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
-public class SlideShow extends AppCompatActivity {
+public class ContentSlideShow extends AppCompatActivity {
     private ViewFlipper mViewFlipper;
     private Context mContext;
     int index;
 
 
-    private static final String TAG = "SlideShow";
+    private static final String TAG = "ContentSlideShow";
 
     RadioButton b1, b2, b3;//radio button for indicator
     Button play, stop;
@@ -57,7 +57,7 @@ public class SlideShow extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_slide_show);
+        setContentView(R.layout.activity_content_slide_show);
 
         mContext = this;
 

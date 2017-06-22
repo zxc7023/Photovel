@@ -41,6 +41,7 @@ import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -72,7 +73,8 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
             @Override
             public void run() {
                 super.run();
-                images = getMainImage();
+                //images = new ArrayList<>();
+                getMainImage();
             }
         };
         getMainImage.start();
@@ -330,7 +332,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         List<Content> content = null;
         HttpURLConnection conn = null;
 
-        String qry = Value.contentURL+"/recommend";
+        String qry = Value.contentURL;
         Log.i(TAG, "1.getPhotoData의 qry= " + qry);
 
         try {

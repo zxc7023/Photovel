@@ -35,11 +35,11 @@
         </activity>
         <activity android:name=".FontActivity" />
         <activity android:name=".FontActivity2" />
-        <activity android:name=".content.ClusterTest" />
+        <activity android:name=".content.ContentCluster" />
         <activity android:name=".content.ContentInsertMain" />
         <activity android:name=".content.ContentInsertGoogleMap" />
         <activity android:name=".content.ContentUpdateMain" />
-        <activity android:name=".content.SlideShow"/>
+        <activity android:name=".content.ContentSlideShow"/>
         <activity android:name=".user.UserLogin"/>
         <activity android:name=".TestActivity"/>
         <activity android:name=".content.ContentDetailListMain" android:theme="@style/AppTheme.NoActionBar"/>
