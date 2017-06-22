@@ -57,7 +57,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
     private RecyclerView mRecyclerView;
     private MainRecommendAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-    private List<Content> myDataset;
+    private List<Content> myRecommendDataset, myNewDataset;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,7 +92,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
             @Override
             public void run() {
                 super.run();
-                myDataset = getRecommendData();
+                myRecommendDataset = getRecommendData();
             }
         };
         getRecommend.start();
@@ -110,7 +110,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setNestedScrollingEnabled(false);
-        mAdapter = new MainRecommendAdapter(myDataset, MainActivity.this);
+        mAdapter = new MainRecommendAdapter(myRecommendDataset, MainActivity.this);
         mRecyclerView.setAdapter(mAdapter);
 
 
@@ -327,12 +327,12 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
 
     }
 
-    //추천게시글 가로스크롤
+    //추천스토리 가로스크롤
     public List<Content> getRecommendData(){
         List<Content> content = null;
         HttpURLConnection conn = null;
 
-        String qry = Value.contentURL;//+"/recommend";
+        String qry = Value.contentURL+"/recommend";
         Log.i(TAG, "1.getPhotoData의 qry= " + qry);
 
         try {
@@ -401,9 +401,102 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
             public void run() {
                 super.run();
                 try {
-                    for (int i = 0; i < myDataset.size(); i++) {
-                        Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL(Value.contentPhotoURL+"/" + myDataset.get(i).getContent_id() + "/" + myDataset.get(i).getPhoto_file_name()).getContent());
-                        myDataset.get(i).setBitmap(bitmap);
+                    for (int i = 0; i < myRecommendDataset.size(); i++) {
+                        Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL(Value.contentPhotoURL+"/" + myRecommendDataset.get(i).getContent_id() + "/" + myRecommendDataset.get(i).getPhoto_file_name()).getContent());
+                        myRecommendDataset.get(i).setBitmap(bitmap);
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        thread2.start();
+        try {
+            thread2.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    //신규스토리 가로스크롤
+    public List<Content> getNewData(){
+        List<Content> content = null;
+        HttpURLConnection conn = null;
+
+        String qry = Value.contentURL+"/new";
+        Log.i(TAG, "1.getPhotoData의 qry= " + qry);
+
+        try {
+            URL strUrl = new URL(qry);
+            conn = (HttpURLConnection) strUrl.openConnection();
+            conn.setDoInput(true);//서버로부터 결과값을 응답받음
+            conn.setRequestMethod("GET");
+            Log.i(TAG, "2.getPhotoData의 qry= " + qry);
+
+
+            final int responseCode = conn.getResponseCode(); //정상인 경우 200번, 그 외 오류있는 경우 오류 번호 반환
+            Log.i(TAG, "getPhotoData의 responseCode= " + responseCode);
+            switch (responseCode){
+                case HttpURLConnection.HTTP_OK:
+
+                    InputStream is = conn.getInputStream();
+                    Reader reader = new InputStreamReader(is, "UTF-8");
+                    BufferedReader br = new BufferedReader(reader);
+                    String responseData = null;
+
+                    responseData = br.readLine();
+                    Log.i(TAG, "getPhotoData의 response data= " + responseData);
+
+                    content = JSON.parseArray(responseData, Content.class);
+                    Log.i(TAG, "getPhotoData의 content= " + content);
+
+                    br.close();
+                    reader.close();
+                    is.close();
+
+                    break;
+                case HttpURLConnection.HTTP_NOT_FOUND:
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), "페이지를 찾을 수 없습니다.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                    break;
+                default:
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), "response code: " + responseCode, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    break;
+            }
+
+            return content;
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            conn.disconnect();
+        }
+
+        return null;
+    }
+    //DB에서 bitmap정보 받아오기
+    public void getNewBitmap(){
+        Thread thread2 = new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                try {
+                    for (int i = 0; i < myNewDataset.size(); i++) {
+                        Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL(Value.contentPhotoURL+"/" + myNewDataset.get(i).getContent_id() + "/" + myNewDataset.get(i).getPhoto_file_name()).getContent());
+                        myNewDataset.get(i).setBitmap(bitmap);
                     }
 
                 } catch (Exception e) {
