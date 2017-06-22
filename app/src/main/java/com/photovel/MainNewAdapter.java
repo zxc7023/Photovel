@@ -3,10 +3,13 @@ package com.photovel;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.vo.Content;
@@ -42,17 +45,28 @@ public class MainNewAdapter extends RecyclerView.Adapter<MainNewAdapter.ViewHold
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
+        public RelativeLayout RlmainTop;
         public ImageView main_ivphoto;
-        public TextView contentSubject;
+        public TextView contentSubject, userNickname;
         public TextView main_icthumb, main_iccomment, main_icshare;
+        public TextView thumbCount, commentCount, shareCount;
+        public LinearLayout llthumb, llcomment, llshare;
 
         public ViewHolder(View view) {
             super(view);
+            RlmainTop = (RelativeLayout)view.findViewById(R.id.RlmainTop);
             main_ivphoto = (ImageView)view.findViewById(R.id.main_ivphoto);
             contentSubject = (TextView)view.findViewById(R.id.contentSubject);
+            userNickname = (TextView)view.findViewById(R.id.userNickname);
             main_icthumb = (TextView)view.findViewById(R.id.main_icthumb);
             main_iccomment = (TextView)view.findViewById(R.id.main_iccomment);
             main_icshare = (TextView)view.findViewById(R.id.main_icshare);
+            thumbCount = (TextView)view.findViewById(R.id.thumbCount);
+            commentCount = (TextView)view.findViewById(R.id.commentCount);
+            shareCount = (TextView)view.findViewById(R.id.shareCount);
+            llthumb = (LinearLayout)view.findViewById(R.id.llthumb);
+            llcomment = (LinearLayout)view.findViewById(R.id.llcomment);
+            llshare = (LinearLayout)view.findViewById(R.id.llshare);
 
         }
     }
@@ -82,32 +96,40 @@ public class MainNewAdapter extends RecyclerView.Adapter<MainNewAdapter.ViewHold
             subject = temp.toString();
         }
         holder.contentSubject.setText(subject);
+        holder.userNickname.setText(mDataset.get(position).getUser().getUser_nick_name());
+        holder.thumbCount.setText(String.valueOf(mDataset.get(position).getGood_count()));
+        holder.commentCount.setText(String.valueOf(mDataset.get(position).getComment_count()));
+        holder.shareCount.setText(String.valueOf(mDataset.get(position).getContent_share_count()));
 
-        holder.main_icthumb.setText(holder.main_icthumb.getText()+" "+mDataset.get(position).getGood_count());
-        holder.main_iccomment.setText(holder.main_iccomment.getText()+" "+mDataset.get(position).getComment_count());
-        holder.main_icshare.setText(holder.main_icshare.getText()+" "+mDataset.get(position).getContent_share_count());
-
-        //좋아요 클릭
-        holder.main_icthumb.setOnClickListener(new View.OnClickListener() {
+        //사진클릭
+        holder.RlmainTop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.i("click","메인이 클릭되었당!");
+            }
+        });
 
+        //좋아요 클릭
+        holder.llthumb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i("click","좋아요가 클릭되었당!");
             }
         });
 
         //댓글 클릭
-        holder.main_iccomment.setOnClickListener(new View.OnClickListener() {
+        holder.llcomment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Log.i("click","댓글 클릭되었당!");
             }
         });
 
         //공유 클릭
-        holder.main_icshare.setOnClickListener(new View.OnClickListener() {
+        holder.llshare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Log.i("click","공유 클릭되었당!");
             }
         });
     }
