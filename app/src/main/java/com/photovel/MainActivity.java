@@ -23,13 +23,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.photovel.User.UserLogin;
+import com.photovel.user.UserLogin;
 import com.alibaba.fastjson.JSON;
-import com.photovel.content.ClusterTest;
 import com.photovel.content.ContentDetailListMain;
 import com.photovel.content.ContentInsertMain;
-import com.photovel.content.ContentUpdateMain;
-import com.photovel.content.SlideShow;
 import com.synnapps.carouselview.CarouselView;
 import com.synnapps.carouselview.ImageListener;
 import com.vo.Content;
@@ -142,10 +139,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
 
         HashMap<Integer,Class> map = new HashMap<>();
         map.put(R.id.loginModuel, UserLogin.class);
-        map.put(R.id.clusterTest, ClusterTest.class);
         map.put(R.id.contentInsert,ContentInsertMain.class);
-        map.put(R.id.contentUpdate, ContentUpdateMain.class);
-        map.put(R.id.slideShowTest, SlideShow.class);
         map.put(R.id.cok,TestActivity.class);
         map.put(R.id.deatilList, ContentDetailListMain.class);
 
