@@ -1,6 +1,8 @@
 package com.photovel;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -9,8 +11,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.photovel.content.ContentDetailListMain;
 import com.vo.Content;
 
 import java.util.List;
@@ -44,6 +48,7 @@ public class MainRecommendAdapter extends RecyclerView.Adapter<MainRecommendAdap
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
+        public RelativeLayout RlmainTop;
         public ImageView main_ivphoto;
         public TextView contentSubject;
         public TextView main_icthumb, main_iccomment, main_icshare;
@@ -52,6 +57,7 @@ public class MainRecommendAdapter extends RecyclerView.Adapter<MainRecommendAdap
 
         public ViewHolder(View view) {
             super(view);
+            RlmainTop = (RelativeLayout)view.findViewById(R.id.RlmainTop);
             main_ivphoto = (ImageView)view.findViewById(R.id.main_ivphoto);
             contentSubject = (TextView)view.findViewById(R.id.contentSubject);
             main_icthumb = (TextView)view.findViewById(R.id.main_icthumb);
@@ -75,7 +81,7 @@ public class MainRecommendAdapter extends RecyclerView.Adapter<MainRecommendAdap
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, final int position) {
         //imageView를 font로 바꿔주기
         Typeface fontAwesomeFont = Typeface.createFromAsset(mcontext.getAssets(), "fontawesome-webfont.ttf");
         holder.main_icthumb.setTypeface(fontAwesomeFont);
@@ -94,6 +100,17 @@ public class MainRecommendAdapter extends RecyclerView.Adapter<MainRecommendAdap
         holder.thumbCount.setText(String.valueOf(mDataset.get(position).getGood_count()));
         holder.commentCount.setText(String.valueOf(mDataset.get(position).getComment_count()));
         holder.shareCount.setText(String.valueOf(mDataset.get(position).getContent_share_count()));
+
+        //사진클릭
+        holder.RlmainTop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i("click","메인이 클릭되었당!");
+                Intent intent = new Intent(mcontext, ContentDetailListMain.class);
+                intent.putExtra("content_id", mDataset.get(position).getContent_id());
+                ((Activity)mcontext).startActivity(intent);
+            }
+        });
 
         //좋아요 클릭
         holder.llthumb.setOnClickListener(new View.OnClickListener() {

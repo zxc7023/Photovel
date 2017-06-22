@@ -7,9 +7,9 @@
     card_view:cardCornerRadius="5dp"
     android:layout_margin="5dp">
     <RelativeLayout
+        android:id="@+id/RlmainTop"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/llmainTop">
+        android:layout_height="wrap_content">
         <ImageView
             android:id="@+id/main_ivphoto"
             android:layout_width="240dp"

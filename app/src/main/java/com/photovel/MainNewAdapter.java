@@ -1,6 +1,8 @@
 package com.photovel;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -12,6 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.photovel.content.ContentDetailListMain;
 import com.vo.Content;
 
 import java.util.List;
@@ -80,7 +83,7 @@ public class MainNewAdapter extends RecyclerView.Adapter<MainNewAdapter.ViewHold
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, final int position) {
         //imageView를 font로 바꿔주기
         Typeface fontAwesomeFont = Typeface.createFromAsset(mcontext.getAssets(), "fontawesome-webfont.ttf");
         holder.main_icthumb.setTypeface(fontAwesomeFont);
@@ -106,6 +109,9 @@ public class MainNewAdapter extends RecyclerView.Adapter<MainNewAdapter.ViewHold
             @Override
             public void onClick(View v) {
                 Log.i("click","메인이 클릭되었당!");
+                Intent intent = new Intent(mcontext, ContentDetailListMain.class);
+                intent.putExtra("content_id", mDataset.get(position).getContent_id());
+                ((Activity)mcontext).startActivity(intent);
             }
         });
 

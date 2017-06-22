@@ -76,6 +76,11 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_content_detail_list_main);
 
+        Intent intent = getIntent();
+        id = intent.getIntExtra("content_id",-1);
+        if(id==-1){
+            Log.i("id","id를 못받아옴!!!");
+        }
         // Adding Toolbar to the activity
         toolbar = (Toolbar) findViewById(R.id.detailListToolbar);
         setSupportActionBar(toolbar);

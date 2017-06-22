@@ -75,7 +75,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
             public void run() {
                 super.run();
                 //images = new ArrayList<>();
-                getMainImage();
+                images = getMainImage();
             }
         };
         getMainImage.start();
