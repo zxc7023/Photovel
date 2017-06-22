@@ -1,100 +1,177 @@
 <android.support.v7.widget.CardView
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/all_store"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    card_view:cardCornerRadius="5dp"
     android:layout_margin="5dp">
     <RelativeLayout
+        android:id="@+id/RlmainTop"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/llmainTop">
+        android:layout_height="wrap_content">
         <ImageView
             android:id="@+id/main_ivphoto"
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            android:orientation="vertical"
+            android:layout_alignParentTop="true"
             android:background="@color/bgToMeong"
-            android:scaleType="centerCrop"
-            android:layout_alignParentTop="true">
-        </ImageView>
+            android:orientation="vertical"
+            android:scaleType="centerCrop"/>
         <LinearLayout
             android:id="@+id/llmainSubject"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:layout_above="@+id/llmainButtons"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
             android:background="@color/bgToMeong"
-            android:gravity="center">
+            android:gravity="center"
+            android:layout_above="@+id/llmainButtons"
+            android:layout_alignParentStart="true">
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="230dp"
                 android:layout_height="match_parent"
                 android:gravity="left">
                 <TextView
                     android:id="@+id/contentSubject"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="14dp"
-                    android:textColor="@color/bgWhite"
-                    android:text="contentSubject"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="20dp"
                     android:gravity="left|center"
-                    android:layout_gravity="center"/>
+                    android:text="contentSubject"
+                    android:textColor="@color/bgWhite"
+                    android:textSize="@dimen/content_text_size" />
             </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_weight="2"
                 android:gravity="right">
+                <com.mikhaellopez.circularimageview.CircularImageView
+                    android:id="@+id/userProfile"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:src="@drawable/ic_profile_circle"
+                    app:civ_border_width="1dp" />
                 <TextView
                     android:id="@+id/userNickname"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="14dp"
-                    android:textColor="@color/bgWhite"
-                    android:text="userNickname"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_marginRight="20dp"
                     android:gravity="center|right"
-                    android:layout_gravity="center"/>
+                    android:text="userNickname"
+                    android:textColor="@color/bgWhite"
+                    android:textSize="@dimen/content_text_size" />
             </LinearLayout>
         </LinearLayout>
+
         <LinearLayout
             android:id="@+id/llmainButtons"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:orientation="horizontal"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/main_ivphoto"
             android:layout_weight="3"
             android:background="@drawable/xml_border"
-            android:layout_below="@+id/main_ivphoto"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true">
-            <TextView
-                android:id="@+id/main_icthumb"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:id="@+id/llthumb"
                 android:layout_width="match_parent"
-                android:layout_height="30dp"
+                android:layout_height="match_parent"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
                 android:layout_weight="1"
-                android:text="@string/fa_thumbs_o_up"
-                android:textSize="14dp"
-                android:gravity="left|center"
-                android:layout_gravity="center"
-                android:layout_marginLeft="20dp"/>
-            <TextView
-                android:id="@+id/main_iccomment"
+                android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/main_icthumb"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="20dp"
+                    android:gravity="left|center"
+                    android:includeFontPadding="false"
+                    android:textColor="@color/bgDarkGrey"
+                    android:text="@string/fa_thumbs_o_up"
+                    android:textSize="@dimen/icon_size" />
+                <TextView
+                    android:id="@+id/thumbCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="@dimen/between_tv_margin"
+                    android:gravity="left|center"
+                    android:includeFontPadding="false"
+                    android:textColor="@color/bgDarkGrey"
+                    android:text="13"
+                    android:textSize="@dimen/content_text_size" />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/llcomment"
                 android:layout_width="match_parent"
-                android:layout_height="30dp"
+                android:layout_height="match_parent"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
                 android:layout_weight="1"
-                android:text="@string/fa_comments"
-                android:textSize="14dp"
                 android:gravity="center"
-                android:layout_gravity="center"/>
-            <TextView
-                android:id="@+id/main_icshare"
+                android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/main_iccomment"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:textColor="@color/bgDarkGrey"
+                    android:text="@string/fa_comments"
+                    android:textSize="@dimen/icon_size" />
+                <TextView
+                    android:id="@+id/commentCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:layout_marginLeft="@dimen/most_left_tv_margin"
+                    android:textColor="@color/bgDarkGrey"
+                    android:text="13"
+                    android:textSize="@dimen/content_text_size" />
+                </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/llshare"
                 android:layout_width="match_parent"
-                android:layout_height="30dp"
-                android:layout_weight="1"
-                android:text="@string/fa_share"
-                android:textSize="14dp"
+                android:layout_height="match_parent"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
                 android:gravity="right|center"
-                android:layout_gravity="center"
-                android:layout_marginRight="20dp"/>
+                android:layout_weight="1"
+                android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/main_icshare"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:textColor="@color/bgDarkGrey"
+                    android:text="@string/fa_share"
+                    android:textSize="@dimen/icon_size" />
+                <TextView
+                    android:id="@+id/shareCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginLeft="@dimen/most_left_tv_margin"
+                    android:textColor="@color/bgDarkGrey"
+                    android:text="13"
+                    android:textSize="@dimen/content_text_size" />
+                </LinearLayout>
         </LinearLayout>
     </RelativeLayout>
 </android.support.v7.widget.CardView>

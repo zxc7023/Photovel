@@ -3,10 +3,12 @@ package com.photovel;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.vo.Content;
@@ -45,6 +47,8 @@ public class MainRecommendAdapter extends RecyclerView.Adapter<MainRecommendAdap
         public ImageView main_ivphoto;
         public TextView contentSubject;
         public TextView main_icthumb, main_iccomment, main_icshare;
+        public TextView thumbCount, commentCount, shareCount;
+        public LinearLayout llthumb, llcomment, llshare;
 
         public ViewHolder(View view) {
             super(view);
@@ -53,7 +57,12 @@ public class MainRecommendAdapter extends RecyclerView.Adapter<MainRecommendAdap
             main_icthumb = (TextView)view.findViewById(R.id.main_icthumb);
             main_iccomment = (TextView)view.findViewById(R.id.main_iccomment);
             main_icshare = (TextView)view.findViewById(R.id.main_icshare);
-
+            thumbCount = (TextView)view.findViewById(R.id.recommend_thumbCount);
+            commentCount = (TextView)view.findViewById(R.id.recommend_commentCount);
+            shareCount = (TextView)view.findViewById(R.id.recommend_shareCount);
+            llthumb = (LinearLayout)view.findViewById(R.id.llthumb);
+            llcomment = (LinearLayout)view.findViewById(R.id.llcomment);
+            llshare = (LinearLayout)view.findViewById(R.id.llshare);
         }
     }
 
@@ -82,13 +91,12 @@ public class MainRecommendAdapter extends RecyclerView.Adapter<MainRecommendAdap
             subject = temp.toString();
         }
         holder.contentSubject.setText(subject);
-
-        holder.main_icthumb.setText(holder.main_icthumb.getText()+" "+mDataset.get(position).getGood_count());
-        holder.main_iccomment.setText(holder.main_iccomment.getText()+" "+mDataset.get(position).getComment_count());
-        holder.main_icshare.setText(holder.main_icshare.getText()+" "+mDataset.get(position).getContent_share_count());
+        holder.thumbCount.setText(String.valueOf(mDataset.get(position).getGood_count()));
+        holder.commentCount.setText(String.valueOf(mDataset.get(position).getComment_count()));
+        holder.shareCount.setText(String.valueOf(mDataset.get(position).getContent_share_count()));
 
         //좋아요 클릭
-        holder.main_icthumb.setOnClickListener(new View.OnClickListener() {
+        holder.llthumb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -96,7 +104,7 @@ public class MainRecommendAdapter extends RecyclerView.Adapter<MainRecommendAdap
         });
 
         //댓글 클릭
-        holder.main_iccomment.setOnClickListener(new View.OnClickListener() {
+        holder.llcomment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -104,7 +112,7 @@ public class MainRecommendAdapter extends RecyclerView.Adapter<MainRecommendAdap
         });
 
         //공유 클릭
-        holder.main_icshare.setOnClickListener(new View.OnClickListener() {
+        holder.llshare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 

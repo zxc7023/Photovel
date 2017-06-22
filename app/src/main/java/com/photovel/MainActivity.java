@@ -54,9 +54,10 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
     List<MainImage> images;
 
     //추천 게시글 가로스크롤
-    private RecyclerView mRecyclerView;
-    private MainRecommendAdapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
+    private RecyclerView RVrecommend, RVnew;
+    private MainRecommendAdapter mRecommendAdapter;
+    private MainNewAdapter mNewAdapter;
+    private RecyclerView.LayoutManager mRecommendLayoutManager, mNewLayoutManager;
     private List<Content> myRecommendDataset, myNewDataset;
 
     @Override
@@ -86,7 +87,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         carouselView.setPageCount(images.size());
         carouselView.setImageListener(imageListener);
 
-        //추천 게시글 가로스크롤
+        //추천 스토리 가로스크롤
         //db에 있는 contentId별 content정보 받아오기
         Thread getRecommend = new Thread(){
             @Override
@@ -105,13 +106,39 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
 
 
         //recycleview사용선언
-        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        mRecyclerView.setHasFixedSize(true);
-        mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.setNestedScrollingEnabled(false);
-        mAdapter = new MainRecommendAdapter(myRecommendDataset, MainActivity.this);
-        mRecyclerView.setAdapter(mAdapter);
+        RVrecommend = (RecyclerView) findViewById(R.id.RVrecommend);
+        RVrecommend.setHasFixedSize(true);
+        RVrecommend.setNestedScrollingEnabled(false);
+        mRecommendLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        RVrecommend.setLayoutManager(mRecommendLayoutManager);
+        mRecommendAdapter = new MainRecommendAdapter(myRecommendDataset, MainActivity.this);
+        RVrecommend.setAdapter(mRecommendAdapter);
+
+        //신규 스토리 세로스크롤
+        //db에 있는 contentId별 content정보 받아오기
+        Thread getNew = new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                myNewDataset = getNewData();
+            }
+        };
+        getNew.start();
+        try {
+            getNew.join();  //모든처리 thread처리 기다리기
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        getNewBitmap(); //content Image받아오기
+
+        //recycleview사용선언
+        RVnew = (RecyclerView) findViewById(R.id.RVnew);
+        RVnew.setHasFixedSize(true);
+        RVnew.setNestedScrollingEnabled(false);
+        mNewLayoutManager = new LinearLayoutManager(this);
+        RVnew.setLayoutManager(mNewLayoutManager);
+        mNewAdapter = new MainNewAdapter(myNewDataset, MainActivity.this);
+        RVnew.setAdapter(mNewAdapter);
 
 
         // Adding Toolbar to the activity
@@ -240,22 +267,21 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
             imageView.setImageBitmap(images.get(position).getBitmap());
         }
     };
-    //
+    //메인이미지 캐러셀뷰
     public List<MainImage> getMainImage(){
         HttpURLConnection conn = null;
         List<MainImage> imgs = null;
         String qry = Value.mainImageURL;
-        Log.i(TAG, "1.getMainImage qry= " + qry);
         try {
             URL strUrl = new URL(qry);
             conn = (HttpURLConnection) strUrl.openConnection();
             conn.setDoInput(true);//서버로부터 결과값을 응답받음
 
             conn.setRequestMethod("GET");
-            Log.i(TAG, "2.getMainImage qry= " + qry);
+            Log.i(TAG, "1.메인이미지 qry= " + qry);
 
             final int responseCode = conn.getResponseCode(); //정상인 경우 200번, 그 외 오류있는 경우 오류 번호 반환
-            Log.i(TAG, "3.getMainImage responseCode= " + responseCode);
+            Log.i(TAG, "2.메인이미지 responseCode= " + responseCode);
             switch (responseCode){
                 case HttpURLConnection.HTTP_OK:
 
@@ -264,7 +290,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
                     BufferedReader br = new BufferedReader(reader);
 
                     String responseData = br.readLine();
-                    Log.i(TAG, "4.getMainImage response data= " + responseData);
+                    Log.i(TAG, "3.메인이미지 response data= " + responseData);
 
                     imgs =  JSON.parseArray(responseData, MainImage.class);
 
@@ -311,7 +337,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
                     for (int i = 0; i < images.size(); i++) {
                         Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL(Value.mainImagePhotoURL+"/"+images.get(i).getImage_file_name()).getContent());
                         images.get(i).setBitmap(bitmap);
-                        Log.i(TAG, "getMainBitmap bitmap= " + bitmap);
+                        Log.i(TAG, "4.메인이미지 bitmap= " + bitmap);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -329,22 +355,20 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
 
     //추천스토리 가로스크롤
     public List<Content> getRecommendData(){
-        List<Content> content = null;
+        List<Content> contents = null;
         HttpURLConnection conn = null;
 
         String qry = Value.contentURL+"/recommend";
-        Log.i(TAG, "1.getPhotoData의 qry= " + qry);
-
         try {
             URL strUrl = new URL(qry);
             conn = (HttpURLConnection) strUrl.openConnection();
             conn.setDoInput(true);//서버로부터 결과값을 응답받음
             conn.setRequestMethod("GET");
-            Log.i(TAG, "2.getPhotoData의 qry= " + qry);
+            Log.i(TAG, "1.추천스토리 qry= " + qry);
 
 
             final int responseCode = conn.getResponseCode(); //정상인 경우 200번, 그 외 오류있는 경우 오류 번호 반환
-            Log.i(TAG, "getPhotoData의 responseCode= " + responseCode);
+            Log.i(TAG, "2.추천스토리 responseCode= " + responseCode);
             switch (responseCode){
                 case HttpURLConnection.HTTP_OK:
 
@@ -354,10 +378,9 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
                     String responseData = null;
 
                     responseData = br.readLine();
-                    Log.i(TAG, "getPhotoData의 response data= " + responseData);
+                    Log.i(TAG, "3.추천스토리 response data= " + responseData);
 
-                    content = JSON.parseArray(responseData, Content.class);
-                    Log.i(TAG, "getPhotoData의 content= " + content);
+                    contents = JSON.parseArray(responseData, Content.class);
 
                     br.close();
                     reader.close();
@@ -383,7 +406,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
                     break;
             }
 
-            return content;
+            return contents;
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -404,6 +427,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
                     for (int i = 0; i < myRecommendDataset.size(); i++) {
                         Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL(Value.contentPhotoURL+"/" + myRecommendDataset.get(i).getContent_id() + "/" + myRecommendDataset.get(i).getPhoto_file_name()).getContent());
                         myRecommendDataset.get(i).setBitmap(bitmap);
+                        Log.i(TAG, "4.추천스토리 bitmap= " + bitmap);
                     }
 
                 } catch (Exception e) {
@@ -422,22 +446,21 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
 
     //신규스토리 가로스크롤
     public List<Content> getNewData(){
-        List<Content> content = null;
+        List<Content> contents = null;
         HttpURLConnection conn = null;
 
         String qry = Value.contentURL+"/new";
-        Log.i(TAG, "1.getPhotoData의 qry= " + qry);
 
         try {
             URL strUrl = new URL(qry);
             conn = (HttpURLConnection) strUrl.openConnection();
             conn.setDoInput(true);//서버로부터 결과값을 응답받음
             conn.setRequestMethod("GET");
-            Log.i(TAG, "2.getPhotoData의 qry= " + qry);
+            Log.i(TAG, "1.신규스토리 qry= " + qry);
 
 
             final int responseCode = conn.getResponseCode(); //정상인 경우 200번, 그 외 오류있는 경우 오류 번호 반환
-            Log.i(TAG, "getPhotoData의 responseCode= " + responseCode);
+            Log.i(TAG, "2.신규스토리 responseCode= " + responseCode);
             switch (responseCode){
                 case HttpURLConnection.HTTP_OK:
 
@@ -447,10 +470,9 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
                     String responseData = null;
 
                     responseData = br.readLine();
-                    Log.i(TAG, "getPhotoData의 response data= " + responseData);
+                    Log.i(TAG, "3.신규스토리 response data= " + responseData);
 
-                    content = JSON.parseArray(responseData, Content.class);
-                    Log.i(TAG, "getPhotoData의 content= " + content);
+                    contents = JSON.parseArray(responseData, Content.class);
 
                     br.close();
                     reader.close();
@@ -476,7 +498,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
                     break;
             }
 
-            return content;
+            return contents;
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -497,6 +519,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
                     for (int i = 0; i < myNewDataset.size(); i++) {
                         Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL(Value.contentPhotoURL+"/" + myNewDataset.get(i).getContent_id() + "/" + myNewDataset.get(i).getPhoto_file_name()).getContent());
                         myNewDataset.get(i).setBitmap(bitmap);
+                        Log.i(TAG, "4.신규스토리 bitmap= " + bitmap);
                     }
 
                 } catch (Exception e) {
