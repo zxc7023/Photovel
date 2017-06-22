@@ -28,6 +28,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * Created by HARA on 2017-06-07.
@@ -143,7 +144,7 @@ public class ContentInsertAdapter extends RecyclerView.Adapter<ContentInsertAdap
         holder.iccircle4.setTypeface(fontAwesomeFont);
         holder.iccircle5.setTypeface(fontAwesomeFont);
 
-        holder.tvPosition.setText(position+1);
+        holder.tvPosition.setText(String.valueOf(position+1));
 
         final Date date=mDataset.get(position).getPhoto().getPhoto_date();
         String date2=null;

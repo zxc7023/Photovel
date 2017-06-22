@@ -61,9 +61,8 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
     private LinearLayout RLdetailDate, LLmenu;
     private TextView icglobe, icflag, icvideo, iccal, icline, icmarker, icpow, icthumb, iccomment, icshare, btnDetailMenu;
     private TextView tvContentInsertDate, tvContentSubject, tvContentLocation, tvUsername, tvDuring, tvdetailcount, tvdetailstate, tvContent;
-    private TextView tvLikeCount, tvCommentCount, tvShareCount;
+    private TextView tvLikeCount, tvCommentCount, tvShareCount, btnLookMap, btnLookPlay;
     private ImageView ivTopPhoto;
-    private Button btnLookMap, btnLookPlay, btnLike, btnComment, btnShare;
     private List<ContentDetail> myDataset;
     private Content content;
     private int id=1;
@@ -75,6 +74,12 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_content_detail_list_main);
+
+        /*Intent intent = getIntent();
+        id = intent.getIntExtra("content_id",-1);
+        if(id==-1){
+            Log.i("id","id를 못받아옴!!!");
+        }*/
 
         // Adding Toolbar to the activity
         toolbar = (Toolbar) findViewById(R.id.detailListToolbar);
@@ -105,8 +110,8 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         tvShareCount = (TextView) findViewById(R.id.tvShareCount);
         tvdetailcount = (TextView) findViewById(R.id.tvdetailcount);
 
-        btnLookMap = (Button) findViewById(R.id.btnLookMap);
-        btnLookPlay = (Button) findViewById(R.id.btnLookPlay);
+        btnLookMap = (TextView) findViewById(R.id.btnLookMap);
+        btnLookPlay = (TextView) findViewById(R.id.btnLookPlay);
 
         //imageView를 font로 바꿔주기
         Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
