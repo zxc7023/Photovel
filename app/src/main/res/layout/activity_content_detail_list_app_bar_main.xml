@@ -16,17 +16,15 @@
             android:layout_height="match_parent"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             android:fitsSystemWindows="true"
-            app:titleEnabled="false"
-            app:expandedTitleMarginStart="48dp"
-            app:expandedTitleMarginEnd="64dp">
+            app:titleEnabled="false">
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="?attr/actionBarSize">
+                android:layout_marginTop="60dp">
                 <LinearLayout
                     android:id="@+id/RLdetailDate"
                     android:layout_width="wrap_content"
-                    android:layout_height="45dp"
+                    android:layout_height="40dp"
                     android:layout_alignTop="@+id/ivTopPhoto"
                     android:layout_alignParentTop="true"
                     android:gravity="center_vertical">
@@ -36,6 +34,8 @@
                         android:layout_height="match_parent"
                         android:text="@string/fa_globe"
                         android:textSize="@dimen/icon_size"
+                        android:gravity="center"
+                        android:includeFontPadding="false"
                         android:layout_marginRight="@dimen/between_tv_margin"
                         android:layout_marginLeft="@dimen/most_left_tv_margin"/>
                     <TextView
@@ -43,7 +43,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:text="2016.06.20"
-                        android:textSize="@dimen/content_text_size"/>
+                        android:textSize="@dimen/content_text_size"
+                        android:gravity="center"
+                        android:includeFontPadding="false"/>
                 </LinearLayout>
                 <LinearLayout
                     android:id="@+id/LLmenu"
@@ -62,13 +64,13 @@
                         android:textSize="@dimen/icon_size"
                         android:textColor="@color/bgWhite"
                         android:onClick="ContentMenuClick"
-                        android:gravity="right"
+                        android:gravity="right|center"
                         android:layout_marginRight="@dimen/most_rignt_tv_margin"/>
                 </LinearLayout>
                 <RelativeLayout
                     android:id="@+id/RldetailData"
                     android:layout_width="wrap_content"
-                    android:layout_height="70dp"
+                    android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="50dp">
@@ -83,7 +85,7 @@
                     <TextView
                         android:id="@+id/tvContentSubject"
                         android:layout_width="wrap_content"
-                        android:layout_height="25dp"
+                        android:layout_height="28dp"
                         android:text="영국으로의 여행"
                         android:textSize="@dimen/content_text_size"
                         android:textColor="@color/bgWhite"
@@ -91,7 +93,7 @@
                         android:layout_centerHorizontal="true"/>
                     <LinearLayout
                         android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
+                        android:layout_height="28dp"
                         android:orientation="horizontal"
                         android:layout_below="@+id/tvContentSubject"
                         android:layout_centerHorizontal="true">
@@ -101,6 +103,8 @@
                             android:layout_height="match_parent"
                             android:text="@string/fa_icon_marker"
                             android:textSize="@dimen/icon_size"
+                            android:gravity="center"
+                            android:includeFontPadding="false"
                             android:textColor="@color/textPurple"
                             android:layout_marginRight="@dimen/between_tv_margin"/>
                         <TextView
@@ -109,7 +113,9 @@
                             android:layout_height="match_parent"
                             android:text="서울시 마포구"
                             android:textSize="@dimen/content_text_size"
-                            android:textColor="@color/bgWhite"/>
+                            android:includeFontPadding="false"
+                            android:textColor="@color/bgWhite"
+                            android:gravity="center"/>
                     </LinearLayout>
                 </RelativeLayout>
                 <ImageView
@@ -129,7 +135,8 @@
                     android:layout_above="@+id/lldetailInfo"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"
-                    android:background="@color/bgToMeong">
+                    android:background="@color/bgToMeong"
+                    android:gravity="center">
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -142,9 +149,10 @@
                             android:text="@string/fa_flag"
                             android:textSize="@dimen/icon_size"
                             android:textColor="@color/bgWhite"
+                            android:includeFontPadding="false"
                             android:gravity="center_vertical"
                             android:layout_marginRight="@dimen/between_tv_margin"/>
-                        <Button
+                        <TextView
                             android:id="@+id/btnLookMap"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
@@ -152,6 +160,7 @@
                             android:text="지도로보기"
                             android:textSize="@dimen/content_text_size"
                             android:textColor="@color/bgWhite"
+                            android:includeFontPadding="false"
                             android:gravity="center_vertical"
                             android:onClick="goLook"/>
                     </LinearLayout>
@@ -170,8 +179,9 @@
                             android:textColor="@color/bgWhite"
                             android:layout_gravity="center"
                             android:gravity="center"
+                            android:includeFontPadding="false"
                             android:layout_marginRight="@dimen/between_tv_margin"/>
-                        <Button
+                        <TextView
                             android:id="@+id/btnLookPlay"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
@@ -181,6 +191,7 @@
                             android:textColor="@color/bgWhite"
                             android:layout_gravity="center"
                             android:gravity="center_vertical"
+                            android:includeFontPadding="false"
                             android:onClick="goLook"/>
                     </LinearLayout>
                 </LinearLayout>
@@ -209,15 +220,16 @@
                     <TextView
                         android:id="@+id/tvUsername"
                         android:layout_width="wrap_content"
-                        android:layout_height="30dp"
+                        android:layout_height="wrap_content"
                         android:text="hara jeon"
                         android:textSize="20dp"
                         android:textColor="@color/bgDarkGrey"
                         android:layout_gravity="center"
-                        android:layout_marginTop="20dp" />
+                        android:layout_marginTop="20dp"
+                        android:includeFontPadding="false"/>
                     <LinearLayout
                         android:layout_width="wrap_content"
-                        android:layout_height="30dp">
+                        android:layout_height="22dp">
                         <TextView
                             android:id="@+id/iccal"
                             android:layout_width="wrap_content"
@@ -225,6 +237,7 @@
                             android:text="@string/fa_calendar"
                             android:textSize="@dimen/icon_size"
                             android:textColor="@color/bgDarkGrey"
+                            android:includeFontPadding="false"
                             android:gravity="center"
                             android:layout_gravity="center"/>
                         <TextView
@@ -237,6 +250,7 @@
                             android:textColor="@color/bgDarkGrey"
                             android:text="2016.04.20 ~ 2016.06.20"
                             android:textSize="@dimen/content_text_size"
+                            android:includeFontPadding="false"
                             android:layout_marginRight="10dp"
                             android:layout_marginLeft="10dp"/>
                         <TextView
@@ -248,7 +262,8 @@
                             android:layout_gravity="center_vertical"
                             android:textColor="@color/textBlue"
                             android:text="10"
-                            android:textSize="@dimen/content_text_size"/>
+                            android:textSize="@dimen/content_text_size"
+                            android:includeFontPadding="false"/>
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
@@ -257,11 +272,13 @@
                             android:layout_gravity="center_vertical"
                             android:textColor="@color/textBlue"
                             android:text="pic"
-                            android:textSize="@dimen/content_text_size"/>
+                            android:textSize="@dimen/content_text_size"
+                            android:includeFontPadding="false"/>
                     </LinearLayout>
                     <LinearLayout
                         android:layout_width="wrap_content"
-                        android:layout_height="30dp">
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp">
                         <TextView
                             android:id="@+id/tvdetailstate"
                             android:layout_width="match_parent"
@@ -270,7 +287,9 @@
                             android:text="사진"
                             android:textColor="@color/textBlue"
                             android:textSize="@dimen/content_point_text__size"
-                            android:gravity="center_vertical"/>
+                            android:gravity="center_vertical"
+                            android:includeFontPadding="false"
+                            android:layout_marginTop="14dp"/>
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
@@ -278,7 +297,9 @@
                             android:text="을 보고 있습니다."
                             android:textColor="@color/bgDarkGrey"
                             android:textSize="@dimen/content_text_size"
-                            android:gravity="center_vertical"/>
+                            android:gravity="center_vertical"
+                            android:includeFontPadding="false"
+                            android:layout_marginTop="14dp"/>
                     </LinearLayout>
                 </LinearLayout>
                 <LinearLayout
@@ -292,7 +313,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:text="content 내용입니다!"
-                        android:textSize="12dp"
+                        android:textSize="@dimen/content_text_size"
                         android:textColor="@color/bgDarkGrey"
                         android:gravity="center_vertical"
                         android:layout_marginLeft="@dimen/most_left_tv_margin"
@@ -320,7 +341,8 @@
                             android:textColor="@color/bgDarkGrey"
                             android:gravity="center_vertical"
                             android:layout_gravity="center"
-                            android:layout_marginLeft="10dp"/>
+                            android:layout_marginLeft="10dp"
+                            android:includeFontPadding="false"/>
                     </LinearLayout>
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -339,7 +361,8 @@
                                 android:textColor="@color/bgDarkGrey"
                                 android:gravity="right"
                                 android:layout_gravity="center"
-                                android:layout_marginRight="@dimen/between_tv_margin"/>
+                                android:layout_marginRight="@dimen/between_tv_margin"
+                                android:includeFontPadding="false"/>
                             <TextView
                                 android:id="@+id/tvLikeCount"
                                 android:layout_width="30dp"
@@ -348,7 +371,8 @@
                                 android:textSize="@dimen/content_text_size"
                                 android:textColor="@color/bgDarkGrey"
                                 android:gravity="center_vertical"
-                                android:layout_gravity="center"/>
+                                android:layout_gravity="center"
+                                android:includeFontPadding="false"/>
                         </LinearLayout>
                         <LinearLayout
                             android:layout_width="wrap_content"
@@ -363,7 +387,8 @@
                                 android:textColor="@color/bgDarkGrey"
                                 android:gravity="right"
                                 android:layout_gravity="center"
-                                android:layout_marginRight="@dimen/between_tv_margin"/>
+                                android:layout_marginRight="@dimen/between_tv_margin"
+                                android:includeFontPadding="false"/>
                             <TextView
                                 android:id="@+id/tvCommentCount"
                                 android:layout_width="30dp"
@@ -372,7 +397,8 @@
                                 android:textSize="@dimen/content_text_size"
                                 android:textColor="@color/bgDarkGrey"
                                 android:gravity="center_vertical"
-                                android:layout_gravity="center"/>
+                                android:layout_gravity="center"
+                                android:includeFontPadding="false"/>
                         </LinearLayout>
                         <LinearLayout
                             android:layout_width="wrap_content"
@@ -387,16 +413,18 @@
                                 android:textColor="@color/bgDarkGrey"
                                 android:gravity="right"
                                 android:layout_gravity="center"
-                                android:layout_marginRight="@dimen/between_tv_margin"/>
+                                android:layout_marginRight="@dimen/between_tv_margin"
+                                android:includeFontPadding="false"/>
                             <TextView
                                 android:id="@+id/tvShareCount"
-                                android:layout_width="30dp"
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="13"
                                 android:textSize="@dimen/content_text_size"
                                 android:textColor="@color/bgDarkGrey"
-                                android:gravity="center_vertical"
-                                android:layout_gravity="center"/>
+                                android:gravity="center_vertical|right"
+                                android:layout_gravity="center"
+                                android:includeFontPadding="false"/>
                         </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
@@ -420,8 +448,9 @@
                             android:gravity="center"
                             android:layout_gravity="center"
                             android:layout_marginLeft="@dimen/most_left_tv_margin"
-                            android:layout_marginRight="@dimen/between_tv_margin"/>
-                        <Button
+                            android:layout_marginRight="@dimen/between_tv_margin"
+                            android:includeFontPadding="false"/>
+                        <TextView
                             android:id="@+id/btnLike"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
@@ -430,7 +459,8 @@
                             android:textSize="@dimen/content_text_size"
                             android:textColor="@color/bgDarkGrey"
                             android:gravity="center_vertical"
-                            android:layout_gravity="center"/>
+                            android:layout_gravity="center"
+                            android:includeFontPadding="false"/>
                     </LinearLayout>
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -445,10 +475,10 @@
                             android:textSize="@dimen/icon_size"
                             android:textColor="@color/bgDarkGrey"
                             android:gravity="center"
-                            android:layout_weight="1"
                             android:layout_gravity="center"
-                            android:layout_marginRight="@dimen/between_tv_margin"/>
-                        <Button
+                            android:layout_marginRight="@dimen/between_tv_margin"
+                            android:includeFontPadding="false"/>
+                        <TextView
                             android:id="@+id/btnComment"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
@@ -457,8 +487,8 @@
                             android:textSize="@dimen/content_text_size"
                             android:textColor="@color/bgDarkGrey"
                             android:gravity="center_vertical"
-                            android:layout_weight="1"
-                            android:layout_gravity="center"/>
+                            android:layout_gravity="center"
+                            android:includeFontPadding="false"/>
                     </LinearLayout>
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -474,8 +504,9 @@
                             android:textColor="@color/bgDarkGrey"
                             android:gravity="center"
                             android:layout_gravity="center"
-                            android:layout_marginLeft="@dimen/between_tv_margin"/>
-                        <Button
+                            android:layout_marginRight="@dimen/between_tv_margin"
+                            android:includeFontPadding="false"/>
+                        <TextView
                             android:id="@+id/btnShare"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
@@ -483,9 +514,10 @@
                             android:text="공유하기"
                             android:textSize="@dimen/content_text_size"
                             android:textColor="@color/bgDarkGrey"
-                            android:gravity="center_vertical"
+                            android:gravity="center_vertical|right"
                             android:layout_gravity="center"
-                            android:layout_marginRight="@dimen/most_rignt_tv_margin"/>
+                            android:layout_marginRight="@dimen/most_rignt_tv_margin"
+                            android:includeFontPadding="false"/>
                     </LinearLayout>
                 </LinearLayout>
             </RelativeLayout>
@@ -497,7 +529,7 @@
                 android:fitsSystemWindows="true"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed"
                 app:layout_collapseMode="pin"
-                app:popupTheme="@style/AppTheme.PopupOverlay"/>
+                app:popupTheme="@style/AppTheme.PopupOverlay" />
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
     <android.support.v4.widget.NestedScrollView

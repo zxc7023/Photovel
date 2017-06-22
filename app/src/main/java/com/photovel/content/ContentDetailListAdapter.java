@@ -62,7 +62,7 @@ public class ContentDetailListAdapter extends RecyclerView.Adapter<ContentDetail
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public ImageView ivphoto;
         public TextView tvLocation, tvDate, tvDetailContent;
-        public TextView icmarker;
+        public TextView icmarker, iccircle1, iccircle2, iccircle3, iccircle4, iccircle5, tvPosition;
 
         public ViewHolder(View view) {
             super(view);
@@ -71,6 +71,12 @@ public class ContentDetailListAdapter extends RecyclerView.Adapter<ContentDetail
             tvDate = (TextView) view.findViewById(R.id.tvDate);
             tvDetailContent = (TextView) view.findViewById(R.id.tvDetailContent);
             icmarker = (TextView) view.findViewById(R.id.icmarker);
+            iccircle1 = (TextView) view.findViewById(R.id.iccircle1);
+            iccircle2 = (TextView) view.findViewById(R.id.iccircle2);
+            iccircle3 = (TextView) view.findViewById(R.id.iccircle3);
+            iccircle4 = (TextView) view.findViewById(R.id.iccircle4);
+            iccircle5 = (TextView) view.findViewById(R.id.iccircle5);
+            tvPosition = (TextView) view.findViewById(R.id.tvPosition);
         }
     }
 
@@ -90,6 +96,13 @@ public class ContentDetailListAdapter extends RecyclerView.Adapter<ContentDetail
         //imageView를 font로 바꿔주기
         Typeface fontAwesomeFont = Typeface.createFromAsset(mcontext.getAssets(), "fontawesome-webfont.ttf");
         holder.icmarker.setTypeface(fontAwesomeFont);
+        holder.iccircle1.setTypeface(fontAwesomeFont);
+        holder.iccircle2.setTypeface(fontAwesomeFont);
+        holder.iccircle3.setTypeface(fontAwesomeFont);
+        holder.iccircle4.setTypeface(fontAwesomeFont);
+        holder.iccircle5.setTypeface(fontAwesomeFont);
+
+        holder.tvPosition.setText(String.valueOf(position+1));
 
         final Date date=mDataset.get(position).getPhoto().getPhoto_date();
         String date2=null;
