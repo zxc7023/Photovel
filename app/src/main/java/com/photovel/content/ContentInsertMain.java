@@ -96,9 +96,9 @@ public class ContentInsertMain extends FontActivity {
         mContext = this;
         checkPermission();
 
-        CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+        /*CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setExpandedTitleTextAppearance(R.style.ExpandedAppBar);
-        collapsingToolbar.setCollapsedTitleTextAppearance(R.style.CollapsedAppBar);
+        collapsingToolbar.setCollapsedTitleTextAppearance(R.style.CollapsedAppBar);*/
 
         contentSubject = (EditText) findViewById(R.id.contentSubject);
         contentText = (EditText) findViewById(R.id.contentText);
