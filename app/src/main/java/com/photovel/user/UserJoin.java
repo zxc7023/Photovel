@@ -1,4 +1,4 @@
-package com.photovel.User;
+package com.photovel.user;
 
 import android.os.Bundle;
 
