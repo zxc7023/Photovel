@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import com.photovel.FontActivity2;
 import com.photovel.R;
+import com.photovel.http.Value;
 import com.vo.User;
 
 import org.json.JSONException;
@@ -81,7 +82,7 @@ public class UserValidityCheck extends FontActivity2 {
                     //id 중복체크
                     JSONObject job = new JSONObject();
                     //final String url = "http://192.128.12.44:8888/photovel/common/login/email";
-                    String url ="http://192.168.1.9:8888/photovel/common/user/idCheck";
+                    String url = Value.userValidityCheckURL;
                     try {
                         job.put("user_id", email);
                         job.put("user_password", password);

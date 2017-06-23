@@ -13,4 +13,10 @@ public class Value {
     public static String mainImageURL = photovelURL+"/main_image";
     //mainImage에 따른 photo
     public static String mainImagePhotoURL = photovelURL+"/app/images/main";
+
+    public static String userLoginURL= photovelURL+"/common/user/email";
+
+    public static String userJoinURL = photovelURL+"/common/user/join";
+
+    public static String userValidityCheckURL = "/common/user/idCheck";
 }

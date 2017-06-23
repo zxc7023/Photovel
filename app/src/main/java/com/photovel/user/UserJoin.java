@@ -20,6 +20,7 @@ import android.widget.Toast;
 import com.photovel.BackPressCloseHandler;
 import com.photovel.FontActivity2;
 import com.photovel.R;
+import com.photovel.http.Value;
 import com.vo.User;
 
 import org.json.JSONException;
@@ -145,7 +146,7 @@ public class UserJoin extends FontActivity2 {
                     }
                     Log.i("myConsole", job.toString());
 
-                    String url = "http://192.168.1.9:8888/photovel/common/user/join";
+                    String url = Value.userJoinURL;
                     join(job.toString(), url);
                     if(isSucess.equals("1")){
                         Log.i("isSucess","로그인페이지로 이동");
@@ -173,7 +174,7 @@ public class UserJoin extends FontActivity2 {
 
                 try {
                     //송신준비 및 송신
-                    URL connectURL = new URL("http://192.168.1.9:8888/photovel/common/user/join");
+                    URL connectURL = new URL(url);
                     conn = (HttpURLConnection) connectURL.openConnection();
                     conn.setDoOutput(true);
                     conn.setDoInput(true);
