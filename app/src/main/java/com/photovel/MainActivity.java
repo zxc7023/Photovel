@@ -23,7 +23,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.photovel.User.UserLogin;
+import com.photovel.user.UserLogin;
 import com.alibaba.fastjson.JSON;
 import com.photovel.content.ClusterTest;
 import com.photovel.content.ContentDetailListMain;

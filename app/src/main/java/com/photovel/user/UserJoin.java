@@ -1,4 +1,4 @@
-package com.photovel.User;
+package com.photovel.user;
 
 import android.app.ActivityManager;
 import android.content.Context;
@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -149,13 +148,6 @@ public class UserJoin extends FontActivity2 {
                     String url = "http://192.168.1.9:8888/photovel/common/user/join";
                     join(job.toString(), url);
                     if(isSucess.equals("1")){
-                        ActivityManager am = (ActivityManager)mContext.getSystemService(Context.ACTIVITY_SERVICE);
-                        List<ActivityManager.RunningTaskInfo> taskList = am.getRunningTasks(100);
-                        for( int i=0; i < taskList.size(); i++){
-                            Log.d("INFO","base="+taskList.get(i).baseActivity.getPackageName()+",top="+taskList.get(i).topActivity.getPackageName());
-                            Log.d("INFO","base="+taskList.get(i).baseActivity.getClassName()+",top="+taskList.get(i).topActivity.getClassName());
-                        }
-
                         Log.i("isSucess","로그인페이지로 이동");
                         Intent intent1 = new Intent(getApplicationContext(),UserLogin.class);
                         intent1.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);

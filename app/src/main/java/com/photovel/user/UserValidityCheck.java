@@ -1,4 +1,4 @@
-package com.photovel.User;
+package com.photovel.user;
 
 import android.content.Intent;
 import android.graphics.Typeface;

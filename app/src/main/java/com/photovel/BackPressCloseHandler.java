@@ -1,13 +1,8 @@
 package com.photovel;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.widget.Toast;
-
-import com.photovel.User.UserJoin;
-import com.photovel.User.UserLogin;
 
 /**
  * Created by Junki on 2017-06-23.
