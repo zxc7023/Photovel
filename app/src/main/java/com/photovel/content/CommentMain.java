@@ -91,7 +91,7 @@ public class CommentMain extends FontActivity2 {
         myCommentDataset.add(new Comment("test3"));
         myCommentDataset.add(new Comment("test1"));
         myCommentDataset.add(new Comment("test2"));
-        myCommentDataset.add(new Comment("test3"));
+        myCommentDataset.add(new Comment("test33333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333"));
 
 
         RVComment = (RecyclerView) findViewById(R.id.RVComment);
