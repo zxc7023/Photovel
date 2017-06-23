@@ -24,6 +24,34 @@ public class Content {
 	private List<ContentDetail> details;
 	private Bitmap bitmap;
 
+	private double photo_latitude;
+	private double photo_longitude;
+
+	private Date fr_photo_date;
+	private Date to_photo_date;
+
+
+	public double getPhoto_latitude() {
+		return photo_latitude;
+	}
+	public void setPhoto_latitude(double photo_latitude) {
+		this.photo_latitude = photo_latitude;
+	}
+	public double getPhoto_longitude() {
+		return photo_longitude;
+	}
+	public void setPhoto_longitude(double photo_longitude) {
+		this.photo_longitude = photo_longitude;
+	}
+	public Date getFr_photo_date() {
+		return fr_photo_date;
+	}
+	public void setFr_photo_date(Date fr_photo_date) {
+		this.fr_photo_date = fr_photo_date;
+	}
+	public Date getTo_photo_date() {
+		return to_photo_date;
+	}
 	public Bitmap getBitmap() {
 		return bitmap;
 	}
@@ -133,9 +161,9 @@ public class Content {
 				+ ", content_delete_status=" + content_delete_status + ", content_warning_status="
 				+ content_warning_status + ", content_share_count=" + content_share_count + ", good_count=" + good_count
 				+ ", comment_count=" + comment_count + ", content_detail_count=" + content_detail_count
-				+ ", photo_file_name=" + photo_file_name + ", user=" + user + ", ad=" + ad + ", comments=" + comments
-				+ ", details=" + details + "]";
+				+ ", photo_file_name=" + photo_file_name + ", photo_latitude=" + photo_latitude + ", photo_longitude="
+				+ photo_longitude + ", fr_photo_date=" + fr_photo_date + ", to_photo_date=" + to_photo_date + ", user="
+				+ user + ", ad=" + ad + ", comments=" + comments + ", details=" + details + "]";
 	}
-	
-	
+
 }

@@ -1,6 +1,7 @@
 package com.photovel.content;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,6 +14,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
@@ -31,6 +33,7 @@ import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.photovel.FontActivity2;
+import com.photovel.MainActivity;
 import com.photovel.R;
 import com.photovel.http.Value;
 import com.vo.Content;
@@ -38,12 +41,14 @@ import com.vo.ContentDetail;
 import com.vo.Photo;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -65,7 +70,7 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
     private Button btnLike, btnComment, btnShare;
     private List<ContentDetail> myDataset;
     private Content content;
-    private int id=0;
+    private int content_id=-1;
 
     private final String contentURL = Value.contentURL;
     private final String contentPhotoURL = Value.contentPhotoURL;
@@ -76,11 +81,11 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         setContentView(R.layout.activity_content_slide_show_main);
 
         Intent intent = getIntent();
-        id = intent.getIntExtra("id",1);
-        if(id==-1){
-            Log.i("id","id를 못받아옴!!!");
+        content_id = intent.getIntExtra("content_id",1);
+        if(content_id==-1){
+            Log.i("content_id","slide_content_id 못받아옴!!!");
         }else {
-            Log.i("id","id : "+id);
+            Log.i("content_id","slide_content_id : "+content_id);
         }
 
         // Adding Toolbar to the activity
@@ -147,7 +152,7 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
             @Override
             public void run() {
                 super.run();
-                content = getContentData(id);
+                content = getContentData(content_id);
             }
         };
         thread1.start();
@@ -220,20 +225,20 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         switch (v.getId()){
             case R.id.btnLookLeft:
                 Intent intent=new Intent(this, ContentDetailListMain.class);
-                intent.putExtra("id",id);
+                intent.putExtra("content_id",content_id);
                 this.startActivity(intent);
                 finish();
                 break;
             case R.id.btnLookRight:
                 Intent intent2=new Intent(this, ContentClusterMain.class);
-                intent2.putExtra("id",id);
+                intent2.putExtra("content_id",content_id);
                 this.startActivity(intent2);
                 finish();
                 break;
         }
     }
 
-    //메뉴클릭시
+    //디테일 설정 메뉴클릭시
     public void ContentMenuClick(View v){
         Context wrapper = new ContextThemeWrapper(this, R.style.MenuStyle);
         PopupMenu popup = new PopupMenu(wrapper, v);
@@ -242,21 +247,144 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()){
+                switch (item.getItemId()) {
                     case R.id.action_update:
-                        Intent intent=new Intent(ContentSlideShowMain.this, ContentUpdateMain.class);
-                        intent.putExtra("id",id);
+                        Intent intent = new Intent(ContentSlideShowMain.this, ContentUpdateMain.class);
+                        intent.putExtra("content_id", content_id);
                         ContentSlideShowMain.this.startActivity(intent);
-                        Toast.makeText(getApplicationContext(),"수정",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "수정", Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.action_delete:
-                        Toast.makeText(getApplicationContext(),"삭제",Toast.LENGTH_SHORT).show();
+                        AlertDialog.Builder dalert_confirm = new AlertDialog.Builder(ContentSlideShowMain.this);
+                        dalert_confirm.setMessage("정말 글을 삭제 하시겠습니까?").setCancelable(false).setPositiveButton("확인",
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        final String url = Value.contentURL+"/"+content_id;
+                                        Thread th = new Thread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                DataOutputStream dos = null;
+                                                HttpURLConnection conn = null;
+                                                URL connectURL = null;
+                                                try {
+                                                    connectURL = new URL(url);
+
+                                                    conn = (HttpURLConnection) connectURL.openConnection();
+                                                    conn.setDoInput(true);
+                                                    conn.setDoOutput(true);
+                                                    conn.setUseCaches(false);
+                                                    conn.setRequestMethod("DELETE");
+
+                                                    int responseCode = conn.getResponseCode();
+                                                    Log.i("responseCode","삭제 : "+responseCode);
+
+                                                    switch (responseCode){
+                                                        case HttpURLConnection.HTTP_OK:
+                                                            Log.i("responseCode","삭제성공");
+                                                            break;
+                                                        default:
+                                                            Log.i("responseCode","삭제실패 responseCode: " +responseCode);
+                                                            break;
+                                                    }
+
+                                                } catch (MalformedURLException e) {
+                                                    e.printStackTrace();
+                                                } catch (ProtocolException e) {
+                                                    e.printStackTrace();
+                                                } catch (IOException e) {
+                                                    e.printStackTrace();
+                                                }
+                                            }
+                                        });
+                                        th.start();
+                                        try {
+                                            th.join();
+                                        } catch (InterruptedException e) {
+                                            e.printStackTrace();
+                                        }
+                                        Toast.makeText(getApplicationContext(),"삭제성공",Toast.LENGTH_SHORT).show();
+                                        Intent dintent = new Intent(getApplicationContext(), MainActivity.class);
+                                        dintent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
+                                        startActivity(dintent);
+                                        finish();
+                                    }
+                                }).setNegativeButton("취소",
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        return;
+                                    }
+                                });
+                        AlertDialog dalert = dalert_confirm.create();
+                        dalert.show();
                         break;
                     case R.id.action_report:
-                        Toast.makeText(getApplicationContext(),"신고",Toast.LENGTH_SHORT).show();
+                        AlertDialog.Builder walert_confirm = new AlertDialog.Builder(ContentSlideShowMain.this);
+                        walert_confirm.setMessage("정말 글을 신고 하시겠습니까?").setCancelable(false).setPositiveButton("확인",
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        final String url = Value.contentURL+"/"+content_id+"/warning";
+                                        Thread th = new Thread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                DataOutputStream dos = null;
+                                                HttpURLConnection conn = null;
+                                                URL connectURL = null;
+                                                try {
+                                                    connectURL = new URL(url);
+
+                                                    conn = (HttpURLConnection) connectURL.openConnection();
+                                                    conn.setDoInput(true);
+                                                    conn.setDoOutput(true);
+                                                    conn.setUseCaches(false);
+                                                    conn.setRequestMethod("POST");
+
+                                                    int responseCode = conn.getResponseCode();
+                                                    Log.i("responseCode","신고 : "+responseCode);
+
+                                                    switch (responseCode){
+                                                        case HttpURLConnection.HTTP_OK:
+                                                            Log.i("responseCode","신고성공");
+                                                            break;
+                                                        default:
+                                                            Log.i("responseCode","신고실패 responseCode: " +responseCode);
+                                                            break;
+                                                    }
+
+                                                } catch (MalformedURLException e) {
+                                                    e.printStackTrace();
+                                                } catch (ProtocolException e) {
+                                                    e.printStackTrace();
+                                                } catch (IOException e) {
+                                                    e.printStackTrace();
+                                                }
+                                            }
+                                        });
+                                        th.start();
+                                        try {
+                                            th.join();
+                                        } catch (InterruptedException e) {
+                                            e.printStackTrace();
+                                        }
+                                        Toast.makeText(getApplicationContext(),"신고성공",Toast.LENGTH_SHORT).show();
+                                        Intent wintent = new Intent(getApplicationContext(), MainActivity.class);
+                                        wintent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
+                                        startActivity(wintent);
+                                        finish();
+                                    }
+                                }).setNegativeButton("취소",
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        return;
+                                    }
+                                });
+                        AlertDialog walert = walert_confirm.create();
+                        walert.show();
                         break;
                 }
-
                 return false;
             }
         });
@@ -276,11 +404,7 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
                     case R.id.show_profile:
                         Toast.makeText(getApplicationContext(),"프로필보기",Toast.LENGTH_SHORT).show();
                         break;
-                    case R.id.show_other_content:
-                        Toast.makeText(getApplicationContext(),"다른컨텐트보기",Toast.LENGTH_SHORT).show();
-                        break;
                 }
-
                 return false;
             }
         });
