@@ -17,4 +17,8 @@
     <string name="fa_paw">&#xf1b0;</string>
     <string name="fa_minus">&#xf068;&#xf068;&#xf068;&#xf068;&#xf068;&#xf068;&#xf068;&#xf068;</string>
     <string name="fa_lock">&#xf023;</string>
+    <string name="fa_user_circle">&#xf2bd;</string>
+    <string name="fa_mobile_phone">&#xf10b;</string>
+    <string name="fa_transgender">&#xf224;</string>
+
 </resources>

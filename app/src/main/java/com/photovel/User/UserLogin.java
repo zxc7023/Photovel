@@ -76,7 +76,7 @@ public class UserLogin extends FontActivity2 {
                 } else {
                     JSONObject job = new JSONObject();
                     //final String url = "http://192.128.12.44:8888/photovel/common/login/email";
-                    String url ="http://192.168.12.44:8888/photovel/common/login/email";
+                    String url ="http://192.168.12.44:8888/photovel/common/user/email";
                     try {
                         job.put("user_id", user_id);
                         job.put("user_password", user_password);
@@ -103,7 +103,7 @@ public class UserLogin extends FontActivity2 {
         joinTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(),UserJoin.class);
+                Intent intent = new Intent(getApplicationContext(),UserValidityCheck.class);
                 startActivity(intent);
             }
         });
