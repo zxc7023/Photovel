@@ -1,5 +1,6 @@
 package com.photovel.content;
 import android.content.Context;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
@@ -12,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.photovel.FontActivity2;
 import com.photovel.MainActivity;
@@ -35,11 +37,18 @@ public class CommentMain extends FontActivity2 {
     private CommentAdapter mCommentAdapter;
     private List<Comment> myCommentDataset;
 
+    private TextView btnBack;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comment_main);
         RlComment = (RelativeLayout) findViewById(R.id.RlComment);
+
+        btnBack = (TextView) findViewById(R.id.btnBack);
+
+        Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
+        btnBack.setTypeface(fontAwesomeFont);
 
         bottomSheetBehavior = BottomSheetBehavior.from(RlComment);
         bottomSheetBehavior.setPeekHeight(0);

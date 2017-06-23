@@ -16,45 +16,75 @@
         app:behavior_hideable="true"
         android:id="@+id/RlComment"
         app:layout_behavior="@string/bottom_sheet_behavior">
-
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="top"
+            android:orientation="horizontal">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical">
+                <TextView
+                    android:id="@+id/btnBack"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/fa_chevron_left"
+                    android:textSize="@dimen/icon_size"
+                    android:layout_marginLeft="@dimen/most_left_tv_margin"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="댓글"
+                    android:textSize="@dimen/content_text_size"
+                    android:layout_marginLeft="@dimen/between_tv_margin"
+                    android:layout_marginRight="@dimen/most_rignt_tv_margin"/>
+            </LinearLayout>
+        </LinearLayout>
         <android.support.v7.widget.RecyclerView
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/RVComment"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             app:font="normal"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
-
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:layout_marginBottom="50dp"
+            android:layout_marginTop="50dp"/>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="bottom"
             android:orientation="horizontal">
-
-            <com.mikhaellopez.circularimageview.CircularImageView
-                android:id="@+id/userProfile"
-                android:layout_width="38dp"
-                android:layout_height="38dp"
-                android:src="@drawable/ic_profile_circle"
-                android:layout_gravity=""
-                android:layout_marginLeft="@dimen/between_tv_margin"
-                app:civ_border_width="1dp" />
-            <EditText
-                android:id="@+id/etComment"
-                android:layout_width="250dp"
-                android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
-                android:ellipsize="end"
-                android:text="댓글을 입력하세요" />
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toRightOf="@id/etComment"
-                android:layout_marginLeft="@dimen/between_tv_margin"
-                android:layout_marginRight="@dimen/most_rignt_tv_margin"
-                android:text="전송"
-                />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center">
+                <com.mikhaellopez.circularimageview.CircularImageView
+                    android:id="@+id/userProfile"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:src="@drawable/ic_profile_circle"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="@dimen/between_tv_margin"
+                    app:civ_border_width="1dp" />
+                <EditText
+                    android:id="@+id/etComment"
+                    android:layout_width="200dp"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:ellipsize="end"
+                    android:text="댓글을 입력하세요" />
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/etComment"
+                    android:layout_marginLeft="@dimen/between_tv_margin"
+                    android:layout_marginRight="@dimen/most_rignt_tv_margin"
+                    android:text="전송"
+                    android:textSize="@dimen/content_text_size"
+                    />
+            </LinearLayout>
         </LinearLayout>
     </RelativeLayout>
 </android.support.design.widget.CoordinatorLayout>

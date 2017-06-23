@@ -28,7 +28,6 @@
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -47,7 +46,13 @@
         <activity android:name=".user.UserLogin"/>
         <activity android:name=".user.UserValidityCheck"/>
         <activity android:name=".user.UserJoin"/>
-        <activity android:name=".content.CommentMain"/>
+        <activity android:name=".content.CommentMain">
+            <!--<intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>-->
+        </activity>
     </application>
 
 </manifest>
