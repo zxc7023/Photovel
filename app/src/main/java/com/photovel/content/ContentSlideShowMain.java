@@ -7,9 +7,11 @@ import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.SearchView;
@@ -52,13 +54,14 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
     private static final String TAG = "AppPermission";
     Toolbar toolbar;
 
-    private RelativeLayout RLdetailProfile, RldetailData;
+    private RelativeLayout RldetailData;
     private LinearLayout RLdetailDate, LLmenu;
-    private TextView icglobe, icflag, icvideo, iccal, icline, icmarker, icpow, icthumb, iccomment, icshare, btnDetailMenu;
+    private TextView icglobe, icleft, icright, tvleft, tvright, iccal, icmarker, icpow, icthumb, iccomment, icshare, btnDetailMenu;
     private TextView tvContentInsertDate, tvContentSubject, tvContentLocation, tvUsername, tvDuring, tvdetailcount, tvdetailstate, tvContent;
     private TextView tvLikeCount, tvCommentCount, tvShareCount;
     private ImageView ivTopPhoto;
-    private LinearLayout btnLookPhoto, btnLookPlay;
+    private LinearLayout btnLookLeft, btnLookRight;
+    private FloatingActionButton btnTop;
     private Button btnLike, btnComment, btnShare;
     private List<ContentDetail> myDataset;
     private Content content;
@@ -85,10 +88,11 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         setSupportActionBar(toolbar);
 
         icglobe = (TextView)findViewById(R.id.icglobe);
-        icflag = (TextView)findViewById(R.id.icflag);
-        icvideo = (TextView)findViewById(R.id.icvideo);
+        icleft = (TextView)findViewById(R.id.icleft);
+        icright = (TextView)findViewById(R.id.icright);
+        tvleft = (TextView)findViewById(R.id.tvleft);
+        tvright = (TextView)findViewById(R.id.tvright);
         iccal = (TextView)findViewById(R.id.iccal);
-        icline = (TextView)findViewById(R.id.icline);
         icmarker = (TextView)findViewById(R.id.icmarker);
         icpow = (TextView)findViewById(R.id.icpow);
         icthumb = (TextView)findViewById(R.id.icthumb);
@@ -109,16 +113,15 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         tvShareCount = (TextView) findViewById(R.id.tvShareCount);
         tvdetailcount = (TextView) findViewById(R.id.tvdetailcount);
 
-        btnLookPhoto = (LinearLayout) findViewById(R.id.btnLookPhoto);
-        btnLookPlay = (LinearLayout) findViewById(R.id.btnLookPlay);
+        btnLookLeft = (LinearLayout) findViewById(R.id.btnLookLeft);
+        btnLookRight = (LinearLayout) findViewById(R.id.btnLookRight);
 
         //imageView를 font로 바꿔주기
         Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
         icglobe.setTypeface(fontAwesomeFont);
-        icflag.setTypeface(fontAwesomeFont);
-        icvideo.setTypeface(fontAwesomeFont);
+        icleft.setTypeface(fontAwesomeFont);
+        icright.setTypeface(fontAwesomeFont);
         iccal.setTypeface(fontAwesomeFont);
-        icline.setTypeface(fontAwesomeFont);
         icmarker.setTypeface(fontAwesomeFont);
         icpow.setTypeface(fontAwesomeFont);
         icthumb.setTypeface(fontAwesomeFont);
@@ -126,12 +129,15 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         icshare.setTypeface(fontAwesomeFont);
         btnDetailMenu.setTypeface(fontAwesomeFont);
 
+        icleft.setText(R.string.fa_photo);
+        tvleft.setText("사진으로 보기");
+        icright.setText(R.string.fa_flag);
+        tvright.setText("지도로 보기");
+
         //UI정렬
-        RLdetailProfile = (RelativeLayout)findViewById(R.id.RLdetailProfile);
         RLdetailDate = (LinearLayout)findViewById(R.id.RLdetailDate);
         LLmenu = (LinearLayout)findViewById(R.id.LLmenu);
         RldetailData = (RelativeLayout)findViewById(R.id.RldetailData);
-        RLdetailProfile.bringToFront();
         RLdetailDate.bringToFront();
         LLmenu.bringToFront();
         RldetailData.bringToFront();
@@ -153,7 +159,7 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         getImage(); //content Image받아오기
 
         //content정보 추가하기
-        tvdetailstate.setText("사진");
+        tvdetailstate.setText("슬라이드");
         tvContentInsertDate.setText(new SimpleDateFormat("yyyy.MM.dd").format(content.getContent_written_date()));
         tvContentSubject.setText(content.getContent_subject());
         tvUsername.setText(content.getUser().getUser_nick_name());
@@ -187,18 +193,38 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        //top버튼
+        btnTop = (FloatingActionButton) findViewById(R.id.btnTop);
+        final NestedScrollView nsv = (NestedScrollView) findViewById(R.id.nestedScrollView);
+        nsv.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {   //스크롤내리면 보이게
+            @Override
+            public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                if (oldScrollY > 200) {
+                    btnTop.show();
+                } else {
+                    btnTop.hide();
+                }
+            }
+        });
+        btnTop.setOnClickListener(new View.OnClickListener() {  //top으로 이동
+            @Override
+            public void onClick(View view) {
+                nsv.fullScroll(View.FOCUS_UP);
+            }
+        });
     }
 
     //onClick
     public void goLook(View v){
         switch (v.getId()){
-            case R.id.btnLookPhoto:
+            case R.id.btnLookLeft:
                 Intent intent=new Intent(this, ContentDetailListMain.class);
                 intent.putExtra("id",id);
                 this.startActivity(intent);
                 finish();
                 break;
-            case R.id.btnLookMap:
+            case R.id.btnLookRight:
                 Intent intent2=new Intent(this, ContentClusterMain.class);
                 intent2.putExtra("id",id);
                 this.startActivity(intent2);
