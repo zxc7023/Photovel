@@ -27,8 +27,7 @@
     </style>
 
     <style name="MenuStyle" parent="ThemeOverlay.AppCompat.Light">
-        <item name="android:dropDownWidth">10dp</item>
-        <item name="android:textSize">10dp</item>
+        <item name="android:textSize">@dimen/content_text_size</item>
         <item name="android:colorBackground">@color/bgDarkGrey</item>
         <item name="android:textColor">@color/bgWhite</item>
     </style>

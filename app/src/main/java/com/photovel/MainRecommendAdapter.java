@@ -1,40 +1,28 @@
 package com.photovel;
 
 import android.app.Activity;
-import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.photovel.content.ContentInsertGoogleMap;
+import com.photovel.content.ContentDetailListMain;
 import com.vo.Content;
-import com.vo.ContentDetail;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder>{
+public class MainRecommendAdapter extends RecyclerView.Adapter<MainRecommendAdapter.ViewHolder>{
     private List<Content> mDataset;
     private Context mcontext;
-    private MainAdapter.ViewHolder holder;
+    private MainRecommendAdapter.ViewHolder holder;
     private int position;
 
     public int getPosition() {
@@ -44,47 +32,56 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder>{
         this.position = position;
     }
 
-    public MainAdapter.ViewHolder getHolder() {
+    public MainRecommendAdapter.ViewHolder getHolder() {
         return holder;
     }
-    public void setHolder(MainAdapter.ViewHolder holder) {
+    public void setHolder(MainRecommendAdapter.ViewHolder holder) {
         this.holder = holder;
     }
 
-    public MainAdapter() {
+    public MainRecommendAdapter() {
     }
 
-    public MainAdapter(List<Content> myDataset, Context mycontext) {
+    public MainRecommendAdapter(List<Content> myDataset, Context mycontext) {
         mDataset = myDataset;
         mcontext = mycontext;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
+        public RelativeLayout RlmainTop;
         public ImageView main_ivphoto;
         public TextView contentSubject;
         public TextView main_icthumb, main_iccomment, main_icshare;
+        public TextView thumbCount, commentCount, shareCount;
+        public LinearLayout llthumb, llcomment, llshare;
 
         public ViewHolder(View view) {
             super(view);
+            RlmainTop = (RelativeLayout)view.findViewById(R.id.RlmainTop);
             main_ivphoto = (ImageView)view.findViewById(R.id.main_ivphoto);
             contentSubject = (TextView)view.findViewById(R.id.contentSubject);
             main_icthumb = (TextView)view.findViewById(R.id.main_icthumb);
             main_iccomment = (TextView)view.findViewById(R.id.main_iccomment);
             main_icshare = (TextView)view.findViewById(R.id.main_icshare);
-
+            thumbCount = (TextView)view.findViewById(R.id.recommend_thumbCount);
+            commentCount = (TextView)view.findViewById(R.id.recommend_commentCount);
+            shareCount = (TextView)view.findViewById(R.id.recommend_shareCount);
+            llthumb = (LinearLayout)view.findViewById(R.id.llthumb);
+            llcomment = (LinearLayout)view.findViewById(R.id.llcomment);
+            llshare = (LinearLayout)view.findViewById(R.id.llshare);
         }
     }
 
     @Override
-    public MainAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public MainRecommendAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // create a new view
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_main_list_adapter, parent, false);
-        MainAdapter.ViewHolder vh = new MainAdapter.ViewHolder(v);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_main_recommend_list_adapter, parent, false);
+        MainRecommendAdapter.ViewHolder vh = new MainRecommendAdapter.ViewHolder(v);
         return vh;
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, final int position) {
         //imageView를 font로 바꿔주기
         Typeface fontAwesomeFont = Typeface.createFromAsset(mcontext.getAssets(), "fontawesome-webfont.ttf");
         holder.main_icthumb.setTypeface(fontAwesomeFont);
@@ -100,13 +97,23 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder>{
             subject = temp.toString();
         }
         holder.contentSubject.setText(subject);
+        holder.thumbCount.setText(String.valueOf(mDataset.get(position).getGood_count()));
+        holder.commentCount.setText(String.valueOf(mDataset.get(position).getComment_count()));
+        holder.shareCount.setText(String.valueOf(mDataset.get(position).getContent_share_count()));
 
-        holder.main_icthumb.setText(holder.main_icthumb.getText()+" "+mDataset.get(position).getGood_count());
-        holder.main_iccomment.setText(holder.main_iccomment.getText()+" "+mDataset.get(position).getComment_count());
-        holder.main_icshare.setText(holder.main_icshare.getText()+" "+mDataset.get(position).getContent_share_count());
+        //사진클릭
+        holder.RlmainTop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i("click","메인이 클릭되었당!");
+                Intent intent = new Intent(mcontext, ContentDetailListMain.class);
+                intent.putExtra("content_id", mDataset.get(position).getContent_id());
+                ((Activity)mcontext).startActivity(intent);
+            }
+        });
 
         //좋아요 클릭
-        holder.main_icthumb.setOnClickListener(new View.OnClickListener() {
+        holder.llthumb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -114,7 +121,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder>{
         });
 
         //댓글 클릭
-        holder.main_iccomment.setOnClickListener(new View.OnClickListener() {
+        holder.llcomment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -122,7 +129,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder>{
         });
 
         //공유 클릭
-        holder.main_icshare.setOnClickListener(new View.OnClickListener() {
+        holder.llshare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 

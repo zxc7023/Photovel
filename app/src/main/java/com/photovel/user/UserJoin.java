@@ -1,7 +1,6 @@
 package com.photovel.User;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 
 import com.photovel.FontActivity2;
 import com.photovel.R;

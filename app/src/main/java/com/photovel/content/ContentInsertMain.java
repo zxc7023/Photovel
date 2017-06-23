@@ -37,7 +37,7 @@ import android.widget.Toast;
 
 import com.photovel.R;
 import com.photovel.FontActivity;
-import com.photovel.http.value;
+import com.photovel.http.Value;
 import com.vo.Content;
 import com.vo.ContentDetail;
 import com.vo.Photo;
@@ -73,7 +73,7 @@ public class ContentInsertMain extends FontActivity {
     private ExifInterface exif;
     private static final String TAG = "AppPermission";
     private final int MY_PERMISSION_REQUEST_STORAGE = 100;
-    private final String photoURL = value.photoURL;
+    private final String contentURL = Value.contentURL;
 
     private RecyclerView mRecyclerView;
     private ContentInsertAdapter mAdapter;
@@ -96,10 +96,9 @@ public class ContentInsertMain extends FontActivity {
         mContext = this;
         checkPermission();
 
-        Intent intent = new Intent(this.getIntent());
-        CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+        /*CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setExpandedTitleTextAppearance(R.style.ExpandedAppBar);
-        collapsingToolbar.setCollapsedTitleTextAppearance(R.style.CollapsedAppBar);
+        collapsingToolbar.setCollapsedTitleTextAppearance(R.style.CollapsedAppBar);*/
 
         contentSubject = (EditText) findViewById(R.id.contentSubject);
         contentText = (EditText) findViewById(R.id.contentText);
@@ -234,9 +233,9 @@ public class ContentInsertMain extends FontActivity {
                                 }
                                 resultContent.setContent_written_date(new Date());
                                 if (flagSwitch == true) {
-                                    resultContent.setContent_private_flag("T");
-                                } else {
                                     resultContent.setContent_private_flag("F");
+                                } else {
+                                    resultContent.setContent_private_flag("T");
                                 }
                                 for (int i = 0; i < myDataset.size(); i++) {
                                     if (myDataset.get(i).getPhoto().getPhoto_latitude() == 0 && myDataset.get(i).getPhoto().getPhoto_longitude() == 0) {
@@ -274,9 +273,7 @@ public class ContentInsertMain extends FontActivity {
 
                                     Log.i("ddd",obj.toString());
 
-
-                                    //final String url = "http://192.168.12.44:8888/photovel/content/photo";
-                                    final String url ="http://192.168.12.197:8080/content/photo";
+                                    final String url =contentURL;
 
                                     //Bitmap처리
                                     final List<Bitmap> tmp = new ArrayList<Bitmap>();

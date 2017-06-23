@@ -8,4 +8,12 @@
 
     <dimen name="custom_profile_image">75dp</dimen>
     <dimen name="custom_profile_padding">2dp</dimen>
+
+    <dimen name="most_left_tv_margin">10dp</dimen>
+    <dimen name="most_rignt_tv_margin">10dp</dimen>
+    <dimen name="between_tv_margin">10dp</dimen>
+
+    <dimen name="icon_size">22dp</dimen>
+    <dimen name="content_text_size">14dp</dimen>
+    <dimen name="content_point_text__size">16dp</dimen>
 </resources>

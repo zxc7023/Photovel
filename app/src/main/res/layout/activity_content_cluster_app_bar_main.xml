@@ -6,10 +6,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.photovel.content.ContentDetailListMain">
+
     <android.support.design.widget.AppBarLayout
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:theme="@style/AppTheme.AppBarOverlay">
+
         <android.support.design.widget.CollapsingToolbarLayout
             android:id="@+id/collapsing_toolbar"
             android:layout_width="match_parent"
@@ -138,7 +140,7 @@
                     android:background="@color/bgToMeong"
                     android:gravity="center">
                     <LinearLayout
-                        android:id="@+id/btnLookMap"
+                        android:id="@+id/btnLookPhoto"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
@@ -148,7 +150,7 @@
                             android:id="@+id/icflag"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
-                            android:text="@string/fa_flag"
+                            android:text="@string/fa_photo"
                             android:textSize="@dimen/icon_size"
                             android:textColor="@color/bgWhite"
                             android:includeFontPadding="false"
@@ -158,7 +160,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:background="@color/bgNo"
-                            android:text="지도로보기"
+                            android:text="사진으로 보기"
                             android:textSize="@dimen/content_text_size"
                             android:textColor="@color/bgWhite"
                             android:includeFontPadding="false"
@@ -528,7 +530,7 @@
                 </LinearLayout>
             </RelativeLayout>
             <android.support.v7.widget.Toolbar
-                android:id="@+id/detailListToolbar"
+                android:id="@+id/clusterToolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:background="?attr/colorPrimary"
@@ -546,12 +548,11 @@
         app:font="normal"
         android:fillViewport="true"
         android:id="@+id/nestedScrollView">
-        <android.support.v7.widget.RecyclerView
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/recycler_view"
+        <include
+            layout="@layout/activity_content_cluster"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+            android:layout_height="match_parent"
+            />
     </android.support.v4.widget.NestedScrollView>
 
     <android.support.design.widget.FloatingActionButton

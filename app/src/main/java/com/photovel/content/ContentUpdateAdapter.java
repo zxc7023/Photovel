@@ -68,7 +68,7 @@ public class ContentUpdateAdapter extends RecyclerView.Adapter<ContentUpdateAdap
         public RadioGroup radioG;
         public RadioButton btnRadio;
         public EditText etContent;
-        public TextView icmarker, ictrash, icpen1, icpen2;
+        public TextView icmarker, ictrash, icpen1, icpen2, iccircle1, iccircle2, iccircle3, iccircle4, iccircle5, tvPosition;
 
         public ViewHolder(View view) {
             super(view);
@@ -107,6 +107,12 @@ public class ContentUpdateAdapter extends RecyclerView.Adapter<ContentUpdateAdap
             ictrash = (TextView) view.findViewById(R.id.ictrash);
             icpen1 = (TextView) view.findViewById(R.id.icpen1);
             icpen2 = (TextView) view.findViewById(R.id.icpen2);
+            iccircle1 = (TextView) view.findViewById(R.id.iccircle1);
+            iccircle2 = (TextView) view.findViewById(R.id.iccircle2);
+            iccircle3 = (TextView) view.findViewById(R.id.iccircle3);
+            iccircle4 = (TextView) view.findViewById(R.id.iccircle4);
+            iccircle5 = (TextView) view.findViewById(R.id.iccircle5);
+            tvPosition = (TextView) view.findViewById(R.id.tvPosition);
         }
     }
 
@@ -129,6 +135,13 @@ public class ContentUpdateAdapter extends RecyclerView.Adapter<ContentUpdateAdap
         holder.ictrash.setTypeface(fontAwesomeFont);
         holder.icpen1.setTypeface(fontAwesomeFont);
         holder.icpen2.setTypeface(fontAwesomeFont);
+        holder.iccircle1.setTypeface(fontAwesomeFont);
+        holder.iccircle2.setTypeface(fontAwesomeFont);
+        holder.iccircle3.setTypeface(fontAwesomeFont);
+        holder.iccircle4.setTypeface(fontAwesomeFont);
+        holder.iccircle5.setTypeface(fontAwesomeFont);
+
+        holder.tvPosition.setText(String.valueOf(position+1));
 
         final Date date=mDataset.get(position).getPhoto().getPhoto_date();
         String date2=null;

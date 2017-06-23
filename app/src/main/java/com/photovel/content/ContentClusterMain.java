@@ -7,15 +7,11 @@ import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -24,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -50,22 +47,19 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ContentDetailListMain extends FontActivity2 implements NavigationView.OnNavigationItemSelectedListener {
+public class ContentClusterMain extends FontActivity2 implements NavigationView.OnNavigationItemSelectedListener {
     private SearchView searchView;
     private static final String TAG = "AppPermission";
     Toolbar toolbar;
-    private RecyclerView mRecyclerView;
-    private RecyclerView.LayoutManager mLayoutManager;
-    private ContentDetailListAdapter mAdapter;
 
     private RelativeLayout RLdetailProfile, RldetailData;
     private LinearLayout RLdetailDate, LLmenu;
     private TextView icglobe, icflag, icvideo, iccal, icline, icmarker, icpow, icthumb, iccomment, icshare, btnDetailMenu;
     private TextView tvContentInsertDate, tvContentSubject, tvContentLocation, tvUsername, tvDuring, tvdetailcount, tvdetailstate, tvContent;
     private TextView tvLikeCount, tvCommentCount, tvShareCount;
-    private LinearLayout btnLookMap, btnLookPlay;
     private ImageView ivTopPhoto;
-    private FloatingActionButton btnTop;
+    private Button btnLike, btnComment, btnShare;
+    private LinearLayout btnLookPhoto, btnLookPlay;
     private List<ContentDetail> myDataset;
     private Content content;
     private int id=0;
@@ -76,10 +70,10 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_content_detail_list_main);
+        setContentView(R.layout.activity_content_cluster_main);
 
         Intent intent = getIntent();
-        id = intent.getIntExtra("content_id",1);
+        id = intent.getIntExtra("id",1);
         if(id==-1){
             Log.i("id","id를 못받아옴!!!");
         }else {
@@ -87,7 +81,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         }
 
         // Adding Toolbar to the activity
-        toolbar = (Toolbar) findViewById(R.id.detailListToolbar);
+        toolbar = (Toolbar) findViewById(R.id.clusterToolbar);
         setSupportActionBar(toolbar);
 
         icglobe = (TextView)findViewById(R.id.icglobe);
@@ -115,7 +109,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         tvShareCount = (TextView) findViewById(R.id.tvShareCount);
         tvdetailcount = (TextView) findViewById(R.id.tvdetailcount);
 
-        btnLookMap = (LinearLayout) findViewById(R.id.btnLookMap);
+        btnLookPhoto = (LinearLayout) findViewById(R.id.btnLookPhoto);
         btnLookPlay = (LinearLayout) findViewById(R.id.btnLookPlay);
 
         //imageView를 font로 바꿔주기
@@ -185,16 +179,6 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         tvDuring.setText(from+" ~ "+to);
 
 
-        //recycleview사용선언
-        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        mRecyclerView.setHasFixedSize(true);
-        mLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.setNestedScrollingEnabled(false);
-        mAdapter = new ContentDetailListAdapter(myDataset, ContentDetailListMain.this);
-        mRecyclerView.setAdapter(mAdapter);
-
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -203,35 +187,13 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-        //top버튼
-        btnTop = (FloatingActionButton) findViewById(R.id.btnTop);
-        final NestedScrollView nsv = (NestedScrollView) findViewById(R.id.nestedScrollView);
-        nsv.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {   //스크롤내리면 보이게
-            @Override
-            public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-                if (oldScrollY > 200) {
-                    btnTop.show();
-                } else {
-                    btnTop.hide();
-                }
-            }
-        });
-        btnTop.setOnClickListener(new View.OnClickListener() {  //top으로 이동
-            @Override
-            public void onClick(View view) {
-                nsv.fullScroll(View.FOCUS_UP);
-            }
-        });
     }
 
     //onClick
     public void goLook(View v){
         switch (v.getId()){
-            case R.id.btnLookMap:
-                Toast.makeText(getApplicationContext(),"지도로보기",Toast.LENGTH_SHORT).show();
-                Log.i("ddd","지도로 보기 클릭");
-                Intent intent=new Intent(this, ContentClusterMain.class);
+            case R.id.btnLookPhoto:
+                Intent intent=new Intent(this, ContentDetailListMain.class);
                 intent.putExtra("id",id);
                 this.startActivity(intent);
                 finish();
@@ -243,9 +205,10 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
                 finish();
                 break;
         }
+
     }
 
-    //디테일 설정 메뉴클릭시
+    //메뉴클릭시
     public void ContentMenuClick(View v){
         Context wrapper = new ContextThemeWrapper(this, R.style.MenuStyle);
         PopupMenu popup = new PopupMenu(wrapper, v);
@@ -256,9 +219,9 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()){
                     case R.id.action_update:
-                        Intent intent=new Intent(ContentDetailListMain.this, ContentUpdateMain.class);
+                        Intent intent=new Intent(ContentClusterMain.this, ContentUpdateMain.class);
                         intent.putExtra("id",id);
-                        ContentDetailListMain.this.startActivity(intent);
+                        ContentClusterMain.this.startActivity(intent);
                         Toast.makeText(getApplicationContext(),"수정",Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.action_delete:
