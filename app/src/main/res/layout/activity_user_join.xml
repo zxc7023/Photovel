@@ -17,112 +17,169 @@
         android:text="Photovel\n사진으로 만드는 여행"
         android:textColor="@android:color/white" />
 
-    <Button
-        android:id="@+id/FacebookLogin"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="FacebookLogin" />
-
-    <Button
-        android:id="@+id/KakaoLogin"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="KakaoLogin" />
-
     <TextView
         android:id="@+id/delimeter"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="----- or -----"
+        android:textColor="@color/bgWhite"
         android:gravity="center"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp">
+        android:layout_marginRight="20dp"
+        android:padding="10dp"
+        android:background="@drawable/border"
+        android:orientation="vertical"
+        >
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical">
+
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="이미지자리."/>
+                android:id="@+id/nickNameIcon"
+                android:layout_width="0dp"
+                android:layout_weight="0.2"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="20dp"
+                android:gravity="center_vertical"
+                android:text="@string/fa_user_circle"
+                android:textColor="@color/bgWhite"
+                android:textSize="20dp" />
+
             <EditText
-                android:layout_width="match_parent"
+                android:id="@+id/nicknameText"
+                android:layout_width="0dp"
+                android:layout_weight="0.8"
+                android:layout_height="match_parent"
+                android:background="@null"
+                android:hint="Nick Name"
+                android:inputType="textPersonName"
+                android:lines="1"
+                android:textColor="@color/bgWhite"
+                android:textColorHint="@color/bgWhite" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/phone1Icon"
+                android:layout_width="0dp"
+                android:layout_weight="0.2"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="20dp"
+                android:text="@string/fa_globe"
+                android:textColor="@color/bgWhite"
+                android:textSize="20dp"
+                android:gravity="center_vertical"/>
+
+            <Spinner
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:hint="email"
-                android:id="@+id/emailText"/>
+                android:layout_weight="0.8"
+                android:gravity="left"
+                android:entries="@array/country_code"
+                android:id="@+id/countrySpiner">
+            </Spinner>
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/phoneIcon"
+                android:layout_width="0dp"
+                android:layout_weight="0.2"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="20dp"
+                android:text="@string/fa_mobile_phone"
+                android:textColor="@color/bgWhite"
+                android:textSize="20dp"
+                android:gravity="center_vertical"/>
+
+            <EditText
+                android:id="@+id/phoneText"
+                android:layout_width="0dp"
+                android:layout_weight="0.8"
+                android:layout_height="match_parent"
+                android:background="@null"
+                android:hint="Phone"
+                android:inputType="phone"
+                android:lines="1"
+                android:textColor="@color/bgWhite"
+                android:textColorHint="@color/bgWhite" />
 
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical">
+
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="이미지자리."/>
-            <EditText
-                android:id="@+id/passwordText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Password" />
+                android:id="@+id/genderIcon"
+                android:layout_width="0dp"
+                android:layout_weight="0.2"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="20dp"
+                android:text="@string/fa_transgender"
+                android:textColor="@color/bgWhite"
+                android:textSize="20dp"
+                android:gravity="center_vertical"/>
 
-        </LinearLayout>
+            <RadioGroup
+                android:layout_width="0dp"
+                android:layout_weight="0.8"
+                android:layout_height="match_parent"
+                android:gravity="top"
+                android:orientation="horizontal"
+                android:id="@+id/genderGroup">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+                <RadioButton
+                    android:id="@+id/maleButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="Male"
+                    android:textColor="@color/bgWhite"
+                    app:buttonTint="@color/bgWhite"
+                    android:checked="true"/>
+
+                <RadioButton
+                    android:id="@+id/femaleButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="Female"
+                    android:textColor="@color/bgWhite"
+                    app:buttonTint="@color/bgWhite" />
+            </RadioGroup>
 
         </LinearLayout>
 
     </LinearLayout>
 
     <Button
-        android:id="@+id/loginButton"
+        android:id="@+id/signUpButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/button_round"
-        android:text="Log IN"
-        android:textColor="@color/bgWhite"
         android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp"/>
+        android:layout_marginRight="30dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/button_round"
+        android:text="SignUp"
+        android:textColor="@color/bgWhite" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_marginTop="10dp">
-
-        <TextView
-            android:id="@+id/textView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="비밀번호찾기"
-            android:textColor="@color/bgWhite" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="20dp"
-            android:text="|"
-            android:layout_marginRight="10dp"
-            android:layout_marginLeft="10dp"
-            android:textColor="@color/bgWhite"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="회원가입"
-            android:textColor="@color/bgWhite"
-            android:id="@+id/joinTextView"/>
-    </LinearLayout>
 
     <Button
         android:layout_width="wrap_content"

@@ -3,6 +3,7 @@ package com.photovel.user;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.os.Bundle;
 
 import com.photovel.R;
@@ -50,12 +51,18 @@ public class UserLogin extends FontActivity2 {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_login);
-
         mContext = this;
+
+        TextView emailIconView = (TextView)findViewById(R.id.emailIcon);
+        TextView passIconView = (TextView)findViewById(R.id.passwordIcon);
 
         emailText = (EditText) findViewById(R.id.emailText);
         passwordTextView = (EditText) findViewById(R.id.passwordText);
 
+
+        Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
+        emailIconView.setTypeface(fontAwesomeFont);
+        passIconView.setTypeface(fontAwesomeFont);
 
         Button loginButton = (Button) findViewById(R.id.loginButton);
         loginButton.setOnClickListener(new View.OnClickListener() {
@@ -69,7 +76,7 @@ public class UserLogin extends FontActivity2 {
                 } else {
                     JSONObject job = new JSONObject();
                     //final String url = "http://192.128.12.44:8888/photovel/common/login/email";
-                    String url ="http://192.168.12.44:8888/photovel/common/login/email";
+                    String url ="http://192.168.12.44:8888/photovel/common/user/email";
                     try {
                         job.put("user_id", user_id);
                         job.put("user_password", user_password);
@@ -96,7 +103,7 @@ public class UserLogin extends FontActivity2 {
         joinTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(),UserJoin.class);
+                Intent intent = new Intent(getApplicationContext(),UserValidityCheck.class);
                 startActivity(intent);
             }
         });
@@ -119,7 +126,7 @@ public class UserLogin extends FontActivity2 {
                     connectURL = new URL(url);
                     conn = (HttpURLConnection) connectURL.openConnection();
                     conn.setDoOutput(true);
-                    conn.setRequestMethod("GET");
+                    conn.setRequestMethod("POST");
                     conn.setRequestProperty("Connection", "Keep-Alive");
                     conn.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
                     dos = conn.getOutputStream();
