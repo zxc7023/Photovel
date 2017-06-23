@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:fitsSystemWindows="true">
+
+    <include layout="@layout/content_basic" />
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:behavior_hideable="true"
+        android:id="@+id/RlComment"
+        app:layout_behavior="@string/bottom_sheet_behavior">
+
+        <android.support.v7.widget.RecyclerView
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/RVComment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:font="normal"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="bottom"
+            android:orientation="horizontal">
+
+            <com.mikhaellopez.circularimageview.CircularImageView
+                android:id="@+id/userProfile"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:src="@drawable/ic_profile_circle"
+                android:layout_gravity=""
+                android:layout_marginLeft="@dimen/between_tv_margin"
+                app:civ_border_width="1dp" />
+            <EditText
+                android:id="@+id/etComment"
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:ellipsize="end"
+                android:text="댓글을 입력하세요" />
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/etComment"
+                android:layout_marginLeft="@dimen/between_tv_margin"
+                android:layout_marginRight="@dimen/most_rignt_tv_margin"
+                android:text="전송"
+                />
+        </LinearLayout>
+    </RelativeLayout>
+</android.support.design.widget.CoordinatorLayout>

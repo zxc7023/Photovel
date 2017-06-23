@@ -113,10 +113,16 @@
                 android:text="loginModuel"/>
 
             <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/cok"
+            android:text="cok"/>
+
+            <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/cok"
-                android:text="cok"/>
+                android:id="@+id/comment"
+                android:text="CommentTEST"/>
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
 
