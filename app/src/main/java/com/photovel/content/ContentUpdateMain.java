@@ -94,6 +94,7 @@ public class ContentUpdateMain extends FontActivity {
     private int id=-1;
 
     private Content content;
+    private String isSucess;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -223,7 +224,7 @@ public class ContentUpdateMain extends FontActivity {
 
         //스위치버튼
         swPrivate = (Switch)findViewById(R.id.swPrivate);
-        if(content.getContent_private_flag().equals("T")){
+        if(content.getContent_private_flag().equals("F")){
             swPrivate.setChecked(true);
         }else{
             swPrivate.setChecked(false);
@@ -374,11 +375,13 @@ public class ContentUpdateMain extends FontActivity {
                                         tmp.add(sumData.get(i).getPhoto().getBitmap());
                                     }
 
-                                    new Thread(new Runnable() {
+                                    Thread th = new Thread(new Runnable() {
                                         @Override
                                         public void run() {
                                             DataOutputStream dos = null;
                                             HttpURLConnection conn = null;
+                                            InputStream is;
+                                            ByteArrayOutputStream baos;
                                             try {
                                                 String lineEnd = "\r\n";
                                                 String twoHyphens = "--";
@@ -434,10 +437,18 @@ public class ContentUpdateMain extends FontActivity {
                                                 Log.i("responseCode",responseCode+"");
 
                                                 switch (responseCode){
-                                                    case HttpURLConnection.HTTP_OK :
-                                                        dos.close();
-                                                        conn.disconnect();
-                                                        break;
+                                                    case HttpURLConnection.HTTP_OK:
+                                                        is = conn.getInputStream();
+                                                        baos = new ByteArrayOutputStream();
+                                                        byte[] byteBuffer = new byte[1024];
+                                                        byte[] byteData = null;
+                                                        int nLength = 0;
+                                                        while ((nLength = is.read(byteBuffer, 0, byteBuffer.length)) != -1) {
+                                                            baos.write(byteBuffer, 0, nLength);
+                                                        }
+                                                        byteData = baos.toByteArray();
+                                                        isSucess = new String(byteData);
+                                                        Log.i("isSucess",isSucess);
                                                 }
 
                                             } catch (ProtocolException e) {
@@ -456,11 +467,24 @@ public class ContentUpdateMain extends FontActivity {
 
                                             }
                                         }
-                                    }).start();
+                                    });
+                                    th.start();
+                                    try {
+                                        th.join();
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
 
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
+
+                                Intent intent = new Intent(getApplicationContext(), ContentDetailListMain.class);
+                                Log.i("content_id","insert_content_id : "+isSucess);
+                                intent.putExtra("content_id",Integer.parseInt(isSucess));
+                                getApplicationContext().startActivity(intent);
+                                finish();
+
                             }
                         }).setNegativeButton("취소",
                         new DialogInterface.OnClickListener() {
