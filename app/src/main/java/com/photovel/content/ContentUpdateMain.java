@@ -91,7 +91,7 @@ public class ContentUpdateMain extends FontActivity {
     private EditText contentSubject, contentText;
     private Switch swPrivate;
     private boolean flagSwitch;
-    private int id=-1;
+    private int content_id=-1;
 
     private Content content;
     private String isSucess;
@@ -103,9 +103,11 @@ public class ContentUpdateMain extends FontActivity {
         checkPermission();
 
         Intent intent = getIntent();
-        id = intent.getIntExtra("id",-1);
-        if(id==-1){
-            Log.i("id","id를 못받아옴!!!");
+        content_id = intent.getIntExtra("content_id",-1);
+        if(content_id==-1){
+            Log.i("content_id","content_id 못받아옴!!!");
+        }else{
+            Log.i("content_id","update_content_id : "+content_id);
         }
 
         tvTitle = (TextView)findViewById(R.id.tvTitle);
@@ -153,7 +155,7 @@ public class ContentUpdateMain extends FontActivity {
             @Override
             public void run() {
                 super.run();
-                content = getContentData(id);
+                content = getContentData(content_id);
             }
         };
         thread1.start();
@@ -367,7 +369,7 @@ public class ContentUpdateMain extends FontActivity {
 
                                     Log.i("ddd",obj.toString());
 
-                                    final String url = contentURL+"/"+id;
+                                    final String url = contentURL+"/"+content_id;
 
                                     //Bitmap처리
                                     final List<Bitmap> tmp = new ArrayList<Bitmap>();

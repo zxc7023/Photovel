@@ -176,6 +176,7 @@ public class ContentInsertMain extends FontActivity {
 
         //스위치버튼
         swPrivate = (Switch) findViewById(R.id.swPrivate);
+        swPrivate.setChecked(true);
         swPrivate.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 //Log.i("ddd",""+isChecked);  //true,false

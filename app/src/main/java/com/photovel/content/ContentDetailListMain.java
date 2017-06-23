@@ -66,8 +66,8 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
     private ContentDetailListAdapter mAdapter;
 
     private RelativeLayout RldetailData;
-    private LinearLayout RLdetailDate, LLmenu;
-    private TextView icglobe, icleft, icright, iccal, icmarker, icpow, icthumb, iccomment, icshare, btnDetailMenu;
+    private LinearLayout RLdetailDate, LLmenu, btnMoreUserContent;
+    private TextView icglobe, icleft, icright, tvleft, tvright, iccal, icmarker, icpow, icthumb, iccomment, icshare, btnDetailMenu;
     private TextView tvContentInsertDate, tvContentSubject, tvContentLocation, tvUsername, tvDuring, tvdetailcount, tvdetailstate, tvContent;
     private TextView tvLikeCount, tvCommentCount, tvShareCount;
     private LinearLayout btnLookLeft, btnLookRight;
@@ -75,7 +75,8 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
     private FloatingActionButton btnTop;
     private List<ContentDetail> myDataset;
     private Content content;
-    private int id=-1;
+    private int content_id=-1;
+    private String user_id="";
 
     private final String contentURL = Value.contentURL;
     private final String contentPhotoURL = Value.contentPhotoURL;
@@ -85,12 +86,12 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_content_detail_list_main);
 
-        Intent intent = getIntent();
-        id = intent.getIntExtra("content_id",-1);
-        if(id==-1){
+        final Intent intent = getIntent();
+        content_id = intent.getIntExtra("content_id",-1);
+        if(content_id==-1){
             Log.i("content_id","detail_content_id를 못받아옴");
         }else {
-            Log.i("content_id","detail_content_id : "+id);
+            Log.i("content_id","detail_content_id : "+content_id);
         }
 
         // Adding Toolbar to the activity
@@ -106,6 +107,8 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         icshare = (TextView)findViewById(R.id.icshare);
         icleft = (TextView)findViewById(R.id.icleft);
         icright = (TextView)findViewById(R.id.icright);
+        tvleft = (TextView)findViewById(R.id.tvleft);
+        tvright = (TextView)findViewById(R.id.tvright);
         btnDetailMenu = (TextView) findViewById(R.id.btnDetailMenu);
         ivTopPhoto = (ImageView) findViewById(R.id.ivTopPhoto);
 
@@ -114,15 +117,16 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         tvContentLocation = (TextView) findViewById(R.id.tvContentLocation);        //컨텐트 위치(마지막)
         tvUsername = (TextView) findViewById(R.id.tvUsername);                        //유저 네임
         tvDuring = (TextView) findViewById(R.id.tvDuring);                             //컨텐트 날짜첫날 ~ 날짜 끝날(2016.04.20 ~ 2016.06.20)
-        tvdetailstate = (TextView) findViewById(R.id.tvdetailstate);                   //디테일 수
-        tvContent = (TextView) findViewById(R.id.tvContent);                            //보고있는 화면 상태(사진/동영상/지도)
-        tvLikeCount = (TextView) findViewById(R.id.tvLikeCount);                        //컨텐트 내용
+        tvdetailstate = (TextView) findViewById(R.id.tvdetailstate);                  //보고있는 화면 상태(사진/동영상/지도)
+        tvContent = (TextView) findViewById(R.id.tvContent);                            //컨텐트 내용
+        tvLikeCount = (TextView) findViewById(R.id.tvLikeCount);
         tvCommentCount = (TextView) findViewById(R.id.tvCommentCount);
         tvShareCount = (TextView) findViewById(R.id.tvShareCount);
-        tvdetailcount = (TextView) findViewById(R.id.tvdetailcount);
+        tvdetailcount = (TextView) findViewById(R.id.tvdetailcount);                    //디테일 수
 
         btnLookLeft = (LinearLayout) findViewById(R.id.btnLookLeft);
         btnLookRight = (LinearLayout) findViewById(R.id.btnLookRight);
+        btnMoreUserContent = (LinearLayout) findViewById(R.id.btnMoreUserContent);
 
         //imageView를 font로 바꿔주기
         Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
@@ -137,6 +141,11 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         icshare.setTypeface(fontAwesomeFont);
         btnDetailMenu.setTypeface(fontAwesomeFont);
 
+        icleft.setText(R.string.fa_flag);
+        tvleft.setText("지도로 보기");
+        icright.setText(R.string.fa_video_camera);
+        tvright.setText("슬라이드로 보기");
+
         //UI정렬
         RLdetailDate = (LinearLayout)findViewById(R.id.RLdetailDate);
         LLmenu = (LinearLayout)findViewById(R.id.LLmenu);
@@ -150,7 +159,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
             @Override
             public void run() {
                 super.run();
-                content = getContentData(id);
+                content = getContentData(content_id);
             }
         };
         thread1.start();
@@ -168,7 +177,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         tvUsername.setText(content.getUser().getUser_nick_name());
 
         tvContent.setText(content.getContent());
-        //tvdetailcount.setText(content.getDetails().size());
+        tvdetailcount.setText(String.valueOf(content.getDetails().size()));
         myDataset = new ArrayList<>();
         for(int i=0; i<content.getDetails().size(); i++){
             Photo ph = new Photo();
@@ -227,6 +236,17 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
                 nsv.fullScroll(View.FOCUS_UP);
             }
         });
+
+        btnMoreUserContent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent dintent = new Intent(getApplicationContext(), ContentListMain.class);
+                user_id = content.getUser().getUser_id();
+                dintent.putExtra("user_id",user_id);
+                getApplicationContext().startActivity(dintent);
+                finish();
+            }
+        });
     }
 
     //onClick
@@ -236,13 +256,13 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
                 Toast.makeText(getApplicationContext(),"지도로보기",Toast.LENGTH_SHORT).show();
                 Log.i("ddd","지도로 보기 클릭");
                 Intent intent=new Intent(this, ContentClusterMain.class);
-                intent.putExtra("id",id);
+                intent.putExtra("content_id",content_id);
                 this.startActivity(intent);
                 finish();
                 break;
             case R.id.btnLookRight:
                 Intent intent2=new Intent(this, ContentSlideShowMain.class);
-                intent2.putExtra("id",id);
+                intent2.putExtra("content_id",content_id);
                 this.startActivity(intent2);
                 finish();
                 break;
@@ -261,17 +281,17 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
                 switch (item.getItemId()) {
                     case R.id.action_update:
                         Intent intent = new Intent(ContentDetailListMain.this, ContentUpdateMain.class);
-                        intent.putExtra("id", id);
+                        intent.putExtra("content_id", content_id);
                         ContentDetailListMain.this.startActivity(intent);
                         Toast.makeText(getApplicationContext(), "수정", Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.action_delete:
-                        AlertDialog.Builder alert_confirm = new AlertDialog.Builder(ContentDetailListMain.this);
-                        alert_confirm.setMessage("정말 글을 삭제 하시겠습니까?").setCancelable(false).setPositiveButton("확인",
+                        AlertDialog.Builder dalert_confirm = new AlertDialog.Builder(ContentDetailListMain.this);
+                        dalert_confirm.setMessage("정말 글을 삭제 하시겠습니까?").setCancelable(false).setPositiveButton("확인",
                                 new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        final String url = Value.contentURL+"/"+id;
+                                        final String url = Value.contentURL+"/"+content_id;
                                         Thread th = new Thread(new Runnable() {
                                             @Override
                                             public void run() {
@@ -288,7 +308,16 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
                                                     conn.setRequestMethod("DELETE");
 
                                                     int responseCode = conn.getResponseCode();
-                                                    Log.i("responseCode","delete : "+responseCode);
+                                                    Log.i("responseCode","삭제 : "+responseCode);
+
+                                                    switch (responseCode){
+                                                        case HttpURLConnection.HTTP_OK:
+                                                            Log.i("responseCode","삭제성공");
+                                                            break;
+                                                        default:
+                                                            Log.i("responseCode","삭제실패 responseCode: " +responseCode);
+                                                            break;
+                                                    }
 
                                                 } catch (MalformedURLException e) {
                                                     e.printStackTrace();
@@ -318,14 +347,75 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
                                         return;
                                     }
                                 });
-                        AlertDialog alert = alert_confirm.create();
-                        alert.show();
+                        AlertDialog dalert = dalert_confirm.create();
+                        dalert.show();
                         break;
                     case R.id.action_report:
-                        Toast.makeText(getApplicationContext(),"신고",Toast.LENGTH_SHORT).show();
+                        AlertDialog.Builder walert_confirm = new AlertDialog.Builder(ContentDetailListMain.this);
+                        walert_confirm.setMessage("정말 글을 신고 하시겠습니까?").setCancelable(false).setPositiveButton("확인",
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        final String url = Value.contentURL+"/"+content_id+"/warning";
+                                        Thread th = new Thread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                DataOutputStream dos = null;
+                                                HttpURLConnection conn = null;
+                                                URL connectURL = null;
+                                                try {
+                                                    connectURL = new URL(url);
+
+                                                    conn = (HttpURLConnection) connectURL.openConnection();
+                                                    conn.setDoInput(true);
+                                                    conn.setDoOutput(true);
+                                                    conn.setUseCaches(false);
+                                                    conn.setRequestMethod("POST");
+
+                                                    int responseCode = conn.getResponseCode();
+                                                    Log.i("responseCode","신고 : "+responseCode);
+
+                                                    switch (responseCode){
+                                                        case HttpURLConnection.HTTP_OK:
+                                                            Log.i("responseCode","신고성공");
+                                                            break;
+                                                        default:
+                                                            Log.i("responseCode","신고실패 responseCode: " +responseCode);
+                                                            break;
+                                                    }
+
+                                                } catch (MalformedURLException e) {
+                                                    e.printStackTrace();
+                                                } catch (ProtocolException e) {
+                                                    e.printStackTrace();
+                                                } catch (IOException e) {
+                                                    e.printStackTrace();
+                                                }
+                                            }
+                                        });
+                                        th.start();
+                                        try {
+                                            th.join();
+                                        } catch (InterruptedException e) {
+                                            e.printStackTrace();
+                                        }
+                                        Toast.makeText(getApplicationContext(),"신고성공",Toast.LENGTH_SHORT).show();
+                                        Intent wintent = new Intent(getApplicationContext(), MainActivity.class);
+                                        wintent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
+                                        startActivity(wintent);
+                                        finish();
+                                    }
+                                }).setNegativeButton("취소",
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        return;
+                                    }
+                                });
+                        AlertDialog walert = walert_confirm.create();
+                        walert.show();
                         break;
                 }
-
                 return false;
             }
         });
@@ -345,11 +435,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
                     case R.id.show_profile:
                         Toast.makeText(getApplicationContext(),"프로필보기",Toast.LENGTH_SHORT).show();
                         break;
-                    case R.id.show_other_content:
-                        Toast.makeText(getApplicationContext(),"다른컨텐트보기",Toast.LENGTH_SHORT).show();
-                        break;
                 }
-
                 return false;
             }
         });

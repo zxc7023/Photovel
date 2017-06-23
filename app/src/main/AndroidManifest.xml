@@ -42,6 +42,7 @@
         <activity android:name=".content.ContentSlideShowMain" android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".content.ContentSlideShow"/>
         <activity android:name=".content.ContentDetailListMain" android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".content.ContentListMain" android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".TestActivity"/>
         <activity android:name=".user.UserLogin"/>
         <activity android:name=".user.UserValidityCheck"/>
