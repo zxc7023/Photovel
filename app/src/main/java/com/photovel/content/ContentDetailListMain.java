@@ -8,7 +8,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -40,7 +39,6 @@ import com.photovel.MainNewAdapter;
 import com.photovel.MainRecommendAdapter;
 import com.photovel.R;
 import com.photovel.http.Value;
-import com.vo.Comment;
 import com.vo.Content;
 import com.vo.ContentDetail;
 import com.vo.Photo;
@@ -82,15 +80,6 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
 
     private final String contentURL = Value.contentURL;
     private final String contentPhotoURL = Value.contentPhotoURL;
-
-    //comment
-    private BottomSheetBehavior bottomSheetBehavior;
-    private RelativeLayout RlComment;
-    private RecyclerView RVComment;
-    private LinearLayoutManager mCommentLayoutManager;
-    private CommentAdapter mCommentAdapter;
-    private List<Comment> myCommentDataset;
-    private TextView btnBack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -172,7 +161,6 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
             public void run() {
                 super.run();
                 content = getContentData(content_id);
-                myCommentDataset = content.getComments();
             }
         };
         thread1.start();
@@ -215,37 +203,6 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         String to = new SimpleDateFormat("yyyy.MM.dd").format(content.getDetails().get(content.getDetails().size()-1).getPhoto().getPhoto_date());
         tvDuring.setText(from+" ~ "+to);
 
-        //comment
-        RlComment = (RelativeLayout) findViewById(R.id.RlComment);
-
-        btnBack = (TextView) findViewById(R.id.btnBack);
-
-        //Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
-        btnBack.setTypeface(fontAwesomeFont);
-
-        bottomSheetBehavior = BottomSheetBehavior.from(RlComment);
-        bottomSheetBehavior.setPeekHeight(0);
-        bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
-
-            @Override
-            public void onStateChanged(@NonNull View bottomSheet, int newState) {
-                switch (newState) {
-                    case BottomSheetBehavior.STATE_EXPANDED:
-                        setTitle("댓글등록창");
-                        break;
-
-                    default:
-                        setTitle("Photovel");
-                        break;
-                }
-            }
-
-            @Override
-            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-
-            }
-        });
-
         //recycleview사용선언
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         mRecyclerView.setHasFixedSize(true);
@@ -254,22 +211,6 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         mRecyclerView.setNestedScrollingEnabled(false);
         mAdapter = new ContentDetailListAdapter(myDataset, ContentDetailListMain.this);
         mRecyclerView.setAdapter(mAdapter);
-
-        //comment
-        RVComment = (RecyclerView) findViewById(R.id.RVComment);
-        RVComment.setHasFixedSize(true);
-        RVComment.setNestedScrollingEnabled(false);
-        mCommentLayoutManager = new LinearLayoutManager(this);
-        RVComment.setLayoutManager(mCommentLayoutManager);
-        mCommentAdapter = new CommentAdapter(myCommentDataset, ContentDetailListMain.this);
-        RVComment.setAdapter(mCommentAdapter);
-
-        findViewById(R.id.btnComment).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-            }
-        });
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
