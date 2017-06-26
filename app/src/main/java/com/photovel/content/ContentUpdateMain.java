@@ -701,7 +701,7 @@ public class ContentUpdateMain extends FontActivity {
     private Bitmap getBitmap(String path) {
         InputStream in = null;
         try {
-            final int IMAGE_MAX_SIZE = 700000; //고정됨!!!!수정금지!!!!
+            final int IMAGE_MAX_SIZE = 250000; //고정됨!!!!수정금지!!!!
             in = new FileInputStream(path);
 
             // Decode image size
