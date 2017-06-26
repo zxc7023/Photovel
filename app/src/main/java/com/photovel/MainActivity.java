@@ -355,9 +355,9 @@ public class MainActivity
     //appbar의 메뉴 생성
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_search, menu);
+        getMenuInflater().inflate(R.menu.main, menu);
 
-        searchItem = menu.findItem(R.id.action_search);
+        searchItem = menu.findItem(R.id.menu_search);
 
         searchItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
