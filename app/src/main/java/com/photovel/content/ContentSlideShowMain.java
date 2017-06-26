@@ -62,7 +62,7 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
     private RelativeLayout RldetailData;
     private LinearLayout RLdetailDate, LLmenu;
     private TextView icglobe, icleft, icright, tvleft, tvright, iccal, icmarker, icpow, icthumb, iccomment, icshare, btnDetailMenu;
-    private TextView tvContentInsertDate, tvContentSubject, tvContentLocation, tvUsername, tvDuring, tvdetailcount, tvdetailstate, tvContent;
+    private TextView tvContentInsertDate, tvContentSubject, tvContentLocation, tvUsername, tvUsername2, tvDuring, tvdetailcount, tvdetailstate, tvContent;
     private TextView tvLikeCount, tvCommentCount, tvShareCount;
     private ImageView ivTopPhoto;
     private LinearLayout btnLookLeft, btnLookRight;
@@ -110,6 +110,7 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         tvContentSubject = (TextView) findViewById(R.id.tvContentSubject);           //컨텐트 제목
         tvContentLocation = (TextView) findViewById(R.id.tvContentLocation);        //컨텐트 위치(마지막)
         tvUsername = (TextView) findViewById(R.id.tvUsername);                        //유저 네임
+        tvUsername2 = (TextView) findViewById(R.id.tvUsername2);                        //유저 네임
         tvDuring = (TextView) findViewById(R.id.tvDuring);                             //컨텐트 날짜첫날 ~ 날짜 끝날(2016.04.20 ~ 2016.06.20)
         tvdetailstate = (TextView) findViewById(R.id.tvdetailstate);                   //디테일 수
         tvContent = (TextView) findViewById(R.id.tvContent);                            //보고있는 화면 상태(사진/동영상/지도)
@@ -168,8 +169,13 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         tvContentInsertDate.setText(new SimpleDateFormat("yyyy.MM.dd").format(content.getContent_written_date()));
         tvContentSubject.setText(content.getContent_subject());
         tvUsername.setText(content.getUser().getUser_nick_name());
+        tvUsername2.setText(content.getUser().getUser_nick_name());
         tvContent.setText(content.getContent());
-        //tvdetailcount.setText(content.getDetails().size());
+        tvdetailcount.setText(String.valueOf(content.getDetails().size()));
+        tvLikeCount.setText(String.valueOf(content.getGood_count()));
+        tvCommentCount.setText(String.valueOf(content.getComment_count()));
+        tvShareCount.setText(String.valueOf(content.getContent_share_count()));
+
         myDataset = new ArrayList<>();
         for(int i=0; i<content.getDetails().size(); i++){
             Photo ph = new Photo();

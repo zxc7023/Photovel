@@ -28,7 +28,7 @@
             android:layout_above="@+id/llmainButtons"
             android:layout_alignParentStart="true">
             <LinearLayout
-                android:layout_width="230dp"
+                android:layout_width="220dp"
                 android:layout_height="match_parent"
                 android:gravity="left">
                 <TextView
@@ -45,7 +45,6 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="2"
                 android:gravity="right">
                 <com.mikhaellopez.circularimageview.CircularImageView
                     android:id="@+id/userProfile"
@@ -53,10 +52,11 @@
                     android:layout_height="35dp"
                     android:layout_gravity="center"
                     android:src="@drawable/ic_profile_circle"
-                    app:civ_border_width="1dp" />
+                    app:civ_border_width="1dp"
+                    android:layout_marginRight="@dimen/between_tv_margin"/>
                 <TextView
                     android:id="@+id/userNickname"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_gravity="center"
                     android:layout_marginRight="20dp"

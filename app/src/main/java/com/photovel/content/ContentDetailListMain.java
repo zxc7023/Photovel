@@ -70,7 +70,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
     private RelativeLayout RldetailData;
     private LinearLayout RLdetailDate, LLmenu, btnMoreUserContent;
     private TextView icglobe, icleft, icright, tvleft, tvright, iccal, icmarker, icpow, icthumb, iccomment, icshare, btnDetailMenu;
-    private TextView tvContentInsertDate, tvContentSubject, tvContentLocation, tvUsername, tvDuring, tvdetailcount, tvdetailstate, tvContent;
+    private TextView tvContentInsertDate, tvContentSubject, tvContentLocation, tvUsername, tvUsername2, tvDuring, tvdetailcount, tvdetailstate, tvContent;
     private TextView tvLikeCount, tvCommentCount, tvShareCount;
     private LinearLayout btnLookLeft, btnLookRight;
     private ImageView ivTopPhoto;
@@ -78,7 +78,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
     private List<ContentDetail> myDataset;
     private Content content;
     private int content_id=-1;
-    private String user_id="";
+    private String user_nick_name="";
 
     private final String contentURL = Value.contentURL;
     private final String contentPhotoURL = Value.contentPhotoURL;
@@ -127,6 +127,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         tvContentSubject = (TextView) findViewById(R.id.tvContentSubject);           //컨텐트 제목
         tvContentLocation = (TextView) findViewById(R.id.tvContentLocation);        //컨텐트 위치(마지막)
         tvUsername = (TextView) findViewById(R.id.tvUsername);                        //유저 네임
+        tvUsername2 = (TextView) findViewById(R.id.tvUsername2);                        //유저 네임
         tvDuring = (TextView) findViewById(R.id.tvDuring);                             //컨텐트 날짜첫날 ~ 날짜 끝날(2016.04.20 ~ 2016.06.20)
         tvdetailstate = (TextView) findViewById(R.id.tvdetailstate);                  //보고있는 화면 상태(사진/동영상/지도)
         tvContent = (TextView) findViewById(R.id.tvContent);                            //컨텐트 내용
@@ -187,9 +188,14 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         tvContentInsertDate.setText(new SimpleDateFormat("yyyy.MM.dd").format(content.getContent_written_date()));
         tvContentSubject.setText(content.getContent_subject());
         tvUsername.setText(content.getUser().getUser_nick_name());
+        tvUsername2.setText(content.getUser().getUser_nick_name());
 
         tvContent.setText(content.getContent());
         tvdetailcount.setText(String.valueOf(content.getDetails().size()));
+        tvLikeCount.setText(String.valueOf(content.getGood_count()));
+        tvCommentCount.setText(String.valueOf(content.getComment_count()));
+        tvShareCount.setText(String.valueOf(content.getContent_share_count()));
+
         myDataset = new ArrayList<>();
         for(int i=0; i<content.getDetails().size(); i++){
             Photo ph = new Photo();
@@ -208,7 +214,6 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         String from = new SimpleDateFormat("yyyy.MM.dd").format(content.getDetails().get(0).getPhoto().getPhoto_date());
         String to = new SimpleDateFormat("yyyy.MM.dd").format(content.getDetails().get(content.getDetails().size()-1).getPhoto().getPhoto_date());
         tvDuring.setText(from+" ~ "+to);
-
 
         //comment
         RlComment = (RelativeLayout) findViewById(R.id.RlComment);
@@ -240,8 +245,6 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
 
             }
         });
-
-
 
         //recycleview사용선언
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
@@ -298,12 +301,13 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
             }
         });
 
+        //user님의 게시판더보기 버튼
         btnMoreUserContent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent dintent = new Intent(getApplicationContext(), ContentListMain.class);
-                user_id = content.getUser().getUser_id();
-                dintent.putExtra("user_id",user_id);
+                user_nick_name = content.getUser().getUser_nick_name();
+                dintent.putExtra("user_nick_name",user_nick_name);
                 getApplicationContext().startActivity(dintent);
                 finish();
             }
