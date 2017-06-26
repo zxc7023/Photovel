@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -39,6 +40,7 @@ import com.photovel.MainNewAdapter;
 import com.photovel.MainRecommendAdapter;
 import com.photovel.R;
 import com.photovel.http.Value;
+import com.vo.Comment;
 import com.vo.Content;
 import com.vo.ContentDetail;
 import com.vo.Photo;
@@ -68,7 +70,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
     private RelativeLayout RldetailData;
     private LinearLayout RLdetailDate, LLmenu, btnMoreUserContent;
     private TextView icglobe, icleft, icright, tvleft, tvright, iccal, icmarker, icpow, icthumb, iccomment, icshare, btnDetailMenu;
-    private TextView tvContentInsertDate, tvContentSubject, tvContentLocation, tvUsername, tvUsername2, tvDuring, tvdetailcount, tvdetailstate, tvContent;
+    private TextView tvContentInsertDate, tvContentSubject, tvContentLocation, tvUsername, tvDuring, tvdetailcount, tvdetailstate, tvContent;
     private TextView tvLikeCount, tvCommentCount, tvShareCount;
     private LinearLayout btnLookLeft, btnLookRight;
     private ImageView ivTopPhoto;
@@ -76,10 +78,19 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
     private List<ContentDetail> myDataset;
     private Content content;
     private int content_id=-1;
-    private String user_nick_name="";
+    private String user_id="";
 
     private final String contentURL = Value.contentURL;
     private final String contentPhotoURL = Value.contentPhotoURL;
+
+    //comment
+    private BottomSheetBehavior bottomSheetBehavior;
+    private RelativeLayout RlComment;
+    private RecyclerView RVComment;
+    private LinearLayoutManager mCommentLayoutManager;
+    private CommentAdapter mCommentAdapter;
+    private List<Comment> myCommentDataset;
+    private TextView btnBack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,7 +127,6 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         tvContentSubject = (TextView) findViewById(R.id.tvContentSubject);           //컨텐트 제목
         tvContentLocation = (TextView) findViewById(R.id.tvContentLocation);        //컨텐트 위치(마지막)
         tvUsername = (TextView) findViewById(R.id.tvUsername);                        //유저 네임
-        tvUsername2 = (TextView) findViewById(R.id.tvUsername2);                        //유저 네임
         tvDuring = (TextView) findViewById(R.id.tvDuring);                             //컨텐트 날짜첫날 ~ 날짜 끝날(2016.04.20 ~ 2016.06.20)
         tvdetailstate = (TextView) findViewById(R.id.tvdetailstate);                  //보고있는 화면 상태(사진/동영상/지도)
         tvContent = (TextView) findViewById(R.id.tvContent);                            //컨텐트 내용
@@ -124,6 +134,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         tvCommentCount = (TextView) findViewById(R.id.tvCommentCount);
         tvShareCount = (TextView) findViewById(R.id.tvShareCount);
         tvdetailcount = (TextView) findViewById(R.id.tvdetailcount);                    //디테일 수
+        btnBack = (TextView) findViewById(R.id.btnBack);
 
         btnLookLeft = (LinearLayout) findViewById(R.id.btnLookLeft);
         btnLookRight = (LinearLayout) findViewById(R.id.btnLookRight);
@@ -141,6 +152,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         iccomment.setTypeface(fontAwesomeFont);
         icshare.setTypeface(fontAwesomeFont);
         btnDetailMenu.setTypeface(fontAwesomeFont);
+        btnBack.setTypeface(fontAwesomeFont);
 
         icleft.setText(R.string.fa_flag);
         tvleft.setText("지도로 보기");
@@ -161,6 +173,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
             public void run() {
                 super.run();
                 content = getContentData(content_id);
+                myCommentDataset = content.getComments();
             }
         };
         thread1.start();
@@ -176,14 +189,9 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         tvContentInsertDate.setText(new SimpleDateFormat("yyyy.MM.dd").format(content.getContent_written_date()));
         tvContentSubject.setText(content.getContent_subject());
         tvUsername.setText(content.getUser().getUser_nick_name());
-        tvUsername2.setText(content.getUser().getUser_nick_name());
 
         tvContent.setText(content.getContent());
         tvdetailcount.setText(String.valueOf(content.getDetails().size()));
-        tvLikeCount.setText(String.valueOf(content.getGood_count()));
-        tvCommentCount.setText(String.valueOf(content.getComment_count()));
-        tvShareCount.setText(String.valueOf(content.getContent_share_count()));
-
         myDataset = new ArrayList<>();
         for(int i=0; i<content.getDetails().size(); i++){
             Photo ph = new Photo();
@@ -203,6 +211,29 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         String to = new SimpleDateFormat("yyyy.MM.dd").format(content.getDetails().get(content.getDetails().size()-1).getPhoto().getPhoto_date());
         tvDuring.setText(from+" ~ "+to);
 
+        //comment
+        RlComment = (RelativeLayout) findViewById(R.id.RlComment);
+        bottomSheetBehavior = BottomSheetBehavior.from(RlComment);
+        bottomSheetBehavior.setPeekHeight(0);
+        bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                switch (newState) {
+                    case BottomSheetBehavior.STATE_EXPANDED:
+                        setTitle("댓글등록창");
+                        break;
+
+                    default:
+                        setTitle("Photovel");
+                        break;
+                }
+            }
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+
+            }
+        });
+
         //recycleview사용선언
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         mRecyclerView.setHasFixedSize(true);
@@ -211,6 +242,22 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         mRecyclerView.setNestedScrollingEnabled(false);
         mAdapter = new ContentDetailListAdapter(myDataset, ContentDetailListMain.this);
         mRecyclerView.setAdapter(mAdapter);
+
+        //comment
+        RVComment = (RecyclerView) findViewById(R.id.RVComment);
+        RVComment.setHasFixedSize(true);
+        RVComment.setNestedScrollingEnabled(false);
+        mCommentLayoutManager = new LinearLayoutManager(this);
+        RVComment.setLayoutManager(mCommentLayoutManager);
+        mCommentAdapter = new CommentAdapter(myCommentDataset, ContentDetailListMain.this);
+        RVComment.setAdapter(mCommentAdapter);
+
+        findViewById(R.id.btnComment).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            }
+        });
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -242,13 +289,12 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
             }
         });
 
-        //user님의 게시판더보기 버튼
         btnMoreUserContent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent dintent = new Intent(getApplicationContext(), ContentListMain.class);
-                user_nick_name = content.getUser().getUser_nick_name();
-                dintent.putExtra("user_nick_name",user_nick_name);
+                user_id = content.getUser().getUser_id();
+                dintent.putExtra("user_id",user_id);
                 getApplicationContext().startActivity(dintent);
                 finish();
             }
