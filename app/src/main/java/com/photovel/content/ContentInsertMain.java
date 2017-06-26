@@ -35,6 +35,8 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.photovel.MainActivity;
+import com.photovel.MainNewAdapter;
 import com.photovel.R;
 import com.photovel.FontActivity;
 import com.photovel.http.Value;
@@ -73,7 +75,6 @@ public class ContentInsertMain extends FontActivity {
     private ExifInterface exif;
     private static final String TAG = "AppPermission";
     private final int MY_PERMISSION_REQUEST_STORAGE = 100;
-    private final String contentURL = Value.contentURL;
 
     private RecyclerView mRecyclerView;
     private ContentInsertAdapter mAdapter;
@@ -85,6 +86,8 @@ public class ContentInsertMain extends FontActivity {
     private int flag = 0;
     private Switch swPrivate;
     private boolean flagSwitch;
+
+    private String isSucess;
 
     //준기가 추가하는 부분
     Context mContext;
@@ -173,6 +176,7 @@ public class ContentInsertMain extends FontActivity {
 
         //스위치버튼
         swPrivate = (Switch) findViewById(R.id.swPrivate);
+        swPrivate.setChecked(true);
         swPrivate.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 //Log.i("ddd",""+isChecked);  //true,false
@@ -273,18 +277,21 @@ public class ContentInsertMain extends FontActivity {
 
                                     Log.i("ddd",obj.toString());
 
-                                    final String url =contentURL;
+                                    final String url = Value.contentURL;
+                                    ;
 
                                     //Bitmap처리
                                     final List<Bitmap> tmp = new ArrayList<Bitmap>();
                                     for(int i=0; i<myDataset.size(); i++){
                                         tmp.add(myDataset.get(i).getPhoto().getBitmap());
                                     }
-                                    new Thread(new Runnable() {
+                                    Thread a =new Thread(new Runnable() {
                                         @Override
                                         public void run() {
                                             DataOutputStream dos = null;
                                             HttpURLConnection conn = null;
+                                            InputStream is;
+                                            ByteArrayOutputStream baos;
                                             try {
                                                 String lineEnd = "\r\n";
                                                 String twoHyphens = "--";
@@ -340,10 +347,18 @@ public class ContentInsertMain extends FontActivity {
                                                 Log.i("responseCode",responseCode+"");
 
                                                 switch (responseCode){
-                                                    case HttpURLConnection.HTTP_OK :
-                                                        dos.close();
-                                                        conn.disconnect();
-                                                        break;
+                                                    case HttpURLConnection.HTTP_OK:
+                                                        is = conn.getInputStream();
+                                                        baos = new ByteArrayOutputStream();
+                                                        byte[] byteBuffer = new byte[1024];
+                                                        byte[] byteData = null;
+                                                        int nLength = 0;
+                                                        while ((nLength = is.read(byteBuffer, 0, byteBuffer.length)) != -1) {
+                                                            baos.write(byteBuffer, 0, nLength);
+                                                        }
+                                                        byteData = baos.toByteArray();
+                                                        isSucess = new String(byteData);
+                                                        Log.i("isSucess",isSucess);
                                                 }
 
                                             } catch (ProtocolException e) {
@@ -362,12 +377,26 @@ public class ContentInsertMain extends FontActivity {
 
                                             }
                                         }
-                                    }).start();
+                                    });
+                                    a.start();
+                                    try {
+                                        a.join();
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
 
+                                    Toast.makeText(getApplicationContext(),"등록성공",Toast.LENGTH_LONG).show();
 
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
+
+                                Intent intent = new Intent(getApplicationContext(), ContentDetailListMain.class);
+                                Log.i("content_id","insert_content_id : "+isSucess);
+                                intent.putExtra("content_id",Integer.parseInt(isSucess));
+                                getApplicationContext().startActivity(intent);
+                                finish();
+
                             }
                         }).setNegativeButton("취소",
                         new DialogInterface.OnClickListener() {
@@ -433,7 +462,7 @@ public class ContentInsertMain extends FontActivity {
 
     //처음일때 한번만 제목 정해주기
     private void setSubject(String address) {
-        if (flag == 0) {
+        if (flag == 0 && contentSubject.getText().length()==0) {
             flag = 1;
             //address중에서 도시만 빼서 넣어줘야함
             if (address.equals("주소 미확인")) {
@@ -492,7 +521,7 @@ public class ContentInsertMain extends FontActivity {
     private Bitmap getBitmap(String path) {
         InputStream in = null;
         try {
-            final int IMAGE_MAX_SIZE = 700000; //고정됨!!!!수정금지!!!!
+            final int IMAGE_MAX_SIZE = 250000; //고정됨!!!!수정금지!!!!
             in = new FileInputStream(path);
 
             // Decode image size

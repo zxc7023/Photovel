@@ -9,6 +9,13 @@ public class Comment {
 	private Date comment_date;
 	private User user;
 
+	public Comment(){
+	}
+
+	public Comment(String comment_content){
+		this.comment_content = comment_content;
+	}
+
 	public int getContent_id() {
 		return content_id;
 	}
