@@ -6,12 +6,45 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="searchViewStyle">@style/ContentSearchViewTheme</item>
     </style>
+
+    <!-- search view style -->
+    <!--<style name="ToolbarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        &lt;!&ndash;<item name="searchViewStyle">@style/ContentSearchViewTheme</item>&ndash;&gt;
+        <item name="searchViewStyle">@style/AppTheme</item>
+    </style>-->
+
+    <style name="ContentSearchViewTheme" parent="Widget.AppCompat.SearchView.ActionBar">
+        <item name="android:layout">@layout/toolbar_search_view_layout</item>
+        <item name="android:autoCompleteTextViewStyle">@style/myAutoCompleteTextViewStyle</item>
+        <item name="android:colorControlNormal">@color/cast_libraries_material_featurehighlight_text_body_color</item>
+        <item name="android:textColorHighlight">@color/cast_libraries_material_featurehighlight_outer_highlight_default_color</item>
+        <item name="android:suggestionRowLayout">@layout/activity_main_new_list_adapter</item>
+        <item name="android:maxWidth">9999dp</item>
+    </style>
+
+    <style name="myAutoCompleteTextViewStyle" parent="Widget.AppCompat.Light.AutoCompleteTextView">
+        <item name="android:popupBackground">@drawable/login_background_image</item>
+        <item name="android:colorFocusedHighlight">#000000</item>
+        <item name="android:popupElevation">0dp</item>
+    </style>
+
+
+
+
+    <!--<style name="mySearchResult" parent="TextAppearance.AppCompat.SearchResult.Title">
+        <item name="android:textColor">#FFF</item>
+    </style>-->
+
+
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
+
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="CollapsedAppBar" parent="@android:style/TextAppearance.Medium">
