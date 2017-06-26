@@ -51,7 +51,7 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
     private RecyclerView.LayoutManager mLayoutManager;
     private List<Content> myDataset;
     private static final String TAG = "";
-    private String user_nick_name;
+    private String user_id;
 
     Toolbar toolbar;
     private SearchView searchView;
@@ -66,12 +66,12 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
         setSupportActionBar(toolbar);
 
         Intent intent = getIntent();
-        user_nick_name = intent.getStringExtra("user_nick_name");
-        if(user_nick_name.equals("")){
-            Log.i("user_nick_name","list_user_nick_name 못받아옴!!!");
-            user_nick_name = "leeej9201@gmail.com";
+        user_id = intent.getStringExtra("user_id");
+        if(user_id.equals("")){
+            Log.i("user_id","list_user_id 못받아옴!!!");
+            user_id = "leeej9201@gmail.com";
         }else{
-            Log.i("user_nick_name","list_user_nick_name : "+user_nick_name);
+            Log.i("user_id","list_user_id : "+user_id);
         }
 
         //db에 있는 userId별 content정보 받아오기
@@ -80,7 +80,7 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
             public void run() {
                 super.run();
                 myDataset = new ArrayList<>();
-                myDataset = getContentData(user_nick_name);
+                myDataset = getContentData(user_id);
             }
         };
         thread1.start();
