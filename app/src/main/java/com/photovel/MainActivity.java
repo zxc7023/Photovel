@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.database.MatrixCursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -20,7 +21,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -60,6 +60,7 @@ import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.Volley;
 import com.photovel.content.ContentInsertMain;
+import com.photovel.content.SearchListAdapter;
 import com.photovel.http.Value;
 import com.photovel.user.UserLogin;
 import com.synnapps.carouselview.CarouselView;
@@ -110,8 +111,12 @@ public class MainActivity
     //검색 리스트
     private ArrayList<Content> contents;
 
-    //검색 제안 위한 커서
+    //커서
+    MatrixCursor matrixCursor;
+
+    //검색 제안 위한 커서 어댑터
     private SimpleCursorAdapter simpleCursorAdapter;
+    private SearchListAdapter searchListAdapter;
 
     //volley request queue 선언
     private RequestQueue requestQueue;
@@ -163,13 +168,14 @@ public class MainActivity
         final int[] to = new int[] {R.id.sdl_textView, R.id.sdl_textView};
 
         //커서 생성
-        simpleCursorAdapter = new SimpleCursorAdapter(getApplicationContext(),
+        /*simpleCursorAdapter = new SimpleCursorAdapter(getApplicationContext(),
                 R.layout.search_dropdown_list,
                 null, //db 커서는 없음
                 from, //UI에 바인드 될 자료들의 컬럼명
                 to,
-                CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
+                CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);*/
 
+        searchListAdapter = new SearchListAdapter(this, matrixCursor, true);
 
         //메인이미지 캐러셀뷰 부분
         carouselView = (CarouselView) findViewById(R.id.carouselView);
@@ -405,7 +411,7 @@ public class MainActivity
                     int size = searchSuggestionsList.size();
 
                     //자료 필터
-                    final MatrixCursor matrixCursor = new MatrixCursor(new String[]{BaseColumns._ID, "user_id", "content_subject"});
+                    matrixCursor = new MatrixCursor(new String[]{BaseColumns._ID, "user_id", "content_subject"});
                     Log.i(TAG, "onQueryTextChange의 searchSuggestionsList.size()= " + size);
 
                     for(int i=0; i<size; i++) {
@@ -417,7 +423,7 @@ public class MainActivity
 
                         }
                     }
-                    simpleCursorAdapter.changeCursor(matrixCursor);
+                    searchListAdapter.changeCursor(matrixCursor);
                     return true;
                 }
             });
