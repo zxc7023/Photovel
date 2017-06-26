@@ -27,6 +27,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -45,11 +46,16 @@ import com.vo.Content;
 import com.vo.ContentDetail;
 import com.vo.Photo;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -90,7 +96,9 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
     private LinearLayoutManager mCommentLayoutManager;
     private CommentAdapter mCommentAdapter;
     private List<Comment> myCommentDataset;
+    private LinearLayout llBack;
     private TextView btnBack;
+    private EditText etComment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -212,14 +220,25 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
 
         //comment
         RlComment = (RelativeLayout) findViewById(R.id.RlComment);
-
         btnBack = (TextView) findViewById(R.id.btnBack);
+        etComment = (EditText) findViewById(R.id.etComment);
+        llBack = (LinearLayout) findViewById(R.id.llBack);
 
         //Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
         btnBack.setTypeface(fontAwesomeFont);
 
+        llBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+            }
+        });
+
         bottomSheetBehavior = BottomSheetBehavior.from(RlComment);
         bottomSheetBehavior.setPeekHeight(0);
+        if(intent.getIntExtra("comment_insert",-1) == 1){
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        }
         bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
 
             @Override
@@ -261,10 +280,72 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         mCommentAdapter = new CommentAdapter(myCommentDataset, ContentDetailListMain.this);
         RVComment.setAdapter(mCommentAdapter);
 
+
         findViewById(R.id.btnComment).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            }
+        });
+        //코멘트 전송
+        findViewById(R.id.btnCommentSubmit).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final JSONObject comment = new JSONObject();
+                try {
+                    JSONObject user = new JSONObject();
+                    user.put("user_id", "leeej9201@gmail.com");
+                    comment.put("content_id", content_id);
+                    comment.put("comment_content", etComment.getText());
+                    comment.put("user",user);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                Log.i("1. comment", comment.toString());
+
+                final String url = Value.contentURL+"/"+content_id+"/comment";
+                Thread th = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        HttpURLConnection conn = null;
+                        OutputStream dos = null;
+                        try {
+                            URL connectURL = new URL(url);
+                            Log.i("2. comment", url);
+                            conn = (HttpURLConnection) connectURL.openConnection();
+                            conn.setDoOutput(true);
+                            conn.setDoInput(true);
+                            conn.setRequestMethod("POST");
+                            conn.setRequestProperty("Connection", "Keep-Alive");
+                            conn.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
+                            dos = conn.getOutputStream();
+                            dos.write(comment.toString().getBytes());
+                            dos.flush();
+                            int responseCode = conn.getResponseCode();
+                            Log.i("3. comment", responseCode + "");
+
+                        } catch (MalformedURLException e) {
+                            e.printStackTrace();
+                        } catch (ProtocolException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                th.start();
+                try {
+                    th.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                //Toast.makeText(getApplicationContext(),"댓글달기성공",Toast.LENGTH_SHORT).show();
+                Intent cintent = new Intent(getApplicationContext(), ContentDetailListMain.class);
+                cintent.putExtra("content_id", content_id);
+                cintent.putExtra("comment_insert", 1);
+                cintent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
+                startActivity(cintent);
+                finish();
             }
         });
 
@@ -678,7 +759,9 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
+        if(bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED){
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        }else if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
