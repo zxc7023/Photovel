@@ -52,6 +52,9 @@ public class Content {
 	public Date getTo_photo_date() {
 		return to_photo_date;
 	}
+	public void setTo_photo_date(Date to_photo_date) {
+		this.to_photo_date = to_photo_date;
+	}
 	public Bitmap getBitmap() {
 		return bitmap;
 	}

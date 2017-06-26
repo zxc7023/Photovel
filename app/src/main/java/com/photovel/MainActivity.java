@@ -23,10 +23,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.photovel.content.CommentMain;
 import com.photovel.user.UserLogin;
 import com.alibaba.fastjson.JSON;
-import com.photovel.content.ContentDetailListMain;
 import com.photovel.content.ContentInsertMain;
 import com.photovel.http.Value;
 import com.synnapps.carouselview.CarouselView;
@@ -42,7 +40,6 @@ import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -171,7 +168,6 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         map.put(R.id.loginModuel, UserLogin.class);
         map.put(R.id.contentInsert,ContentInsertMain.class);
         map.put(R.id.cok,TestActivity.class);
-        map.put(R.id.comment, CommentMain.class);
 
 
         Set<Integer> keys = map.keySet();

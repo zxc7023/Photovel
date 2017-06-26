@@ -171,6 +171,7 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
                     Log.i(TAG, "getPhotoData의 response data= " + responseData);
 
                     contents = JSON.parseArray(responseData, Content.class);
+                    Log.i(TAG, "getPhotoData의 contents= " + contents);
 
                     br.close();
                     reader.close();
