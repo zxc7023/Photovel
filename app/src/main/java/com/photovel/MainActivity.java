@@ -1,6 +1,7 @@
 package com.photovel;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -23,10 +24,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.photovel.content.CommentMain;
 import com.photovel.user.UserLogin;
 import com.alibaba.fastjson.JSON;
-import com.photovel.content.ContentDetailListMain;
 import com.photovel.content.ContentInsertMain;
 import com.photovel.http.Value;
 import com.synnapps.carouselview.CarouselView;
@@ -35,16 +34,18 @@ import com.vo.Content;
 import com.vo.MainImage;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class MainActivity extends FontActivity2 implements NavigationView.OnNavigationItemSelectedListener {
@@ -171,7 +172,6 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         map.put(R.id.loginModuel, UserLogin.class);
         map.put(R.id.contentInsert,ContentInsertMain.class);
         map.put(R.id.cok,TestActivity.class);
-        map.put(R.id.comment, CommentMain.class);
 
 
         Set<Integer> keys = map.keySet();
@@ -206,7 +206,6 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
         //noinspection SimplifiableIfStatement
         /*if (id == R.id.action_settings) {
             return true;
@@ -220,8 +219,12 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-        if(id == R.id.nav_send){
-            Toast.makeText(this, "로그아웃버튼 눌림", Toast.LENGTH_SHORT).show();
+        if(id==R.id.nav_log_out){
+            Toast.makeText(this, "로그아웃", Toast.LENGTH_SHORT).show();
+            logout(Value.userLogoutURL);
+            Intent intent = new Intent(getApplicationContext(),SessionMangement.class);
+            startActivity(intent);
+            finish();
         }
         /*
 
@@ -541,5 +544,54 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
             e.printStackTrace();
         }
 
+    }
+    public void logout(final String userLogoutURL){
+        Thread logoutThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                HttpURLConnection conn = null;
+                InputStream is = null;
+                URL connectURL = null;
+                OutputStream dos= null;
+                ByteArrayOutputStream baos;
+
+
+                try {
+                    connectURL = new URL(userLogoutURL);
+                    conn = (HttpURLConnection) connectURL.openConnection();
+                    conn.setDoInput(true);
+                    conn.setRequestMethod("GET");
+                    conn.setRequestProperty("Connection", "Keep-Alive");
+                    conn.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
+
+                    int responseCode = conn.getResponseCode();
+                    Log.i("myResponseCode", responseCode + "");
+                    switch (responseCode){
+                        case HttpURLConnection.HTTP_OK :
+                            //로그아웃이되면 공유객체의 jSession 삭제
+                            SharedPreferences test = getSharedPreferences("loginInfo", MODE_PRIVATE);
+                            String isRemovable = test.getString("Set-Cookie","notFound");
+                            if(!isRemovable.equals("notFound")){
+                                SharedPreferences.Editor editor2 = test.edit();
+                                editor2.remove("Set-Cookie");
+                                editor2.commit();
+                            }
+                            break;
+                    }
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }finally {
+                }
+            }
+        });
+
+        logoutThread.start();
+        try {
+            logoutThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

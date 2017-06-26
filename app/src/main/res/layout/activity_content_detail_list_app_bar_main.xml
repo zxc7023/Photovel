@@ -20,8 +20,7 @@
             <include
                 layout="@layout/activity_content_detail_include_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                />
+                android:layout_height="wrap_content" />
             <android.support.v7.widget.Toolbar
                 android:id="@+id/detailListToolbar"
                 android:layout_width="match_parent"
@@ -79,13 +78,12 @@
                     android:layout_marginLeft="@dimen/most_left_tv_margin"
                     android:background="@drawable/xml_border2">
                     <com.mikhaellopez.circularimageview.CircularImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
                         android:src="@drawable/ic_profile_circle"
-                        android:onClick="ProFileMenuClick"
                         app:civ_border_width="1dp"
                         android:gravity="center"
-                        android:layout_marginRight="@dimen/between_tv_margin"/>
+                        android:layout_marginRight="5dp"/>
                     <TextView
                         android:id="@+id/tvUsername2"
                         android:layout_width="wrap_content"
@@ -119,4 +117,93 @@
         android:visibility="gone"
         android:src="@drawable/btn_up"
         app:backgroundTint="@color/bgWhite"/>
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:behavior_hideable="true"
+        android:id="@+id/RlComment"
+        android:background="@drawable/xml_border"
+        app:layout_behavior="@string/bottom_sheet_behavior">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="top"
+            android:orientation="horizontal">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:background="@drawable/xml_border">
+                <TextView
+                    android:id="@+id/btnBack"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/fa_chevron_left"
+                    android:textSize="@dimen/icon_size"
+                    android:layout_marginLeft="@dimen/most_left_tv_margin"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="댓글"
+                    android:textSize="@dimen/content_text_size"
+                    android:layout_marginLeft="@dimen/between_tv_margin"
+                    android:layout_marginRight="@dimen/most_rignt_tv_margin"/>
+            </LinearLayout>
+        </LinearLayout>
+        <android.support.v7.widget.RecyclerView
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/RVComment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:font="normal"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:layout_marginBottom="50dp"
+            android:layout_marginTop="50dp"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="bottom"
+            android:orientation="horizontal">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center"
+                android:layout_weight="6">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center">
+                    <com.mikhaellopez.circularimageview.CircularImageView
+                        android:id="@+id/userProfile"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:src="@drawable/ic_profile_circle"
+                        android:layout_gravity="center"
+                        app:civ_border_width="1dp" />
+                </LinearLayout>
+                <EditText
+                    android:id="@+id/etComment"
+                    android:layout_width="wrap_content"
+                    android:layout_height="38dp"
+                    android:background="@drawable/xml_border"
+                    android:layout_weight="4"
+                    android:ellipsize="end"
+                    android:hint="댓글을 입력하세요"
+                    android:textSize="@dimen/content_text_size"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="38dp"
+                    android:background="@drawable/xml_border"
+                    android:layout_marginLeft="@dimen/between_tv_margin"
+                    android:layout_marginRight="@dimen/most_rignt_tv_margin"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="전송"
+                    android:textSize="@dimen/content_text_size" />
+            </LinearLayout>
+        </LinearLayout>
+    </RelativeLayout>
 </android.support.design.widget.CoordinatorLayout>

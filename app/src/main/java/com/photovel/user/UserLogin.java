@@ -92,6 +92,7 @@ public class UserLogin extends FontActivity2 {
                         Toast.makeText(mContext, "로그인성공", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                         startActivity(intent);
+                        finish();
 
                     }else{
                         Toast.makeText(mContext, "로그인실패", Toast.LENGTH_SHORT).show();

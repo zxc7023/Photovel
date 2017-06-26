@@ -14,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,6 +29,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 /**
@@ -65,12 +67,16 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView tvComment, btnCommentMenu;
+        public TextView tvComment, btnCommentMenu, tvUsername, tvCommentDate;
+        private LinearLayout LLmenu;
 
         public ViewHolder(View view) {
             super(view);
             tvComment = (TextView)view.findViewById(R.id.tvComment);
             btnCommentMenu = (TextView)view.findViewById(R.id.btnCommentMenu);
+            LLmenu = (LinearLayout)view.findViewById(R.id.LLmenu);
+            tvUsername = (TextView)view.findViewById(R.id.tvUsername);
+            tvCommentDate = (TextView)view.findViewById(R.id.tvCommentDate);
         }
     }
 
@@ -88,10 +94,11 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         //imageView를 font로 바꿔주기
         Typeface fontAwesomeFont = Typeface.createFromAsset(mcontext.getAssets(), "fontawesome-webfont.ttf");
         holder.btnCommentMenu.setTypeface(fontAwesomeFont);
-
+        holder.tvUsername.setText(mDataset.get(position).getUser().getUser_nick_name());
+        holder.tvCommentDate.setText(new SimpleDateFormat("yyyy.MM.dd").format(mDataset.get(position).getComment_date()));
         holder.tvComment.setText(mDataset.get(position).getComment_content());
 
-        holder.btnCommentMenu.setOnClickListener(new View.OnClickListener() {
+        holder.LLmenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 /*ca = new CommentAdapter();
