@@ -132,6 +132,7 @@
             android:gravity="top"
             android:orientation="horizontal">
             <LinearLayout
+                android:id="@+id/llBack"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
@@ -194,6 +195,7 @@
                     android:hint="댓글을 입력하세요"
                     android:textSize="@dimen/content_text_size"/>
                 <TextView
+                    android:id="@+id/btnCommentSubmit"
                     android:layout_width="wrap_content"
                     android:layout_height="38dp"
                     android:background="@drawable/xml_border"
