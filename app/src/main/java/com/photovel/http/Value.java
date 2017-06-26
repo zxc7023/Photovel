@@ -2,8 +2,8 @@ package com.photovel.http;
 
 public class Value {
     //기본
-    public static String photovelURL = "http://www.photovel.com";
-    //public static String photovelURL = "//http://192.168.12.197:8080"; //은디언니꺼
+    //public static String photovelURL = "http://www.photovel.com";
+    public static String photovelURL = "http://192.168.12.197:8080"; //은디언니꺼
 
     //content selectALL(GET), insert(POST), update(POST), delete 작업
     public static String contentURL = photovelURL+"/content/photo";
@@ -18,5 +18,5 @@ public class Value {
 
     public static String userJoinURL = photovelURL+"/common/user/join";
 
-    public static String userValidityCheckURL = "/common/user/idCheck";
+    public static String userValidityCheckURL = photovelURL + "/common/user/idCheck";
 }

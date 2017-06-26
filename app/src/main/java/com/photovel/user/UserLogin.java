@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
 
+import com.photovel.MainActivity;
 import com.photovel.R;
 import android.util.Log;
 import android.view.View;
@@ -48,6 +49,7 @@ public class UserLogin extends FontActivity2 {
 
     String isSucess;
     String cookieValues = "";
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,8 +78,8 @@ public class UserLogin extends FontActivity2 {
                     Toast.makeText(mContext, "아이디와 비밀번호를 입력해주세요.", Toast.LENGTH_SHORT).show();
                 } else {
                     JSONObject job = new JSONObject();
-                    //final String url = "http://192.128.12.44:8888/photovel/common/login/email";
-                    String url =Value.userLoginURL;
+                    final String url = "http://192.168.12.44:8888/photovel/common/user/email";
+                    //String url =Value.userLoginURL;
                     try {
                         job.put("user_id", user_id);
                         job.put("user_password", user_password);
@@ -86,10 +88,9 @@ public class UserLogin extends FontActivity2 {
                     }
                     Log.i("myJsonString", job.toString());
                     login(job.toString(),url);
-                    //Log.i("myResult",result);
                     if(isSucess.equals("1")){
                         Toast.makeText(mContext, "로그인성공", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(getApplicationContext(), TestActivity.class);
+                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                         startActivity(intent);
 
                     }else{
@@ -116,6 +117,7 @@ public class UserLogin extends FontActivity2 {
         Thread loginThread = new Thread(new Runnable() {
             @Override
             public void run() {
+                Log.i("please",json+"\n"+url);
                 HttpURLConnection conn = null;
                 InputStream is = null;
                 URL connectURL = null;
@@ -150,12 +152,15 @@ public class UserLogin extends FontActivity2 {
                             byteData=baos.toByteArray();
                             isSucess = new String(byteData);
                             Log.i("isSucess",isSucess);
-
                             //로그인이 삭제되건 성공하건 이전의 세션은 삭제해줘야한다.
                             SharedPreferences test = getSharedPreferences("loginInfo", MODE_PRIVATE);
-                            SharedPreferences.Editor editor2 = test.edit();
-                            editor2.remove("Set-Cookie");
-                            editor2.commit();
+                            String isRemovable = test.getString("Set-Cookie","notFound");
+                            if(!isRemovable.equals("notFound")){
+                                SharedPreferences.Editor editor2 = test.edit();
+                                editor2.remove("Set-Cookie");
+                                editor2.commit();
+                            }
+
 
                             Map<String,List<String>> responseHeaders = conn.getHeaderFields();
                             Set<String> keys = responseHeaders.keySet();
@@ -184,11 +189,6 @@ public class UserLogin extends FontActivity2 {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }finally {
-                    try {
-                        dos.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
                 }
             }
         });
