@@ -136,12 +136,13 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         tvdetailcount = (TextView) findViewById(R.id.tvdetailcount);                    //디테일 수
         btnBack = (TextView) findViewById(R.id.btnBack);
 
+
         btnLookLeft = (LinearLayout) findViewById(R.id.btnLookLeft);
         btnLookRight = (LinearLayout) findViewById(R.id.btnLookRight);
         btnMoreUserContent = (LinearLayout) findViewById(R.id.btnMoreUserContent);
 
         //imageView를 font로 바꿔주기
-        Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
+        final Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
         icglobe.setTypeface(fontAwesomeFont);
         icleft.setTypeface(fontAwesomeFont);
         icright.setTypeface(fontAwesomeFont);
@@ -192,6 +193,10 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
 
         tvContent.setText(content.getContent());
         tvdetailcount.setText(String.valueOf(content.getDetails().size()));
+        tvLikeCount.setText(String.valueOf(content.getGood_count()));
+        tvCommentCount.setText(String.valueOf(content.getComment_count()));
+        tvShareCount.setText(String.valueOf(content.getContent_share_count()));
+
         myDataset = new ArrayList<>();
         for(int i=0; i<content.getDetails().size(); i++){
             Photo ph = new Photo();
@@ -267,7 +272,18 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()){
+                    case R.id.btnContentInsert :
+                        Toast.makeText(ContentDetailListMain.this,"여기",Toast.LENGTH_SHORT).show();
+                        TextView btnContentInsert = (TextView) findViewById(R.id.btnContentInsert);
+                        btnContentInsert.setTypeface(fontAwesomeFont);
+                }
+                return false;
+            }
+        });
 
         //top버튼
         btnTop = (FloatingActionButton) findViewById(R.id.btnTop);
@@ -493,6 +509,8 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         });
         popup.show();
     }
+
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

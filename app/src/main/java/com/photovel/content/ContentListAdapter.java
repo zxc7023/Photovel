@@ -3,12 +3,19 @@ package com.photovel.content;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -20,12 +27,21 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.photovel.MainActivity;
 import com.photovel.R;
+import com.photovel.http.Value;
 import com.vo.Content;
 import com.vo.ContentDetail;
 import com.vo.Photo;
 
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -39,7 +55,7 @@ public class ContentListAdapter extends RecyclerView.Adapter<ContentListAdapter.
     private List<Content> mDataset;
     private Context mcontext;
     private ViewHolder holder;
-    private int position;
+    private int position, content_id=-1;;
 
     public int getPosition() {
         return position;
@@ -67,8 +83,8 @@ public class ContentListAdapter extends RecyclerView.Adapter<ContentListAdapter.
         public RelativeLayout RldetailData;
         public LinearLayout RLdetailDate, LLmenu;
         public TextView icglobe, icleft, icright, tvleft, tvright, iccal, icmarker, icpow, icthumb, iccomment, icshare, btnDetailMenu;
-        public TextView tvContentInsertDate, tvContentSubject, tvContentLocation, tvUsername, tvDuring, tvdetailcount, tvdetailstate, tvdetailstatetext, tvContent;
-        public TextView tvLikeCount, tvCommentCount, tvShareCount;
+        public TextView tvContentInsertDate, tvContentSubject, tvContentLocation, tvUsername, tvDuring, tvdetailcount, tvContent;
+        public TextView tvLikeCount, tvCommentCount, tvShareCount, btnComment;
         public LinearLayout btnLookLeft, btnLookRight;
         public ImageView ivTopPhoto;
 
@@ -97,14 +113,13 @@ public class ContentListAdapter extends RecyclerView.Adapter<ContentListAdapter.
             tvContentLocation = (TextView) view.findViewById(R.id.tvContentLocation);        //컨텐트 위치(마지막)
             tvUsername = (TextView) view.findViewById(R.id.tvUsername);                        //유저 네임
             tvDuring = (TextView) view.findViewById(R.id.tvDuring);                             //컨텐트 날짜첫날 ~ 날짜 끝날(2016.04.20 ~ 2016.06.20)
-            tvdetailstate = (TextView) view.findViewById(R.id.tvdetailstate);                  //보고있는 화면 상태(사진/동영상/지도)
-            tvdetailstatetext = (TextView) view.findViewById(R.id.tvdetailstatetext);
             tvContent = (TextView) view.findViewById(R.id.tvContent);                            //컨텐트 내용
             tvLikeCount = (TextView) view.findViewById(R.id.tvLikeCount);
             tvCommentCount = (TextView) view.findViewById(R.id.tvCommentCount);
             tvShareCount = (TextView) view.findViewById(R.id.tvShareCount);
             tvdetailcount = (TextView) view.findViewById(R.id.tvdetailcount);                    //디테일 수
 
+            btnComment = (TextView) view.findViewById(R.id.btnComment);
             btnLookLeft = (LinearLayout) view.findViewById(R.id.btnLookLeft);
             btnLookRight = (LinearLayout) view.findViewById(R.id.btnLookRight);
         }
@@ -165,14 +180,217 @@ public class ContentListAdapter extends RecyclerView.Adapter<ContentListAdapter.
 
         holder.tvDuring.setText(frDate+" ~ "+toDate);
         holder.tvdetailcount.setText(String.valueOf(mDataset.get(position).getContent_detail_count()));
-        holder.tvdetailstate.setText("");
-        holder.tvdetailstatetext.setText("");
 
         holder.tvLikeCount.setText(String.valueOf(mDataset.get(position).getGood_count()));
         holder.tvCommentCount.setText(String.valueOf(mDataset.get(position).getComment_count()));
         holder.tvShareCount.setText(String.valueOf(mDataset.get(position).getContent_share_count()));
 
         holder.ivTopPhoto.setImageBitmap(mDataset.get(position).getBitmap());
+
+        holder.btnLookLeft.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                content_id = mDataset.get(position).getContent_id();
+                goLook(view);
+            }
+        });
+        holder.btnLookRight.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                content_id = mDataset.get(position).getContent_id();
+                goLook(view);
+            }
+        });
+        holder.btnComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                content_id = mDataset.get(position).getContent_id();
+                goLook(view);
+            }
+        });
+
+        holder.btnDetailMenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                content_id = mDataset.get(position).getContent_id();
+                ContentMenuClick(view);
+            }
+        });
+    }
+
+    //onClick
+    public void goLook(View v){
+        switch (v.getId()){
+            case R.id.btnLookLeft:
+                //Toast.makeText(mcontext,"지도로보기",Toast.LENGTH_SHORT).show();
+                Intent intent=new Intent(mcontext, ContentClusterMain.class);
+                intent.putExtra("content_id",content_id);
+                mcontext.startActivity(intent);
+                break;
+            case R.id.btnLookRight:
+                Intent intent2=new Intent(mcontext, ContentSlideShowMain.class);
+                intent2.putExtra("content_id",content_id);
+                mcontext.startActivity(intent2);
+                break;
+            case  R.id.btnComment:
+                Intent intent3=new Intent(mcontext, ContentDetailListMain.class);
+                intent3.putExtra("content_id",content_id);
+                mcontext.startActivity(intent3);
+                break;
+        }
+    }
+
+    //디테일 설정 메뉴클릭시
+    public void ContentMenuClick(View v){
+        Context wrapper = new ContextThemeWrapper(mcontext, R.style.MenuStyle);
+        PopupMenu popup = new PopupMenu(wrapper, v);
+        MenuInflater inflater = popup.getMenuInflater();
+        inflater.inflate(R.menu.content_setting_menu, popup.getMenu());
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.action_update:
+                        Intent intent = new Intent(mcontext, ContentUpdateMain.class);
+                        intent.putExtra("content_id", content_id);
+                        mcontext.startActivity(intent);
+                        Toast.makeText(mcontext, "수정", Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.action_delete:
+                        AlertDialog.Builder dalert_confirm = new AlertDialog.Builder(mcontext);
+                        dalert_confirm.setMessage("정말 글을 삭제 하시겠습니까?").setCancelable(false).setPositiveButton("확인",
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        final String url = Value.contentURL+"/"+content_id;
+                                        Thread th = new Thread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                DataOutputStream dos = null;
+                                                HttpURLConnection conn = null;
+                                                URL connectURL = null;
+                                                try {
+                                                    connectURL = new URL(url);
+
+                                                    conn = (HttpURLConnection) connectURL.openConnection();
+                                                    conn.setDoInput(true);
+                                                    conn.setDoOutput(true);
+                                                    conn.setUseCaches(false);
+                                                    conn.setRequestMethod("DELETE");
+
+                                                    int responseCode = conn.getResponseCode();
+                                                    Log.i("responseCode","삭제 : "+responseCode);
+
+                                                    switch (responseCode){
+                                                        case HttpURLConnection.HTTP_OK:
+                                                            Log.i("responseCode","삭제성공");
+                                                            break;
+                                                        default:
+                                                            Log.i("responseCode","삭제실패 responseCode: " +responseCode);
+                                                            break;
+                                                    }
+
+                                                } catch (MalformedURLException e) {
+                                                    e.printStackTrace();
+                                                } catch (ProtocolException e) {
+                                                    e.printStackTrace();
+                                                } catch (IOException e) {
+                                                    e.printStackTrace();
+                                                }
+                                            }
+                                        });
+                                        th.start();
+                                        try {
+                                            th.join();
+                                        } catch (InterruptedException e) {
+                                            e.printStackTrace();
+                                        }
+                                        Toast.makeText(mcontext,"삭제성공",Toast.LENGTH_SHORT).show();
+                                        Intent dintent = new Intent(mcontext, MainActivity.class);
+                                        dintent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
+                                        mcontext.startActivity(dintent);
+                                        //finish();
+                                    }
+                                }).setNegativeButton("취소",
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        return;
+                                    }
+                                });
+                        AlertDialog dalert = dalert_confirm.create();
+                        dalert.show();
+                        break;
+                    case R.id.action_report:
+                        AlertDialog.Builder walert_confirm = new AlertDialog.Builder(mcontext);
+                        walert_confirm.setMessage("정말 글을 신고 하시겠습니까?").setCancelable(false).setPositiveButton("확인",
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        final String url = Value.contentURL+"/"+content_id+"/warning";
+                                        Thread th = new Thread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                DataOutputStream dos = null;
+                                                HttpURLConnection conn = null;
+                                                URL connectURL = null;
+                                                try {
+                                                    connectURL = new URL(url);
+
+                                                    conn = (HttpURLConnection) connectURL.openConnection();
+                                                    conn.setDoInput(true);
+                                                    conn.setDoOutput(true);
+                                                    conn.setUseCaches(false);
+                                                    conn.setRequestMethod("POST");
+
+                                                    int responseCode = conn.getResponseCode();
+                                                    Log.i("responseCode","신고 : "+responseCode);
+
+                                                    switch (responseCode){
+                                                        case HttpURLConnection.HTTP_OK:
+                                                            Log.i("responseCode","신고성공");
+                                                            break;
+                                                        default:
+                                                            Log.i("responseCode","신고실패 responseCode: " +responseCode);
+                                                            break;
+                                                    }
+
+                                                } catch (MalformedURLException e) {
+                                                    e.printStackTrace();
+                                                } catch (ProtocolException e) {
+                                                    e.printStackTrace();
+                                                } catch (IOException e) {
+                                                    e.printStackTrace();
+                                                }
+                                            }
+                                        });
+                                        th.start();
+                                        try {
+                                            th.join();
+                                        } catch (InterruptedException e) {
+                                            e.printStackTrace();
+                                        }
+                                        Toast.makeText(mcontext,"신고성공",Toast.LENGTH_SHORT).show();
+                                        Intent wintent = new Intent(mcontext, MainActivity.class);
+                                        wintent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
+                                        mcontext.startActivity(wintent);
+                                        //finish();
+                                    }
+                                }).setNegativeButton("취소",
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        return;
+                                    }
+                                });
+                        AlertDialog walert = walert_confirm.create();
+                        walert.show();
+                        break;
+                }
+                return false;
+            }
+        });
+        popup.show();
     }
 
     @Override

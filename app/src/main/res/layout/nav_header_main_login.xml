@@ -11,7 +11,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:theme="@style/ThemeOverlay.AppCompat.Dark"
     android:orientation="horizontal"
-    android:gravity="bottom">
+    android:layout_marginTop="10dp">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -26,8 +26,8 @@
             android:layout_marginRight="@dimen/between_tv_margin">
             <com.mikhaellopez.circularimageview.CircularImageView
                 android:id="@+id/userProfile"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:src="@drawable/ic_profile_circle"
                 android:layout_gravity="center"
                 app:civ_border_width="1dp"/>
@@ -36,28 +36,23 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:gravity="center_vertical">
+            android:gravity="center">
             <TextView
                 android:id="@+id/tvUserName"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="jeon hara"
-                android:textSize="20dp"/>
+                android:textSize="@dimen/content_text_size"
+                android:includeFontPadding="false"/>
             <TextView
                 android:id="@+id/tvProfileUpdate"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="프로필 수정"
                 android:textColor="@color/textBlue"
-                android:textSize="@dimen/content_text_size"/>
+                android:textSize="10dp"/>
         </LinearLayout>
     </LinearLayout>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:background="@drawable/xml_border"
-        android:text="l"/>
 
     <TextView
         android:id="@+id/btnContentInsert"
