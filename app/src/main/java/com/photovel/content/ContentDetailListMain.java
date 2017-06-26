@@ -416,9 +416,11 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
                 finish();
                 break;
             case R.id.btnLookRight:
+                Toast.makeText(getApplicationContext(),"슬라이드로보기",Toast.LENGTH_SHORT).show();
                 Intent intent2=new Intent(this, ContentSlideShowMain.class);
                 intent2.putExtra("content_id",content_id);
                 this.startActivity(intent2);
+                Log.i("ddd","슬라이드로 보기 클릭");
                 finish();
                 break;
         }
