@@ -4,8 +4,8 @@ public class Value {
     //기본
 
     //public static String photovelURL = "http://www.photovel.com";
-    public static String photovelURL = "http://192.168.12.197:8080"; //은디언니꺼
-
+    //public static String photovelURL = "http://192.168.12.197:8080"; //은디언니꺼
+    public static String photovelURL = "http://192.168.12.44:8888"; //준기님꺼
     //content selectALL(GET), insert(POST), update(POST), delete 작업
     public static String contentURL = photovelURL+"/content/photo";
     //content에 따른 photo
@@ -20,4 +20,6 @@ public class Value {
     public static String userJoinURL = photovelURL+"/common/user/join";
 
     public static String userValidityCheckURL = photovelURL + "/common/user/idCheck";
+
+    public static String userCompareURL = photovelURL + "/common/user";
 }

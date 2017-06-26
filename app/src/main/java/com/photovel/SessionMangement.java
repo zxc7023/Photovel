@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 
 import com.google.android.gms.internal.pr;
+import com.photovel.http.Value;
 import com.photovel.user.UserLogin;
 
 import java.io.BufferedWriter;
@@ -70,6 +71,14 @@ public class SessionMangement extends Activity {
             }
             //jSession에 일치하는 로그인 인포가 없을 경우
             else{
+                //내 로컬에 저장된 jSession의 값이 서버의 저장된 세션의 인포와 똑같은게 없을때 삭제를 해줘야한다.
+                SharedPreferences test = getSharedPreferences("loginInfo", MODE_PRIVATE);
+                String isRemovable = test.getString("Set-Cookie","notFound");
+                if(!isRemovable.equals("notFound")){
+                    SharedPreferences.Editor editor2 = test.edit();
+                    editor2.remove("Set-Cookie");
+                    editor2.commit();
+                }
                 Intent intent = new Intent(getApplication(), UserLogin.class);
                 startActivity(intent);
                 finish();
@@ -96,7 +105,8 @@ public class SessionMangement extends Activity {
                 ByteArrayOutputStream baos;
 
                 try {
-                    url = new URL("http://192.168.12.44:8888/photovel/common/user");
+                    String startURL = Value.userCompareURL;
+                    url = new URL(startURL);
                     conn = (HttpURLConnection) url.openConnection();
                     conn.setRequestMethod("GET");
                     conn.setDoInput(true);

@@ -78,8 +78,8 @@ public class UserLogin extends FontActivity2 {
                     Toast.makeText(mContext, "아이디와 비밀번호를 입력해주세요.", Toast.LENGTH_SHORT).show();
                 } else {
                     JSONObject job = new JSONObject();
-                    final String url = "http://192.168.12.44:8888/photovel/common/user/email";
-                    //String url =Value.userLoginURL;
+                    //final String url = "http://192.168.12.44:8888/photovel/common/user/email";
+                    String url =Value.userLoginURL;
                     try {
                         job.put("user_id", user_id);
                         job.put("user_password", user_password);

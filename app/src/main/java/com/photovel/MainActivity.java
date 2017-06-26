@@ -220,7 +220,10 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-/*
+        if(id == R.id.nav_send){
+            Toast.makeText(this, "로그아웃버튼 눌림", Toast.LENGTH_SHORT).show();
+        }
+        /*
 
         if (id == R.id.nav_camera) {
             // Handle the camera action
