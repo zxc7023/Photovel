@@ -147,6 +147,7 @@ public class UserJoin extends FontActivity2 {
                     }
                     Log.i("myConsole", job.toString());
 
+                    String t1 = "t1="+job.toString();
                     String url = Value.userJoinURL;
                     join(job.toString(), url);
                     if(isSucess.equals("1")){

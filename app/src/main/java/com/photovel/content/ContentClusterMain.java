@@ -587,6 +587,7 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
                         //Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL("http://photovel.com/upload/" + content.getContent_id() + "/" + content.getDetails().get(i).getPhoto().getPhoto_file_name()).getContent());
                         Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL(contentPhotoURL+ "/" + content.getContent_id() + "/" + content.getDetails().get(i).getPhoto().getPhoto_file_name()).getContent());
                         content.getDetails().get(i).getPhoto().setBitmap(bitmap);
+                        content.getDetails().get(i).getPhoto().setRank(String.valueOf(i));
                         //File filePath = new File(Environment.getExternalStorageDirectory());
                         //FileUtils.copyURLToFile(new URL("http://photovel.com/upload/" + contentData.getContent_id() + "/" + contentData.getDetails().get(i).getPhoto().getPhotoFileName()), );
                     }
@@ -750,7 +751,7 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
             proFileInImageView = (ImageView) newMultiPhotoView.findViewById(R.id.image);
             proFileInImageView.setImageBitmap(photo.getBitmap());
             rankTextView = (TextView) newMultiPhotoView.findViewById(R.id.rankTextView);
-//            rankTextView.setText(photo.getRank()+"");
+            rankTextView.setText(photo.getRank());
             amu_text = (TextView) newMultiPhotoView.findViewById(R.id.amu_text);
             amu_text.setVisibility(View.GONE);
 
