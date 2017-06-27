@@ -19,9 +19,11 @@
         android:theme="@style/AppTheme">
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAiudYhFEK-5EW9nzlu8Tbv1FoUNyLRWz8" />
+            android:value="AIzaSyDHhbAmLoQolRIfA6C2Xdm-NzKa9naq3XA" />
         <!-- AIzaSyDHhbAmLoQolRIfA6C2Xdm-NzKa9naq3XA
         준기키-->
+        <!-- AIzaSyAiudYhFEK-5EW9nzlu8Tbv1FoUNyLRWz8
+        하라키 -->
         <activity
             android:name=".SessionMangement"
             android:label="@string/app_name"
