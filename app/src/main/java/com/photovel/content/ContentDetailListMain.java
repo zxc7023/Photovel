@@ -61,7 +61,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
     private ContentDetailListAdapter mAdapter;
 
     private RelativeLayout RldetailData;
-    private LinearLayout RLdetailDate, LLmenu, btnMoreUserContent, btnLike, btnComment;
+    private LinearLayout RLdetailDate, LLmenu, btnMoreUserContent, btnLike, btnComment, btnBookmark;
     private TextView icglobe, icleft, icright, tvleft, tvright, iccal, icmarker, icpow, icthumb, iccomment, icshare, btnDetailMenu;
     private TextView tvContentInsertDate, tvContentSubject, tvContentLocation, tvUsername, tvUsername2, tvDuring, tvdetailcount, tvdetailstate, tvContent;
     private TextView tvLikeCount, tvCommentCount, tvShareCount;
@@ -135,6 +135,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         btnMoreUserContent = (LinearLayout) findViewById(R.id.btnMoreUserContent);
         btnLike = (LinearLayout) findViewById(R.id.btnLike);
         btnComment = (LinearLayout) findViewById(R.id.btnComment);
+        btnBookmark = (LinearLayout) findViewById(R.id.btnBookmark);
 
 
         btnLookLeft.setOnClickListener(new View.OnClickListener() {
@@ -175,6 +176,8 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         LLmenu.bringToFront();
         RldetailData.bringToFront();
 
+
+
         //사진 스토리, 댓글 객체 받아오기
         Thread detailList = new Thread(){
             @Override
@@ -206,6 +209,12 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
             myDataset.get(i).getPhoto().setBitmap(detailBitmaps.get(i));
         }
 
+        //디테일 메뉴 보이기 전에 글쓴이 == 내계정 확인
+        SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
+        user_id = get_to_eat.getString("user_id","notFound");
+        if(!content.getUser().getUser_id().equals(user_id)){
+            LLmenu.setVisibility(View.GONE);
+        }
 
         //content정보 추가하기
         tvdetailstate.setText("사진");
@@ -342,6 +351,30 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
                 intent.putExtra("content_id", content_id);
                 startActivity(intent);
                 Toast.makeText(getApplicationContext(),"좋아요 완료!",Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        //북마크
+        btnBookmark.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Thread bookmark = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        JsonConnection.getConnection(Value.contentURL+"/"+content_id+"/bookmark/"+user_id, "POST", null);
+                    }
+                });
+                bookmark.start();
+                try {
+                    bookmark.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                Intent intent = new Intent(getApplicationContext(), ContentDetailListMain.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
+                intent.putExtra("content_id", content_id);
+                startActivity(intent);
+                Toast.makeText(getApplicationContext(),"북마크 완료!",Toast.LENGTH_SHORT).show();
             }
         });
 

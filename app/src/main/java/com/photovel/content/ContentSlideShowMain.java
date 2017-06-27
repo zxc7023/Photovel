@@ -3,6 +3,7 @@ package com.photovel.content;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
@@ -65,6 +66,7 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
     private SearchView searchView;
     private static final String TAG = "ContentSlideShow";
     Toolbar toolbar;
+    String user_id;
 
     private RelativeLayout RldetailData;
     private LinearLayout RLdetailDate, LLmenu, btnLike, btnComment;
@@ -201,6 +203,13 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         List<Bitmap> contentBitmaps = JsonConnection.getBitmap(tmpContent, Value.contentPhotoURL);
         for(int i = 0; i < contentBitmaps.size(); i++){
             tmpContent.get(i).setBitmap(contentBitmaps.get(i));
+        }
+
+        //디테일 메뉴 보이기 전에 글쓴이 == 내계정 확인
+        SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
+        user_id = get_to_eat.getString("user_id","notFound");
+        if(!content.getUser().getUser_id().equals(user_id)){
+            LLmenu.setVisibility(View.GONE);
         }
 
         //content정보 추가하기

@@ -92,6 +92,7 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
     private SearchView searchView;
     private static final String TAG = "AppPermission";
     Toolbar toolbar;
+    String user_id;
 
     private RelativeLayout RldetailData;
     private LinearLayout RLdetailDate, LLmenu, btnLike, btnComment;
@@ -241,6 +242,12 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
             myDataset.get(i).getPhoto().setRank(String.valueOf(i));
         }
 
+        //디테일 메뉴 보이기 전에 글쓴이 == 내계정 확인
+        SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
+        user_id = get_to_eat.getString("user_id","notFound");
+        if(!content.getUser().getUser_id().equals(user_id)){
+            LLmenu.setVisibility(View.GONE);
+        }
 
         //content정보 추가하기
         tvdetailstate.setText("지도");

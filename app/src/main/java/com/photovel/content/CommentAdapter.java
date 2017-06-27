@@ -50,6 +50,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
     private CommentAdapter ca;
     private CommentAdapter.ViewHolder holder;
     private int position;
+    private String user_id;
 
     public int getPosition() {
         return position;
@@ -115,13 +116,19 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         holder.tvComment.setText(mDataset.get(position).getComment_content());
         holder.etComment.setText(mDataset.get(position).getComment_content());
 
+        //디테일 메뉴 보이기 전에 글쓴이 == 내계정 확인
+        SharedPreferences get_to_eat = mcontext.getSharedPreferences("loginInfo", mcontext.MODE_PRIVATE);
+        user_id = get_to_eat.getString("user_id","notFound");
+        if(!mDataset.get(getPosition()).getUser().getUser_id().equals(user_id)){
+            holder.LLmenu.setVisibility(View.GONE);
+        }
+
         holder.LLmenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 ca = new CommentAdapter();
                 ca.setHolder(holder);
                 ca.setPosition(position);
-
                 CommentMenu(view);
             }
         });
@@ -134,93 +141,88 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         PopupMenu popup = new PopupMenu(wrapper, v);
         MenuInflater inflater = popup.getMenuInflater();
         inflater.inflate(R.menu.comment_setting_menu, popup.getMenu());
-        SharedPreferences get_to_eat = mcontext.getSharedPreferences("loginInfo", mcontext.MODE_PRIVATE);
-        final String user_id = get_to_eat.getString("user_id","notFound");
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.action_update:
-                        if(mDataset.get(ca.getPosition()).getUser().getUser_id().equals(user_id)){
-                            ca.getHolder().llupdate.setVisibility(View.VISIBLE);
-                            ca.getHolder().llselect.setVisibility(View.GONE);
-                            ca.getHolder().LLmenu.setVisibility(View.INVISIBLE);
-                            ca.getHolder().btnCommentSubmit.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    final JSONObject comment = new JSONObject();
-                                    try {
-                                        JSONObject user = new JSONObject();
-                                        user.put("user_id", user_id);
-                                        comment.put("content_id", mDataset.get(ca.getPosition()).getContent_id());
-                                        comment.put("comment_id", mDataset.get(ca.getPosition()).getComment_id());
-                                        comment.put("comment_content", ca.getHolder().etComment.getText());
-                                        comment.put("user",user);
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-                                    Log.i("1. comment", comment.toString());
-
-                                    Thread commentUpdate = new Thread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            JsonConnection.getConnection(Value.contentURL+"/"+mDataset.get(ca.getPosition()).getContent_id()+"/"+mDataset.get(ca.getPosition()).getComment_id(), "POST", comment);
-                                        }
-                                    });
-                                    commentUpdate.start();
-                                    try {
-                                        commentUpdate.join();
-                                    } catch (InterruptedException e) {
-                                        e.printStackTrace();
-                                    }
-                                    //Toast.makeText(getApplicationContext(),"댓글달기성공",Toast.LENGTH_SHORT).show();
-                                    Intent intent = new Intent(mcontext, ContentDetailListMain.class);
-                                    intent.putExtra("content_id", mDataset.get(ca.getPosition()).getContent_id());
-                                    intent.putExtra("comment_insert", 1);
-                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
-                                    mcontext.startActivity(intent);
-                                    Toast.makeText(mcontext,"수정완료!",Toast.LENGTH_SHORT).show();
+                        ca.getHolder().llupdate.setVisibility(View.VISIBLE);
+                        ca.getHolder().llselect.setVisibility(View.GONE);
+                        ca.getHolder().LLmenu.setVisibility(View.INVISIBLE);
+                        ca.getHolder().btnCommentSubmit.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                final JSONObject comment = new JSONObject();
+                                try {
+                                    JSONObject user = new JSONObject();
+                                    user.put("user_id", user_id);
+                                    comment.put("content_id", mDataset.get(ca.getPosition()).getContent_id());
+                                    comment.put("comment_id", mDataset.get(ca.getPosition()).getComment_id());
+                                    comment.put("comment_content", ca.getHolder().etComment.getText());
+                                    comment.put("user",user);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
                                 }
-                            });
-                        }
+                                Log.i("1. comment", comment.toString());
+
+                                Thread commentUpdate = new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        JsonConnection.getConnection(Value.contentURL+"/"+mDataset.get(ca.getPosition()).getContent_id()+"/"+mDataset.get(ca.getPosition()).getComment_id(), "POST", comment);
+                                    }
+                                });
+                                commentUpdate.start();
+                                try {
+                                    commentUpdate.join();
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                                //Toast.makeText(getApplicationContext(),"댓글달기성공",Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(mcontext, ContentDetailListMain.class);
+                                intent.putExtra("content_id", mDataset.get(ca.getPosition()).getContent_id());
+                                intent.putExtra("comment_insert", 1);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
+                                mcontext.startActivity(intent);
+                                Toast.makeText(mcontext,"수정완료!",Toast.LENGTH_SHORT).show();
+                            }
+                        });
                         break;
                     case R.id.action_delete:
-                        if(mDataset.get(ca.getPosition()).getUser().getUser_id().equals(user_id)) {
-                            AlertDialog.Builder dalert_confirm = new AlertDialog.Builder(mcontext);
-                            dalert_confirm.setMessage("정말 댓글을 삭제 하시겠습니까?").setCancelable(false).setPositiveButton("확인",
-                                    new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            Thread commentDelete = new Thread(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    JsonConnection.getConnection(Value.contentURL+"/"+mDataset.get(ca.getPosition()).getContent_id()+"/"+mDataset.get(ca.getPosition()).getComment_id(), "DELETE", null);
-                                                }
-                                            });
-                                            commentDelete.start();
-                                            try {
-                                                commentDelete.join();
-                                            } catch (InterruptedException e) {
-                                                e.printStackTrace();
+
+                        AlertDialog.Builder dalert_confirm = new AlertDialog.Builder(mcontext);
+                        dalert_confirm.setMessage("정말 댓글을 삭제 하시겠습니까?").setCancelable(false).setPositiveButton("확인",
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        Thread commentDelete = new Thread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                JsonConnection.getConnection(Value.contentURL+"/"+mDataset.get(ca.getPosition()).getContent_id()+"/"+mDataset.get(ca.getPosition()).getComment_id(), "DELETE", null);
                                             }
-                                            Toast.makeText(mcontext, "삭제성공", Toast.LENGTH_SHORT).show();
-                                            Intent cintent = new Intent(mcontext, ContentDetailListMain.class);
-                                            cintent.putExtra("content_id", mDataset.get(ca.getPosition()).getContent_id());
-                                            cintent.putExtra("comment_insert", 1);
-                                            cintent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
-                                            mcontext.startActivity(cintent);
+                                        });
+                                        commentDelete.start();
+                                        try {
+                                            commentDelete.join();
+                                        } catch (InterruptedException e) {
+                                            e.printStackTrace();
                                         }
-                                    }).setNegativeButton("취소",
-                                    new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            return;
-                                        }
-                                    });
-                            AlertDialog dalert = dalert_confirm.create();
-                            dalert.show();
-                        }
-                            break;
+                                        Toast.makeText(mcontext, "삭제성공", Toast.LENGTH_SHORT).show();
+                                        Intent cintent = new Intent(mcontext, ContentDetailListMain.class);
+                                        cintent.putExtra("content_id", mDataset.get(ca.getPosition()).getContent_id());
+                                        cintent.putExtra("comment_insert", 1);
+                                        cintent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
+                                        mcontext.startActivity(cintent);
+                                    }
+                                }).setNegativeButton("취소",
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        return;
+                                    }
+                                });
+                        AlertDialog dalert = dalert_confirm.create();
+                        dalert.show();
+                        break;
                 }
                 return false;
             }

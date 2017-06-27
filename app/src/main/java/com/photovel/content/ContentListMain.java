@@ -2,6 +2,7 @@ package com.photovel.content;
 
 import android.content.ClipData;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
@@ -76,7 +77,10 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
         user_id = intent.getStringExtra("user_id");
         if(user_id.equals("")){
             Log.i("user_id","list_user_id 못받아옴!!!");
-            user_id = "leeej9201@gmail.com";
+            //현재 로그인한 user_id 받아오기
+            SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
+            user_id = get_to_eat.getString("user_id","notFound");
+            Log.i("user_id", user_id);
         }else{
             Log.i("user_id","list_user_id : "+user_id);
         }

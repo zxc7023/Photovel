@@ -44,7 +44,8 @@ public class ContentListAdapter extends RecyclerView.Adapter<ContentListAdapter.
     private List<Content> mDataset;
     private Context mcontext;
     private ViewHolder holder;
-    private int position, content_id=-1;;
+    private int position, content_id=-1;
+    private String user_id;
 
     public int getPosition() {
         return position;
@@ -74,7 +75,7 @@ public class ContentListAdapter extends RecyclerView.Adapter<ContentListAdapter.
         public TextView icglobe, icleft, icright, tvleft, tvright, iccal, icmarker, icpow, icthumb, iccomment, icshare, btnDetailMenu;
         public TextView tvContentInsertDate, tvContentSubject, tvContentLocation, tvUsername, tvDuring, tvdetailcount, tvContent;
         public TextView tvLikeCount, tvCommentCount, tvShareCount, btnComment;
-        public LinearLayout btnLookLeft, btnLookRight, btnLike;
+        public LinearLayout btnLookLeft, btnLookRight, btnLike, btnBookmark;
         public ImageView ivTopPhoto;
 
         public ViewHolder(View view) {
@@ -112,6 +113,7 @@ public class ContentListAdapter extends RecyclerView.Adapter<ContentListAdapter.
             btnLookLeft = (LinearLayout) view.findViewById(R.id.btnLookLeft);
             btnLookRight = (LinearLayout) view.findViewById(R.id.btnLookRight);
             btnLike = (LinearLayout) view.findViewById(R.id.btnLike);
+            btnBookmark = (LinearLayout) view.findViewById(R.id.btnBookmark);
         }
     }
 
@@ -196,6 +198,12 @@ public class ContentListAdapter extends RecyclerView.Adapter<ContentListAdapter.
             }
         });
 
+        //디테일 메뉴 보이기 전에 글쓴이 == 내계정 확인
+        SharedPreferences get_to_eat = mcontext.getSharedPreferences("loginInfo", mcontext.MODE_PRIVATE);
+        user_id = get_to_eat.getString("user_id","notFound");
+        if(!mDataset.get(position).getUser().getUser_id().equals(user_id)){
+            holder.LLmenu.setVisibility(View.GONE);
+        }
         holder.btnDetailMenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -207,8 +215,6 @@ public class ContentListAdapter extends RecyclerView.Adapter<ContentListAdapter.
         holder.btnLike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SharedPreferences get_to_eat = mcontext.getSharedPreferences("loginInfo", mcontext.MODE_PRIVATE);
-                final String user_id = get_to_eat.getString("user_id","notFound");
                 Thread good = new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -227,6 +233,30 @@ public class ContentListAdapter extends RecyclerView.Adapter<ContentListAdapter.
                 intent.putExtra("urlflag", "");
                 mcontext.startActivity(intent);
                 Toast.makeText(mcontext,"좋아요 완료!",Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        holder.btnBookmark.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Thread bookmark = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        JsonConnection.getConnection(Value.contentURL+"/"+mDataset.get(position).getContent_id()+"/bookmark/"+user_id, "POST", null);
+                    }
+                });
+                bookmark.start();
+                try {
+                    bookmark.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                Intent intent = new Intent(mcontext, ContentListMain.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
+                intent.putExtra("user_id", user_id);
+                intent.putExtra("urlflag", "");
+                mcontext.startActivity(intent);
+                Toast.makeText(mcontext,"북마크 완료!",Toast.LENGTH_SHORT).show();
             }
         });
 
