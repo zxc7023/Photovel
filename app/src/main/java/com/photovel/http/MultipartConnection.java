@@ -24,7 +24,7 @@ import java.util.List;
 public class MultipartConnection {
     private static final String TAG = "MultipartConnection";
 
-    public String getConnection(String url, JSONObject json, List<Bitmap> bitmaps){
+    public static String getConnection(String url, JSONObject json, List<Bitmap> bitmaps){
         String responseData = null;
         HttpURLConnection conn = null;
         InputStream is = null;

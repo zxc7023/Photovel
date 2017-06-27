@@ -12,15 +12,18 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -30,7 +33,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -42,6 +45,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -56,25 +60,31 @@ import com.photovel.FontActivity2;
 import com.photovel.MainActivity;
 import com.photovel.NavigationItemSelected;
 import com.photovel.R;
+import com.photovel.http.JsonConnection;
 import com.photovel.http.Value;
+import com.vo.Comment;
 import com.vo.Content;
 import com.vo.ContentDetail;
 import com.vo.Photo;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+
+import static com.photovel.http.Value.contentURL;
 
 public class ContentClusterMain extends FontActivity2 implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, ClusterManager.OnClusterClickListener<Photo>,
         ClusterManager.OnClusterInfoWindowClickListener<Photo>, ClusterManager.OnClusterItemClickListener<Photo>, ClusterManager.OnClusterItemInfoWindowClickListener<Photo> {
@@ -83,42 +93,43 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
     Toolbar toolbar;
 
     private RelativeLayout RldetailData;
-    private LinearLayout RLdetailDate, LLmenu;
+    private LinearLayout RLdetailDate, LLmenu, btnLike, btnComment;
     private TextView icglobe, icleft, icright, tvleft, tvright, iccal, icmarker, icpow, icthumb, iccomment, icshare, btnDetailMenu;
     private TextView tvContentInsertDate, tvContentSubject, tvContentLocation, tvUsername, tvUsername2, tvDuring, tvdetailcount, tvdetailstate, tvContent;
     private TextView tvLikeCount, tvCommentCount, tvShareCount;
     private ImageView ivTopPhoto;
-    private Button btnLike, btnComment, btnShare;
+    private FloatingActionButton btnTop;
     private LinearLayout btnLookLeft, btnLookRight;
     private List<ContentDetail> myDataset;
     private Content content;
     private int content_id=0;
     private NestedScrollView ns;
 
-    private final String contentURL = Value.contentURL;
-    private final String contentPhotoURL = Value.contentPhotoURL;
-
     //은지 수정
     private ClusterManager<Photo> cm;
     private GoogleMap mMap;
+
+    //댓글
+    //comment
+    private BottomSheetBehavior bottomSheetBehavior;
+    private RelativeLayout RlComment;
+    private RecyclerView RVComment;
+    private LinearLayoutManager mCommentLayoutManager;
+    private CommentAdapter mCommentAdapter;
+    private List<Comment> myCommentDataset;
+    private LinearLayout llBack;
+    private TextView btnBack;
+    private EditText etComment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_content_cluster_main);
 
-        //setContentView(R.layout.activity_content_cluster);
-
         //프래그먼트에 지도를 보여주기위해 싱크
-        MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-
-        //mMap = ((MySupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map)).getMapAsync(this);
-
         ns = (NestedScrollView)findViewById(R.id.cluster_nestedScrollView);
-        MySupportMapFragment mSupportMapFragment = (MySupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map);
-        //mSupportMapFragment.getMapAsync(this);
-
+        MySupportMapFragment mSupportMapFragment = (MySupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.cluster_map);
+        mSupportMapFragment.getMapAsync(this);
         if(mSupportMapFragment != null) {
             mSupportMapFragment.setListener(new MySupportMapFragment.OnTouchListener() {
                 @Override
@@ -169,6 +180,8 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
 
         btnLookLeft = (LinearLayout) findViewById(R.id.btnLookLeft);
         btnLookRight = (LinearLayout) findViewById(R.id.btnLookRight);
+        btnLike = (LinearLayout) findViewById(R.id.btnLike);
+        btnComment = (LinearLayout) findViewById(R.id.btnComment);
 
         //imageView를 font로 바꿔주기
         Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
@@ -196,21 +209,37 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
         LLmenu.bringToFront();
         RldetailData.bringToFront();
 
-        //db에 있는 contentId별 content정보 받아오기
-        Thread thread1 = new Thread(){
+        //지도 스토리, 댓글 객체 받아오기
+        Thread clusterList = new Thread(){
             @Override
             public void run() {
                 super.run();
-                content = getContentData(content_id);
+                String responseData = JsonConnection.getConnection(contentURL+"/"+content_id, "GET", null);
+                content = JSON.parseObject(responseData, Content.class);
+                myDataset = content.getDetails();
+                myCommentDataset = content.getComments();
             }
         };
-        thread1.start();
+        clusterList.start();
         try {
-            thread1.join();  //모든처리 thread처리 기다리기
+            clusterList.join();  //모든처리 thread처리 기다리기
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        getImage(); //content Image받아오기
+        //content의 bitmap 받아오기
+        List<Content> tmpContent = new ArrayList<>();
+        tmpContent.add(content);
+        List<Bitmap> contentBitmaps = JsonConnection.getBitmap(tmpContent, Value.contentPhotoURL);
+        for(int i = 0; i < contentBitmaps.size(); i++){
+            tmpContent.get(i).setBitmap(contentBitmaps.get(i));
+        }
+        //지도 스토리 bitmap 받아오기
+        List<Bitmap> clusterBitmaps = JsonConnection.getBitmap(myDataset, Value.contentPhotoURL);
+        for(int i = 0; i < myDataset.size(); i++){
+            myDataset.get(i).getPhoto().setBitmap(clusterBitmaps.get(i));
+            myDataset.get(i).getPhoto().setRank(String.valueOf(i));
+        }
+
 
         //content정보 추가하기
         tvdetailstate.setText("지도");
@@ -224,25 +253,118 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
         tvCommentCount.setText(String.valueOf(content.getComment_count()));
         tvShareCount.setText(String.valueOf(content.getContent_share_count()));
 
-        myDataset = new ArrayList<>();
-        for(int i=0; i<content.getDetails().size(); i++){
-            Photo ph = new Photo();
-            ph.setPhoto_latitude(content.getDetails().get(i).getPhoto().getPhoto_latitude());
-            ph.setPhoto_longitude(content.getDetails().get(i).getPhoto().getPhoto_longitude());
+        //메인 사진 저장
+        ivTopPhoto.setImageBitmap(content.getBitmap());
 
-            GetCurrentAddress getAddress = new GetCurrentAddress();
-            String address = getAddress.getAddress(ph);
-            content.getDetails().get(i).getPhoto().setAddress(address);
-            if(content.getDetails().get(i).getPhoto().getPhoto_top_flag()==1){
-                ivTopPhoto.setImageBitmap(content.getDetails().get(i).getPhoto().getBitmap());
+        //메인 위치 저장
+        GetCurrentAddress getAddress = new GetCurrentAddress();
+        String address = getAddress.getAddress(content.getPhoto_latitude(), content.getPhoto_longitude());
+        tvContentLocation.setText(address);
+
+        //메인 기간 저장
+        String from = new SimpleDateFormat("yyyy.MM.dd").format(content.getFr_photo_date());
+        String to = new SimpleDateFormat("yyyy.MM.dd").format(content.getTo_photo_date());
+        tvDuring.setText(from+" ~ "+to);
+
+        //comment
+        RlComment = (RelativeLayout) findViewById(R.id.RlComment);
+        btnBack = (TextView) findViewById(R.id.btnBack);
+        etComment = (EditText) findViewById(R.id.etComment);
+        llBack = (LinearLayout) findViewById(R.id.llBack);
+
+        //Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
+        btnBack.setTypeface(fontAwesomeFont);
+
+        //comment recycleview사용선언
+        RVComment = (RecyclerView) findViewById(R.id.RVComment);
+        RVComment.setHasFixedSize(true);
+        RVComment.setNestedScrollingEnabled(false);
+        mCommentLayoutManager = new LinearLayoutManager(this);
+        RVComment.setLayoutManager(mCommentLayoutManager);
+        mCommentAdapter = new CommentAdapter(myCommentDataset, ContentClusterMain.this);
+        RVComment.setAdapter(mCommentAdapter);
+
+        llBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
             }
-            myDataset.add(content.getDetails().get(i));
+        });
+
+        bottomSheetBehavior = BottomSheetBehavior.from(RlComment);
+        bottomSheetBehavior.setPeekHeight(0);
+        if(intent.getIntExtra("comment_insert",-1) == 1){
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         }
 
-        tvContentLocation.setText(content.getDetails().get(content.getDetails().size()-1).getPhoto().getAddress());
-        String from = new SimpleDateFormat("yyyy.MM.dd").format(content.getDetails().get(0).getPhoto().getPhoto_date());
-        String to = new SimpleDateFormat("yyyy.MM.dd").format(content.getDetails().get(content.getDetails().size()-1).getPhoto().getPhoto_date());
-        tvDuring.setText(from+" ~ "+to);
+        btnComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            }
+        });
+
+        //코멘트 전송
+        findViewById(R.id.btnCommentSubmit).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final JSONObject comment = new JSONObject();
+                try {
+                    JSONObject user = new JSONObject();
+                    user.put("user_id", "leeej9201@gmail.com");
+                    comment.put("content_id", content_id);
+                    comment.put("comment_content", etComment.getText());
+                    comment.put("user",user);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                Log.i("1. comment", comment.toString());
+
+                Thread commentSend = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        JsonConnection.getConnection(contentURL+"/"+content_id+"/comment", "POST", comment);
+                    }
+                });
+                commentSend.start();
+                try {
+                    commentSend.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                Intent intent = new Intent(getApplicationContext(), ContentClusterMain.class);
+                intent.putExtra("content_id", content_id);
+                intent.putExtra("comment_insert", 1);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
+                startActivity(intent);
+                finish();
+            }
+        });
+
+        //좋아요 버튼
+        btnLike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final String id = "leeej9201@gmail.com";
+                Thread good = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        JsonConnection.getConnection(contentURL+"/"+content_id+"/good/"+id, "POST", null);
+                    }
+                });
+                good.start();
+                try {
+                    good.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                Intent intent = new Intent(getApplicationContext(), ContentClusterMain.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
+                intent.putExtra("content_id", content_id);
+                startActivity(intent);
+                Toast.makeText(getApplicationContext(),"좋아요 완료!",Toast.LENGTH_SHORT).show();
+            }
+        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -314,53 +436,22 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
                                 new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        final String url = Value.contentURL+"/"+content_id;
-                                        Thread th = new Thread(new Runnable() {
+                                        Thread deleteContent = new Thread(new Runnable() {
                                             @Override
                                             public void run() {
-                                                DataOutputStream dos = null;
-                                                HttpURLConnection conn = null;
-                                                URL connectURL = null;
-                                                try {
-                                                    connectURL = new URL(url);
-
-                                                    conn = (HttpURLConnection) connectURL.openConnection();
-                                                    conn.setDoInput(true);
-                                                    conn.setDoOutput(true);
-                                                    conn.setUseCaches(false);
-                                                    conn.setRequestMethod("DELETE");
-
-                                                    int responseCode = conn.getResponseCode();
-                                                    Log.i("responseCode","삭제 : "+responseCode);
-
-                                                    switch (responseCode){
-                                                        case HttpURLConnection.HTTP_OK:
-                                                            Log.i("responseCode","삭제성공");
-                                                            break;
-                                                        default:
-                                                            Log.i("responseCode","삭제실패 responseCode: " +responseCode);
-                                                            break;
-                                                    }
-
-                                                } catch (MalformedURLException e) {
-                                                    e.printStackTrace();
-                                                } catch (ProtocolException e) {
-                                                    e.printStackTrace();
-                                                } catch (IOException e) {
-                                                    e.printStackTrace();
-                                                }
+                                                JsonConnection.getConnection(contentURL+"/"+content_id, "DELETE", null);
                                             }
                                         });
-                                        th.start();
+                                        deleteContent.start();
                                         try {
-                                            th.join();
+                                            deleteContent.join();
                                         } catch (InterruptedException e) {
                                             e.printStackTrace();
                                         }
                                         Toast.makeText(getApplicationContext(),"삭제성공",Toast.LENGTH_SHORT).show();
-                                        Intent dintent = new Intent(getApplicationContext(), MainActivity.class);
-                                        dintent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
-                                        startActivity(dintent);
+                                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
+                                        startActivity(intent);
                                         finish();
                                     }
                                 }).setNegativeButton("취소",
@@ -379,41 +470,10 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
                                 new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        final String url = Value.contentURL+"/"+content_id+"/warning";
                                         Thread th = new Thread(new Runnable() {
                                             @Override
                                             public void run() {
-                                                DataOutputStream dos = null;
-                                                HttpURLConnection conn = null;
-                                                URL connectURL = null;
-                                                try {
-                                                    connectURL = new URL(url);
-
-                                                    conn = (HttpURLConnection) connectURL.openConnection();
-                                                    conn.setDoInput(true);
-                                                    conn.setDoOutput(true);
-                                                    conn.setUseCaches(false);
-                                                    conn.setRequestMethod("POST");
-
-                                                    int responseCode = conn.getResponseCode();
-                                                    Log.i("responseCode","신고 : "+responseCode);
-
-                                                    switch (responseCode){
-                                                        case HttpURLConnection.HTTP_OK:
-                                                            Log.i("responseCode","신고성공");
-                                                            break;
-                                                        default:
-                                                            Log.i("responseCode","신고실패 responseCode: " +responseCode);
-                                                            break;
-                                                    }
-
-                                                } catch (MalformedURLException e) {
-                                                    e.printStackTrace();
-                                                } catch (ProtocolException e) {
-                                                    e.printStackTrace();
-                                                } catch (IOException e) {
-                                                    e.printStackTrace();
-                                                }
+                                                JsonConnection.getConnection(contentURL+"/"+content_id+"/warning", "POST", null);
                                             }
                                         });
                                         th.start();
@@ -423,9 +483,9 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
                                             e.printStackTrace();
                                         }
                                         Toast.makeText(getApplicationContext(),"신고성공",Toast.LENGTH_SHORT).show();
-                                        Intent wintent = new Intent(getApplicationContext(), MainActivity.class);
-                                        wintent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
-                                        startActivity(wintent);
+                                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
+                                        startActivity(intent);
                                         finish();
                                     }
                                 }).setNegativeButton("취소",
@@ -498,6 +558,7 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
         return true;
     }
 
+
     //DB에서 content정보 받아오기
     public Content getContentData(int id){
         Content content = null;
@@ -566,13 +627,15 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
             return content;
         } catch (MalformedURLException e) {
             e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (ProtocolException e) {
+            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-
             conn.disconnect();
         }
-
         return null;
     }
 
@@ -585,7 +648,7 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
                 try {
                     for (int i = 0; i < content.getDetails().size(); i++) {
                         //Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL("http://photovel.com/upload/" + content.getContent_id() + "/" + content.getDetails().get(i).getPhoto().getPhoto_file_name()).getContent());
-                        Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL(contentPhotoURL+ "/" + content.getContent_id() + "/" + content.getDetails().get(i).getPhoto().getPhoto_file_name()).getContent());
+                        Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL(Value.contentPhotoURL+ "/" + content.getContent_id() + "/" + content.getDetails().get(i).getPhoto().getPhoto_file_name()).getContent());
                         content.getDetails().get(i).getPhoto().setBitmap(bitmap);
                         content.getDetails().get(i).getPhoto().setRank(String.valueOf(i));
                         //File filePath = new File(Environment.getExternalStorageDirectory());
@@ -610,13 +673,19 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
+        if(bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED){
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        }else if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
             super.onBackPressed();
         }
     }
 
+    //cluster
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;

@@ -39,6 +39,7 @@ import com.photovel.MainActivity;
 import com.photovel.MainNewAdapter;
 import com.photovel.R;
 import com.photovel.FontActivity;
+import com.photovel.http.MultipartConnection;
 import com.photovel.http.Value;
 import com.vo.Content;
 import com.vo.ContentDetail;
@@ -87,7 +88,7 @@ public class ContentInsertMain extends FontActivity {
     private Switch swPrivate;
     private boolean flagSwitch = true;
 
-    private String isSucess;
+    private int content_id;
 
     //준기가 추가하는 부분
     Context mContext;
@@ -277,123 +278,33 @@ public class ContentInsertMain extends FontActivity {
 
                                     Log.i("ddd",obj.toString());
 
-                                    final String url = Value.contentURL;
-                                    ;
 
                                     //Bitmap처리
                                     final List<Bitmap> tmp = new ArrayList<Bitmap>();
                                     for(int i=0; i<myDataset.size(); i++){
                                         tmp.add(myDataset.get(i).getPhoto().getBitmap());
                                     }
-                                    Thread a =new Thread(new Runnable() {
+                                    Thread contentInsert =new Thread(new Runnable() {
                                         @Override
                                         public void run() {
-                                            DataOutputStream dos = null;
-                                            HttpURLConnection conn = null;
-                                            InputStream is;
-                                            ByteArrayOutputStream baos;
-                                            try {
-                                                String lineEnd = "\r\n";
-                                                String twoHyphens = "--";
-                                                String boundary = "**##**";
-
-                                                URL connectURL = new URL(url);
-
-                                                conn = (HttpURLConnection) connectURL.openConnection();
-                                                conn.setDoInput(true);
-                                                conn.setDoOutput(true);
-                                                conn.setUseCaches(false);
-                                                conn.setRequestMethod("POST");
-
-                                                conn.setRequestProperty("Connection", "Keep-Alive");
-                                                conn.setRequestProperty("Content-Type","multipart/form-data;boundary=" + boundary);
-                                                dos = new DataOutputStream(conn.getOutputStream());
-
-                                                dos.writeBytes(lineEnd + twoHyphens + boundary + lineEnd);
-                                                dos.writeBytes("Content-Disposition: form-data; name=\"content\""+lineEnd+lineEnd+ URLEncoder.encode(obj.toString(),"UTF-8"));
-                                                //dos.writeBytes("Content-Type: application/json;charset=\"UTF-8\"\r\n\r\n");
-
-                                                for(int i=0; i < tmp.size(); i++){
-                                                    dos.writeBytes(lineEnd + twoHyphens + boundary + lineEnd);
-                                                    dos.writeBytes("Content-Disposition: form-data; name=\"uploadFile\"; filename=\"uploadFile\""+lineEnd);
-                                                    dos.writeBytes("Content-Type: image/jpg"+lineEnd+lineEnd);
-                                                    /*dos.writeBytes("Content-Type: application/octet-stream\r\n\r\n");*/
-
-                                                    ByteArrayOutputStream outPutStream = new ByteArrayOutputStream();
-                                                    tmp.get(i).compress(Bitmap.CompressFormat.JPEG, 100, outPutStream);
-                                                    byte[] byteArray = outPutStream.toByteArray();
-                                                    ByteArrayInputStream inputStream = new ByteArrayInputStream(byteArray);
-                                                    int bytesAvailable = inputStream.available();
-                                                    int maxBufferSize = 1024;
-                                                    int bufferSize = Math.min(bytesAvailable, maxBufferSize);
-                                                    byte[] buffer = new byte[bufferSize];
-
-                                                    int bytesRead = inputStream.read(buffer, 0, bufferSize);
-                                                    while (bytesRead > 0)
-                                                    {
-                                                        dos.write(buffer, 0, bufferSize);
-                                                        bytesAvailable = inputStream.available();
-                                                        bufferSize = Math.min(bytesAvailable, maxBufferSize);
-                                                        bytesRead = inputStream.read(buffer, 0, bufferSize);
-                                                    }
-                                                    inputStream.close();
-                                                }
-
-
-                                                dos.writeBytes(lineEnd + twoHyphens + boundary + twoHyphens + lineEnd);
-                                                dos.flush();
-
-                                                int responseCode = conn.getResponseCode();
-                                                Log.i("responseCode",responseCode+"");
-
-                                                switch (responseCode){
-                                                    case HttpURLConnection.HTTP_OK:
-                                                        is = conn.getInputStream();
-                                                        baos = new ByteArrayOutputStream();
-                                                        byte[] byteBuffer = new byte[1024];
-                                                        byte[] byteData = null;
-                                                        int nLength = 0;
-                                                        while ((nLength = is.read(byteBuffer, 0, byteBuffer.length)) != -1) {
-                                                            baos.write(byteBuffer, 0, nLength);
-                                                        }
-                                                        byteData = baos.toByteArray();
-                                                        isSucess = new String(byteData);
-                                                        Log.i("isSucess",isSucess);
-                                                }
-
-                                            } catch (ProtocolException e) {
-                                                e.printStackTrace();
-                                            } catch (MalformedURLException e) {
-                                                e.printStackTrace();
-                                            } catch (IOException e) {
-                                                e.printStackTrace();
-                                            }finally {
-                                                try {
-                                                    dos.close();
-                                                    conn.disconnect();
-                                                } catch (IOException e) {
-                                                    e.printStackTrace();
-                                                }
-
-                                            }
+                                            String responseData = MultipartConnection.getConnection(Value.contentURL, obj, tmp);
+                                            content_id = Integer.parseInt(responseData);
                                         }
                                     });
-                                    a.start();
+                                    contentInsert.start();
                                     try {
-                                        a.join();
+                                        contentInsert.join();
                                     } catch (InterruptedException e) {
                                         e.printStackTrace();
                                     }
-
                                     Toast.makeText(getApplicationContext(),"등록성공",Toast.LENGTH_LONG).show();
-
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
 
                                 Intent intent = new Intent(getApplicationContext(), ContentDetailListMain.class);
-                                Log.i("content_id","insert_content_id : "+isSucess);
-                                intent.putExtra("content_id",Integer.parseInt(isSucess));
+                                Log.i("content_id","insert_content_id : "+content_id);
+                                intent.putExtra("content_id", content_id);
                                 getApplicationContext().startActivity(intent);
                                 finish();
 
@@ -487,7 +398,7 @@ public class ContentInsertMain extends FontActivity {
                 photo.setPhoto_latitude(geo.getLatitude());
                 photo.setPhoto_longitude(geo.getLongitude());
                 GetCurrentAddress getAddress = new GetCurrentAddress();
-                address = getAddress.getAddress(photo); //주소로 바꿔주기
+                address = getAddress.getAddress(geo.getLatitude(), geo.getLongitude()); //주소로 바꿔주기
                 photo.setAddress(address);
             } else {
                 photo.setAddress("주소 미확인");
@@ -504,7 +415,7 @@ public class ContentInsertMain extends FontActivity {
             exif = new ExifInterface(path);
             int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED); //회전률
             //사진보여주기 전에 용량처리해주기
-            Bitmap bitmap = getBitmap(path);
+            Bitmap bitmap = resizeBitmap(path);
 
             //사진보여주기 전에 회전처리해주기
             photo.setBitmap(rotateBitmap(bitmap, orientation));
@@ -518,7 +429,7 @@ public class ContentInsertMain extends FontActivity {
     }
 
     //사진 용량 줄이기
-    private Bitmap getBitmap(String path) {
+    private Bitmap resizeBitmap(String path) {
         InputStream in = null;
         try {
             final int IMAGE_MAX_SIZE = 200000; //고정됨!!!!수정금지!!!!

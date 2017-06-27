@@ -23,6 +23,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,6 +32,7 @@ import com.photovel.FontActivity;
 import com.photovel.FontActivity2;
 import com.photovel.NavigationItemSelected;
 import com.photovel.R;
+import com.photovel.http.JsonConnection;
 import com.photovel.http.Value;
 import com.vo.Content;
 import com.vo.ContentDetail;
@@ -85,24 +87,38 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
             Log.i("urlflag","list_urlflag : "+urlflag);
         }
 
-
-        //db에 있는 userId별 content정보 받아오기
-        Thread thread1 = new Thread(){
+        //스토리 객체 받아오기
+        Thread listMain = new Thread(){
             @Override
             public void run() {
                 super.run();
-                myDataset = new ArrayList<>();
-                myDataset = getContentData(user_id);
+
+                String qry = null;
+                if(urlflag.equals("C")){
+                    qry = Value.contentURL+"/user/" + user_id;
+                }else if(urlflag.equals("M")){
+                    qry = Value.contentURL+"/my/" + user_id;
+                }else if(urlflag.equals("N")){
+                    qry = Value.contentURL+"/new";
+                }else if(urlflag.equals("R")){
+                    qry = Value.contentURL+"/recommend";
+                }
+
+                String responseData = JsonConnection.getConnection(qry, "GET", null);
+                myDataset = JSON.parseArray(responseData, Content.class);
             }
         };
-        thread1.start();
+        listMain.start();
         try {
-            thread1.join();  //모든처리 thread처리 기다리기
+            listMain.join();  //모든처리 thread처리 기다리기
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        Log.i("ddd","size : "+myDataset.size());
-        getImage(); //content Image받아오기
+        //스토리 bitmap 받아오기
+        List<Bitmap> newBitmaps = JsonConnection.getBitmap(myDataset, Value.contentPhotoURL);
+        for(int i = 0; i < myDataset.size(); i++){
+            myDataset.get(i).setBitmap(newBitmaps.get(i));
+        }
 
         //recycleview사용선언
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
@@ -112,6 +128,7 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
         mRecyclerView.setNestedScrollingEnabled(false);
         mAdapter = new ContentListAdapter(myDataset, ContentListMain.this);
         mRecyclerView.setAdapter(mAdapter);
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -162,121 +179,6 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
                 nsv.fullScroll(View.FOCUS_UP);
             }
         });
-    }
-
-    //DB에서 content정보 받아오기
-    public List<Content> getContentData(String id){
-        List<Content> contents = null;
-        HttpURLConnection conn = null;
-        Log.i(TAG, "getPhotoData의 id= " + id);
-
-        String qry="";
-        if(urlflag.equals("C")){
-            qry = Value.contentURL+"/user/" + id;
-        }else if(urlflag.equals("M")){
-            qry = Value.contentURL+"/my/" + id;
-        }else if(urlflag.equals("N")){
-            qry = Value.contentURL+"/new";
-        }else if(urlflag.equals("R")){
-            qry = Value.contentURL+"/recommend";
-        }
-        Log.i(TAG, "1.getPhotoData의 qry= " + qry);
-
-        try {
-            URL strUrl = new URL(qry);
-            conn = (HttpURLConnection) strUrl.openConnection();
-            conn.setDoInput(true);//서버로부터 결과값을 응답받음
-            //conn.setDoOutput(true);//서버로 값을 출력. GET방식의 경우 이 설정을 하면 405에러가 난다. 왜???
-            //conn.connect();
-            conn.setRequestMethod("GET");
-            Log.i(TAG, "2.getPhotoData의 qry= " + qry);
-            /*
-            OutputStream os = conn.getOutputStream();
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-            // bw.write(id);
-
-            bw.flush();
-            bw.close();*/
-
-            final int responseCode = conn.getResponseCode(); //정상인 경우 200번, 그 외 오류있는 경우 오류 번호 반환
-            Log.i(TAG, "getPhotoData의 responseCode= " + responseCode);
-            switch (responseCode){
-                case HttpURLConnection.HTTP_OK:
-
-                    InputStream is = conn.getInputStream();
-                    Reader reader = new InputStreamReader(is, "UTF-8");
-                    BufferedReader br = new BufferedReader(reader);
-                    // while(br.read() != -1 ){
-                    String responseData = null;
-
-                    responseData = br.readLine();
-                    Log.i(TAG, "getPhotoData의 response data= " + responseData);
-
-                    contents = JSON.parseArray(responseData, Content.class);
-                    Log.i(TAG, "getPhotoData의 contents= " + contents);
-
-                    br.close();
-                    reader.close();
-                    is.close();
-
-                    break;
-                case HttpURLConnection.HTTP_NOT_FOUND:
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getApplicationContext(), "페이지를 찾을 수 없습니다.", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-
-                    break;
-                default:
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getApplicationContext(), "response code: " + responseCode, Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                    break;
-            }
-            return contents;
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-
-            conn.disconnect();
-        }
-
-        return null;
-    }
-
-    //DB에서 bitmap정보 받아오기
-    public void getImage(){
-        Thread thread2 = new Thread(){
-            @Override
-            public void run() {
-                super.run();
-                try {
-                    for (int i = 0; i < myDataset.size(); i++) {
-                        Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL(Value.contentPhotoURL+"/" + myDataset.get(i).getContent_id() + "/" + myDataset.get(i).getPhoto_file_name()).getContent());
-                        myDataset.get(i).setBitmap(bitmap);
-                        //File filePath = new File(Environment.getExternalStorageDirectory());
-                        //FileUtils.copyURLToFile(new URL("http://photovel.com/upload/" + contentData.getContent_id() + "/" + contentData.getDetails().get(i).getPhoto().getPhotoFileName()), );
-                    }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        thread2.start();
-        try {
-            thread2.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
     }
 
     @Override

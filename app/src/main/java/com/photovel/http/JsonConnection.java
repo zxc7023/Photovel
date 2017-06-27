@@ -4,8 +4,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 
-import com.alibaba.fastjson.JSONObject;
+import org.json.JSONObject;
 import com.vo.Content;
+import com.vo.ContentDetail;
 import com.vo.MainImage;
 
 import java.io.BufferedReader;
@@ -92,23 +93,36 @@ public class JsonConnection {
             public void run() {
                 super.run();
                 try {
-                    //Content 타입일 때
-                    if(imgs.get(0) instanceof Content){
+
+                    //MainImage 타입일 때
+                    if (imgs.get(0) instanceof MainImage) {
                         for (int i = 0; i < imgs.size(); i++) {
-                            Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL(url+"/"+((Content)imgs.get(i)).getPhoto_file_name()).getContent());
+                            Bitmap bitmap = BitmapFactory.decodeStream((InputStream)
+                                    new URL(url + "/" + ((MainImage) imgs.get(i)).getImage_file_name()).getContent());
+                            bitmaps.add(bitmap);
+                            Log.i(TAG, "4. getBitmap (MainImage)bitmap= " + bitmap);
+                        }
+
+                    //Content 타입일 때
+                    }else if(imgs.get(0) instanceof Content){
+                        for (int i = 0; i < imgs.size(); i++) {
+                            Bitmap bitmap = BitmapFactory.decodeStream((InputStream)
+                                    new URL(url+"/"+((Content)imgs.get(i)).getContent_id()+"/"+((Content)imgs.get(i)).getPhoto_file_name()).getContent());
                             bitmaps.add(bitmap);
                             Log.i(TAG, "4. getBitmap (Content)bitmap= " + bitmap);
                         }
 
-                    //MainImage 타입일 때
-                    } else if (imgs.get(0) instanceof MainImage) {
+                    //ContentDetail 타입일 때
+                    } else if (imgs.get(0) instanceof ContentDetail) {
                         for (int i = 0; i < imgs.size(); i++) {
-                            Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL(url+"/"+((MainImage)imgs.get(i)).getImage_file_name()).getContent());
+                            Bitmap bitmap = BitmapFactory.decodeStream((InputStream)
+                                    new URL(url+"/"+((ContentDetail)imgs.get(i)).getContent_id()+"/"+((ContentDetail)imgs.get(i)).getPhoto().getPhoto_file_name()).getContent());
                             bitmaps.add(bitmap);
-                            Log.i(TAG, "4. getBitmap (MainImage)bitmap= " + bitmap);
+                            Log.i(TAG, "4. getBitmap (ContentDetail)bitmap= " + bitmap);
                         }
+
                     }else{
-                        Log.i(TAG, "Content도 아니고 MainImage도 아님요");
+                        Log.i(TAG, "MainImage, Content, ContentDetail Type이 아닙니다");
                     }
 
 

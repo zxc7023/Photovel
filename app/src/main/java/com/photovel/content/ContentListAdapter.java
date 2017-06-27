@@ -1,7 +1,5 @@
 package com.photovel.content;
 
-import android.app.Activity;
-import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -9,8 +7,6 @@ import android.graphics.Typeface;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
@@ -18,23 +14,17 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.photovel.MainActivity;
 import com.photovel.R;
+import com.photovel.http.JsonConnection;
 import com.photovel.http.Value;
 import com.vo.Content;
-import com.vo.ContentDetail;
-import com.vo.Photo;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -42,9 +32,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -85,7 +73,7 @@ public class ContentListAdapter extends RecyclerView.Adapter<ContentListAdapter.
         public TextView icglobe, icleft, icright, tvleft, tvright, iccal, icmarker, icpow, icthumb, iccomment, icshare, btnDetailMenu;
         public TextView tvContentInsertDate, tvContentSubject, tvContentLocation, tvUsername, tvDuring, tvdetailcount, tvContent;
         public TextView tvLikeCount, tvCommentCount, tvShareCount, btnComment;
-        public LinearLayout btnLookLeft, btnLookRight;
+        public LinearLayout btnLookLeft, btnLookRight, btnLike;
         public ImageView ivTopPhoto;
 
         public ViewHolder(View view) {
@@ -122,6 +110,7 @@ public class ContentListAdapter extends RecyclerView.Adapter<ContentListAdapter.
             btnComment = (TextView) view.findViewById(R.id.btnComment);
             btnLookLeft = (LinearLayout) view.findViewById(R.id.btnLookLeft);
             btnLookRight = (LinearLayout) view.findViewById(R.id.btnLookRight);
+            btnLike = (LinearLayout) view.findViewById(R.id.btnLike);
         }
     }
 
@@ -165,11 +154,8 @@ public class ContentListAdapter extends RecyclerView.Adapter<ContentListAdapter.
         holder.tvContentSubject.setText(mDataset.get(position).getContent_subject());
 
         //주소처리
-        Photo ph = new Photo();
-        ph.setPhoto_latitude(mDataset.get(position).getPhoto_latitude());
-        ph.setPhoto_longitude(mDataset.get(position).getPhoto_longitude());
         GetCurrentAddress getAddress = new GetCurrentAddress();
-        String address = getAddress.getAddress(ph);
+        String address = getAddress.getAddress(mDataset.get(position).getPhoto_latitude(), mDataset.get(position).getPhoto_longitude());
 
         holder.tvContentLocation.setText(address);
         holder.tvUsername.setText(mDataset.get(position).getUser().getUser_nick_name());
@@ -216,6 +202,32 @@ public class ContentListAdapter extends RecyclerView.Adapter<ContentListAdapter.
                 ContentMenuClick(view);
             }
         });
+
+        holder.btnLike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final String id = "leeej9201@gmail.com";
+                Thread good = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        JsonConnection.getConnection(Value.contentURL+"/"+mDataset.get(position).getContent_id()+"/good/"+id, "POST", null);
+                    }
+                });
+                good.start();
+                try {
+                    good.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                Intent intent = new Intent(mcontext, ContentListMain.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
+                intent.putExtra("user_id", id);
+                intent.putExtra("urlflag", "");
+                mcontext.startActivity(intent);
+                Toast.makeText(mcontext,"좋아요 완료!",Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 
     //onClick
@@ -262,53 +274,22 @@ public class ContentListAdapter extends RecyclerView.Adapter<ContentListAdapter.
                                 new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        final String url = Value.contentURL+"/"+content_id;
-                                        Thread th = new Thread(new Runnable() {
+                                        Thread deleteContent = new Thread(new Runnable() {
                                             @Override
                                             public void run() {
-                                                DataOutputStream dos = null;
-                                                HttpURLConnection conn = null;
-                                                URL connectURL = null;
-                                                try {
-                                                    connectURL = new URL(url);
-
-                                                    conn = (HttpURLConnection) connectURL.openConnection();
-                                                    conn.setDoInput(true);
-                                                    conn.setDoOutput(true);
-                                                    conn.setUseCaches(false);
-                                                    conn.setRequestMethod("DELETE");
-
-                                                    int responseCode = conn.getResponseCode();
-                                                    Log.i("responseCode","삭제 : "+responseCode);
-
-                                                    switch (responseCode){
-                                                        case HttpURLConnection.HTTP_OK:
-                                                            Log.i("responseCode","삭제성공");
-                                                            break;
-                                                        default:
-                                                            Log.i("responseCode","삭제실패 responseCode: " +responseCode);
-                                                            break;
-                                                    }
-
-                                                } catch (MalformedURLException e) {
-                                                    e.printStackTrace();
-                                                } catch (ProtocolException e) {
-                                                    e.printStackTrace();
-                                                } catch (IOException e) {
-                                                    e.printStackTrace();
-                                                }
+                                                JsonConnection.getConnection(Value.contentURL+"/"+content_id, "DELETE", null);
                                             }
                                         });
-                                        th.start();
+                                        deleteContent.start();
                                         try {
-                                            th.join();
+                                            deleteContent.join();
                                         } catch (InterruptedException e) {
                                             e.printStackTrace();
                                         }
                                         Toast.makeText(mcontext,"삭제성공",Toast.LENGTH_SHORT).show();
-                                        Intent dintent = new Intent(mcontext, MainActivity.class);
-                                        dintent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
-                                        mcontext.startActivity(dintent);
+                                        Intent intent = new Intent(mcontext, MainActivity.class);
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
+                                        mcontext.startActivity(intent);
                                         //finish();
                                     }
                                 }).setNegativeButton("취소",
@@ -327,41 +308,10 @@ public class ContentListAdapter extends RecyclerView.Adapter<ContentListAdapter.
                                 new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        final String url = Value.contentURL+"/"+content_id+"/warning";
                                         Thread th = new Thread(new Runnable() {
                                             @Override
                                             public void run() {
-                                                DataOutputStream dos = null;
-                                                HttpURLConnection conn = null;
-                                                URL connectURL = null;
-                                                try {
-                                                    connectURL = new URL(url);
-
-                                                    conn = (HttpURLConnection) connectURL.openConnection();
-                                                    conn.setDoInput(true);
-                                                    conn.setDoOutput(true);
-                                                    conn.setUseCaches(false);
-                                                    conn.setRequestMethod("POST");
-
-                                                    int responseCode = conn.getResponseCode();
-                                                    Log.i("responseCode","신고 : "+responseCode);
-
-                                                    switch (responseCode){
-                                                        case HttpURLConnection.HTTP_OK:
-                                                            Log.i("responseCode","신고성공");
-                                                            break;
-                                                        default:
-                                                            Log.i("responseCode","신고실패 responseCode: " +responseCode);
-                                                            break;
-                                                    }
-
-                                                } catch (MalformedURLException e) {
-                                                    e.printStackTrace();
-                                                } catch (ProtocolException e) {
-                                                    e.printStackTrace();
-                                                } catch (IOException e) {
-                                                    e.printStackTrace();
-                                                }
+                                                JsonConnection.getConnection(Value.contentURL+"/"+content_id+"/warning", "POST", null);
                                             }
                                         });
                                         th.start();
@@ -371,9 +321,9 @@ public class ContentListAdapter extends RecyclerView.Adapter<ContentListAdapter.
                                             e.printStackTrace();
                                         }
                                         Toast.makeText(mcontext,"신고성공",Toast.LENGTH_SHORT).show();
-                                        Intent wintent = new Intent(mcontext, MainActivity.class);
-                                        wintent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
-                                        mcontext.startActivity(wintent);
+                                        Intent intent = new Intent(mcontext, MainActivity.class);
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
+                                        mcontext.startActivity(intent);
                                         //finish();
                                     }
                                 }).setNegativeButton("취소",
