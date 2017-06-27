@@ -26,6 +26,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.photovel.http.JsonConnection;
 import com.photovel.user.UserLogin;
 import com.alibaba.fastjson.JSON;
 import com.photovel.content.ContentInsertMain;
@@ -78,8 +79,10 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
             @Override
             public void run() {
                 super.run();
-                //images = new ArrayList<>();
-                images = getMainImage();
+                //images = getMainImage();
+                String responseData = JsonConnection.getConnection(Value.mainImageURL, "GET", null);
+                images = JSON.parseArray(responseData, MainImage.class);
+                Log.i(TAG, "images= " + images);
             }
         };
         getMainImage.start();
@@ -88,7 +91,11 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        getMainBitmap(); //메인 Image받아오기
+        //getMainBitmap(); //메인 Image받아오기
+        List<Bitmap> bitmaps = JsonConnection.getBitmap(images, Value.mainImagePhotoURL);
+        for(int i = 0; i < images.size(); i++){
+            images.get(i).setBitmap(bitmaps.get(i));
+        }
 
         carouselView.setPageCount(images.size());
         carouselView.setImageListener(imageListener);

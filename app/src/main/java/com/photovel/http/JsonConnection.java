@@ -5,6 +5,8 @@ import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSONObject;
+import com.vo.Content;
+import com.vo.MainImage;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -16,6 +18,7 @@ import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,7 +32,7 @@ public class JsonConnection {
     private JSONObject json;
 
 
-    public String getConnection(final String url, final  String method, final JSONObject json){
+    public static String getConnection(final String url, final  String method, final JSONObject json){
 
         String responseData = null;
         HttpURLConnection conn = null;
@@ -82,18 +85,33 @@ public class JsonConnection {
         return responseData;
     }
 
-    public List<Bitmap> getBitmap(final List imgs, final String url){
-        final List<Bitmap> bitmaps = null;
+    public static List<Bitmap> getBitmap(final List imgs, final String url){
+        final List<Bitmap> bitmaps = new ArrayList<Bitmap>();
         Thread thread2 = new Thread(){
             @Override
             public void run() {
                 super.run();
                 try {
-                    for (int i = 0; i < imgs.size(); i++) {
-                        Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL(url).getContent());
-                        bitmaps.add(bitmap);
-                        Log.i(TAG, "4. getBitmap bitmap= " + bitmap);
+                    //Content 타입일 때
+                    if(imgs.get(0) instanceof Content){
+                        for (int i = 0; i < imgs.size(); i++) {
+                            Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL(url+"/"+((Content)imgs.get(i)).getPhoto_file_name()).getContent());
+                            bitmaps.add(bitmap);
+                            Log.i(TAG, "4. getBitmap (Content)bitmap= " + bitmap);
+                        }
+
+                    //MainImage 타입일 때
+                    } else if (imgs.get(0) instanceof MainImage) {
+                        for (int i = 0; i < imgs.size(); i++) {
+                            Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL(url+"/"+((MainImage)imgs.get(i)).getImage_file_name()).getContent());
+                            bitmaps.add(bitmap);
+                            Log.i(TAG, "4. getBitmap (MainImage)bitmap= " + bitmap);
+                        }
+                    }else{
+                        Log.i(TAG, "Content도 아니고 MainImage도 아님요");
                     }
+
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

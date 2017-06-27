@@ -4,14 +4,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 
 import com.photovel.MainActivity;
 import com.photovel.R;
+
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,6 +27,7 @@ import com.photovel.http.Value;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -56,8 +62,23 @@ public class UserLogin extends FontActivity2 {
         setContentView(R.layout.activity_user_login);
         mContext = this;
 
+        //FacebookLogin 배경색을 java로 동적으로 함
+        LinearLayout facebookLayout = (LinearLayout) findViewById(R.id.FacebookLoginLayout);
+        GradientDrawable bgShape = (GradientDrawable)facebookLayout.getBackground();
+        int facebookColor = ContextCompat.getColor(this,R.color.facebookColor);
+        bgShape.setColor(facebookColor);
+
+        //KAKAO 배경색을 java로 동적으로 함
+        LinearLayout kakaoLayout = (LinearLayout) findViewById(R.id.kakaoLoginLayout);
+        GradientDrawable bgShape2 = (GradientDrawable)kakaoLayout.getBackground();
+        int kakaoColor = ContextCompat.getColor(this,R.color.kakaoColor);
+        bgShape2.setColor(kakaoColor);
+
         TextView emailIconView = (TextView)findViewById(R.id.emailIcon);
         TextView passIconView = (TextView)findViewById(R.id.passwordIcon);
+        TextView facebookView = (TextView)findViewById(R.id.fa_facebook_official);
+        TextView kakaoView = (TextView)findViewById(R.id.fa_commenting);
+
 
         emailText = (EditText) findViewById(R.id.emailText);
         passwordTextView = (EditText) findViewById(R.id.passwordText);
@@ -66,6 +87,8 @@ public class UserLogin extends FontActivity2 {
         Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
         emailIconView.setTypeface(fontAwesomeFont);
         passIconView.setTypeface(fontAwesomeFont);
+        facebookView.setTypeface(fontAwesomeFont);
+        kakaoView.setTypeface(fontAwesomeFont);
 
         Button loginButton = (Button) findViewById(R.id.loginButton);
         loginButton.setOnClickListener(new View.OnClickListener() {

@@ -26,5 +26,7 @@
     <string name="fa_transgender">&#xf224;</string>
     <string name="fa_times">&#xf00d;</string>
     <string name="fa_plus_circle">&#xf055;</string>
+    <string name="fa_facebook_official">&#xf230;</string>
+    <string name="fa_commenting">&#xf27a;</string>
 
 </resources>

@@ -43,4 +43,11 @@
     
     <!-- 투명 색상-->
     <color name="transparent">#00ff0000</color>
+
+    <!-- facebook 색상-->
+    <color name="facebookColor">#3B5998</color>
+    <!-- kakao 색상-->
+    <color name="kakaoColor">#FBE600</color>
+    <color name="kakaoIconColor">#3B1E1E</color>
+
 </resources>

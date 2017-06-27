@@ -176,7 +176,7 @@
         android:layout_marginLeft="30dp"
         android:layout_marginRight="30dp"
         android:layout_marginTop="20dp"
-        android:background="@drawable/button_round"
+        android:background="@drawable/layout_round"
         android:text="SignUp"
         android:textColor="@color/bgWhite" />
 
