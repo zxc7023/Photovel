@@ -6,7 +6,9 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
+import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -20,17 +22,24 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
+import android.view.DragEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.RelativeLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ViewFlipper;
 
+import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
 import com.alibaba.fastjson.JSON;
 import com.photovel.FontActivity2;
 import com.photovel.MainActivity;
@@ -56,7 +65,7 @@ import java.util.List;
 
 public class ContentSlideShowMain extends FontActivity2 implements NavigationView.OnNavigationItemSelectedListener {
     private SearchView searchView;
-    private static final String TAG = "AppPermission";
+    private static final String TAG = "ContentSlideShow";
     Toolbar toolbar;
 
     private RelativeLayout RldetailData;
@@ -74,6 +83,17 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
 
     private final String contentURL = Value.contentURL;
     private final String contentPhotoURL = Value.contentPhotoURL;
+
+    //은디수정
+    private ViewFlipper mViewFlipper;
+    private Context mContext;
+    int index;
+
+    RadioButton b1, b2, b3;//radio button for indicator
+    Button play, stop;
+    SeekBar slideSeekBar;
+    TextView tvCurrPage;
+    RoundCornerProgressBar rcpb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -190,6 +210,7 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
             }
             myDataset.add(content.getDetails().get(i));
         }
+
         tvContentLocation.setText(content.getDetails().get(content.getDetails().size()-1).getPhoto().getAddress());
         String from = new SimpleDateFormat("yyyy.MM.dd").format(content.getDetails().get(0).getPhoto().getPhoto_date());
         String to = new SimpleDateFormat("yyyy.MM.dd").format(content.getDetails().get(content.getDetails().size()-1).getPhoto().getPhoto_date());
@@ -224,6 +245,158 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
                 nsv.fullScroll(View.FOCUS_UP);
             }
         });
+
+        //find  view
+        mViewFlipper = (ViewFlipper) this.findViewById(R.id.view_flipper);
+        play = (Button) findViewById(R.id.play);
+        stop = (Button) findViewById(R.id.stop);
+
+        //SeekBar 찾아오기
+        slideSeekBar = (SeekBar) findViewById(R.id.slide_seek_bar);
+        //SeekBar 분할
+        //slideSeekBar.setMax(contentData.getDetails().size()-1);
+
+        //현재 페이지 표시할 TextView
+        tvCurrPage = (TextView)findViewById(R.id.tv_curr_page);
+
+        final long frameInterval = 1000;
+        final long maxTime = 30000;
+        final int totalTime = (int) (maxTime / frameInterval);
+        final int secPerFrame = totalTime / content.getDetails().size();
+
+
+        mViewFlipper.setFlipInterval(secPerFrame*1000);// set interval time
+
+        final Animation inFromLeft = AnimationUtils.loadAnimation(this, R.anim.in_from_left);
+        Animation outFromLeft = AnimationUtils.loadAnimation(this, R.anim.out_from_left);
+        mViewFlipper.setOutAnimation(outFromLeft);
+        mViewFlipper.setInAnimation(inFromLeft);//set  animatio style
+
+        MediaPlayer mp = new MediaPlayer();
+
+        for(int i=0 ; i < content.getDetails().size(); i++){
+            ImageView iView = new ImageView(this);
+            iView.setImageBitmap(content.getDetails().get(i).getPhoto().getBitmap());
+            mViewFlipper.addView(iView,mViewFlipper.getWidth(),mViewFlipper.getHeight());
+        }
+
+        rcpb = (RoundCornerProgressBar) findViewById(R.id.slide_progress_bar);
+        rcpb.setMax(content.getDetails().size());
+
+        final CountDownTimer cdt = new CountDownTimer(maxTime, frameInterval) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                Log.i(TAG, "onTick의 millisUntilFinished= " + millisUntilFinished);
+                /*int i = (int)(maxTime - millisUntilFinished);
+                slideSeekBar.setProgress(index);*/
+                int remainSeconds = (int)millisUntilFinished/1000;
+                int currSeconds = totalTime - remainSeconds;
+                index = currSeconds / secPerFrame;
+                slideSeekBar.setProgress(currSeconds);
+
+                //long seconds = TimeUnit.SECONDS.toSeconds(millisUntilFinished);
+                String result = String.format("%02d", 00) + ":"
+                        + String.format("%02d", currSeconds);
+
+                tvCurrPage.setText("현재 시간 : " + result);
+            }
+
+            @Override
+            public void onFinish() {
+
+            }
+        };
+
+        //slideSeekBar.setMax((int)TimeUnit.MILLISECONDS.toSeconds(maxTime));
+        slideSeekBar.setMax(totalTime);
+
+        //play  animation
+        play.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                play.setVisibility(View.INVISIBLE);
+                mViewFlipper.startFlipping();
+                cdt.start();
+            }
+        });
+
+        //stop animation
+        stop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                play.setVisibility(View.VISIBLE);
+                cdt.cancel();
+                mViewFlipper.stopFlipping();
+            }
+        });
+
+
+        //slideSeekBar.setAnimation();
+        //SeekBar의 Progress 진행 위한 Thread
+        new Thread(){
+            @Override
+            public void run() {
+                //ViewFlipper의 레이아웃이 변할 경우
+                mViewFlipper.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+                    @Override
+                    public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+
+                        //UI에 접근하기 위한 runOnUiThread 구현
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                //남은 시간 확인 위한 메소드
+
+                                //ViewFlipper의 자식 뷰의 인덱스 번호
+                                index = mViewFlipper.indexOfChild(mViewFlipper.getCurrentView());
+                                //index = (maxTime / interval) / myDataset.size()
+                                slideSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                                    @Override
+                                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                                        Log.i(TAG, "onProgressChanged의 progress= " + progress);
+                                        index = progress / secPerFrame;
+                                        Log.i(TAG, "onProgressChanged의 index= " + index);
+                                    }
+
+                                    @Override
+                                    public void onStartTrackingTouch(SeekBar seekBar) {
+                                        Log.i(TAG, "onStartTrackingTouch의 index= " + index);
+                                    }
+
+                                    @Override
+                                    public void onStopTrackingTouch(SeekBar seekBar) {
+                                        Log.i(TAG, "onStopTrackingTouch의 index= " + index);
+                                        index = seekBar.getProgress() / secPerFrame;
+                                        Log.i(TAG, "onStopTrackingTouch index= " + index);
+                                        mViewFlipper.setDisplayedChild(index);
+                                    }
+                                });
+
+                                slideSeekBar.setOnDragListener(new View.OnDragListener() {
+                                    @Override
+                                    public boolean onDrag(View v, DragEvent event) {
+                                        return false;
+                                    }
+                                });
+
+                                rcpb.setProgress(index);
+
+                               /* slideSeekBar.setProgress(index);
+                                tvCurrPage.setText("현재 페이지 : " + String.valueOf(index+1));*/
+                            }
+                        });
+                    }
+                });
+            }
+        }.start();
+
+        final Runtime runtime = Runtime.getRuntime();
+        final long usedMemInMB=(runtime.totalMemory() - runtime.freeMemory()) / 1048576L;
+        final long maxHeapSizeInMB=runtime.maxMemory() / 1048576L;
+        final long availHeapSizeInMB = maxHeapSizeInMB;
+        Log.i(TAG, "usedMemInMB= " + usedMemInMB);
+        Log.i(TAG, "maxHeapSizeInMB= " + maxHeapSizeInMB);
+        Log.i(TAG, "availHeapSizeInMB= " + availHeapSizeInMB);
     }
 
     //onClick
@@ -567,13 +740,9 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
                 super.run();
                 try {
                     for (int i = 0; i < content.getDetails().size(); i++) {
-                        //Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL("http://photovel.com/upload/" + content.getContent_id() + "/" + content.getDetails().get(i).getPhoto().getPhoto_file_name()).getContent());
-                        Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL(contentPhotoURL+ "/" + content.getContent_id() + "/" + content.getDetails().get(i).getPhoto().getPhoto_file_name()).getContent());
+                        Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL(contentPhotoURL+ "/" + content_id + "/" + content.getDetails().get(i).getPhoto().getPhoto_file_name()).getContent());
                         content.getDetails().get(i).getPhoto().setBitmap(bitmap);
-                        //File filePath = new File(Environment.getExternalStorageDirectory());
-                        //FileUtils.copyURLToFile(new URL("http://photovel.com/upload/" + contentData.getContent_id() + "/" + contentData.getDetails().get(i).getPhoto().getPhotoFileName()), );
                     }
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
