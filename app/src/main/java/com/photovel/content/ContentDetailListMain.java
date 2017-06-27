@@ -1,11 +1,9 @@
 package com.photovel.content;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -38,31 +36,17 @@ import android.widget.Toast;
 import com.alibaba.fastjson.JSON;
 import com.photovel.FontActivity2;
 import com.photovel.MainActivity;
-import com.photovel.MainNewAdapter;
-import com.photovel.MainRecommendAdapter;
 import com.photovel.NavigationItemSelected;
 import com.photovel.R;
+import com.photovel.http.JsonConnection;
 import com.photovel.http.Value;
 import com.vo.Comment;
 import com.vo.Content;
 import com.vo.ContentDetail;
-import com.vo.Photo;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -76,7 +60,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
     private ContentDetailListAdapter mAdapter;
 
     private RelativeLayout RldetailData;
-    private LinearLayout RLdetailDate, LLmenu, btnMoreUserContent;
+    private LinearLayout RLdetailDate, LLmenu, btnMoreUserContent, btnLike, btnComment;
     private TextView icglobe, icleft, icright, tvleft, tvright, iccal, icmarker, icpow, icthumb, iccomment, icshare, btnDetailMenu;
     private TextView tvContentInsertDate, tvContentSubject, tvContentLocation, tvUsername, tvUsername2, tvDuring, tvdetailcount, tvdetailstate, tvContent;
     private TextView tvLikeCount, tvCommentCount, tvShareCount;
@@ -87,9 +71,6 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
     private Content content;
     private int content_id=-1;
     private String user_id="";
-
-    private final String contentURL = Value.contentURL;
-    private final String contentPhotoURL = Value.contentPhotoURL;
 
     //comment
     private BottomSheetBehavior bottomSheetBehavior;
@@ -151,6 +132,9 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         btnLookLeft = (LinearLayout) findViewById(R.id.btnLookLeft);
         btnLookRight = (LinearLayout) findViewById(R.id.btnLookRight);
         btnMoreUserContent = (LinearLayout) findViewById(R.id.btnMoreUserContent);
+        btnLike = (LinearLayout) findViewById(R.id.btnLike);
+        btnComment = (LinearLayout) findViewById(R.id.btnComment);
+
 
         //imageView를 font로 바꿔주기
         final Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
@@ -179,22 +163,37 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         LLmenu.bringToFront();
         RldetailData.bringToFront();
 
-        //db에 있는 contentId별 content정보 받아오기
-        Thread thread1 = new Thread(){
+        //사진 스토리, 댓글 객체 받아오기
+        Thread detailList = new Thread(){
             @Override
             public void run() {
                 super.run();
-                content = getContentData(content_id);
+                String responseData = JsonConnection.getConnection(Value.contentURL+"/"+content_id, "GET", null);
+                content = JSON.parseObject(responseData, Content.class);
+                myDataset = content.getDetails();
                 myCommentDataset = content.getComments();
             }
         };
-        thread1.start();
+        detailList.start();
         try {
-            thread1.join();  //모든처리 thread처리 기다리기
+            detailList.join();  //모든처리 thread처리 기다리기
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        getImage(); //content Image받아오기
+        //content의 bitmap 받아오기
+        List<Content> tmpContent = new ArrayList<>();
+        tmpContent.add(content);
+        List<Bitmap> contentBitmaps = JsonConnection.getBitmap(tmpContent, Value.contentPhotoURL);
+        for(int i = 0; i < contentBitmaps.size(); i++){
+            tmpContent.get(i).setBitmap(contentBitmaps.get(i));
+        }
+
+        //사진 스토리 bitmap 받아오기
+        List<Bitmap> detailBitmaps = JsonConnection.getBitmap(myDataset, Value.contentPhotoURL);
+        for(int i = 0; i < myDataset.size(); i++){
+            myDataset.get(i).getPhoto().setBitmap(detailBitmaps.get(i));
+        }
+
 
         //content정보 추가하기
         tvdetailstate.setText("사진");
@@ -202,31 +201,34 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         tvContentSubject.setText(content.getContent_subject());
         tvUsername.setText(content.getUser().getUser_nick_name());
         tvUsername2.setText(content.getUser().getUser_nick_name());
-
         tvContent.setText(content.getContent());
         tvdetailcount.setText(String.valueOf(content.getDetails().size()));
         tvLikeCount.setText(String.valueOf(content.getGood_count()));
         tvCommentCount.setText(String.valueOf(content.getComment_count()));
         tvShareCount.setText(String.valueOf(content.getContent_share_count()));
 
-        myDataset = new ArrayList<>();
-        for(int i=0; i<content.getDetails().size(); i++){
-            Photo ph = new Photo();
-            ph.setPhoto_latitude(content.getDetails().get(i).getPhoto().getPhoto_latitude());
-            ph.setPhoto_longitude(content.getDetails().get(i).getPhoto().getPhoto_longitude());
 
-            GetCurrentAddress getAddress = new GetCurrentAddress();
-            String address = getAddress.getAddress(ph);
-            content.getDetails().get(i).getPhoto().setAddress(address);
-            if(content.getDetails().get(i).getPhoto().getPhoto_top_flag()==1){
-                ivTopPhoto.setImageBitmap(content.getDetails().get(i).getPhoto().getBitmap());
-            }
-            myDataset.add(content.getDetails().get(i));
-        }
-        tvContentLocation.setText(content.getDetails().get(content.getDetails().size()-1).getPhoto().getAddress());
-        String from = new SimpleDateFormat("yyyy.MM.dd").format(content.getDetails().get(0).getPhoto().getPhoto_date());
-        String to = new SimpleDateFormat("yyyy.MM.dd").format(content.getDetails().get(content.getDetails().size()-1).getPhoto().getPhoto_date());
+        //메인 사진 저장
+        ivTopPhoto.setImageBitmap(content.getBitmap());
+
+        //메인 위치 저장
+        GetCurrentAddress getAddress = new GetCurrentAddress();
+        String address = getAddress.getAddress(content.getPhoto_latitude(), content.getPhoto_longitude());
+        tvContentLocation.setText(address);
+
+        //메인 기간 저장
+        String from = new SimpleDateFormat("yyyy.MM.dd").format(content.getFr_photo_date());
+        String to = new SimpleDateFormat("yyyy.MM.dd").format(content.getTo_photo_date());
         tvDuring.setText(from+" ~ "+to);
+
+        //recycleview사용선언
+        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        mRecyclerView.setHasFixedSize(true);
+        mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setNestedScrollingEnabled(false);
+        mAdapter = new ContentDetailListAdapter(myDataset, ContentDetailListMain.this);
+        mRecyclerView.setAdapter(mAdapter);
 
         //comment
         RlComment = (RelativeLayout) findViewById(R.id.RlComment);
@@ -236,6 +238,15 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
 
         //Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
         btnBack.setTypeface(fontAwesomeFont);
+
+        //comment recycleview사용선언
+        RVComment = (RecyclerView) findViewById(R.id.RVComment);
+        RVComment.setHasFixedSize(true);
+        RVComment.setNestedScrollingEnabled(false);
+        mCommentLayoutManager = new LinearLayoutManager(this);
+        RVComment.setLayoutManager(mCommentLayoutManager);
+        mCommentAdapter = new CommentAdapter(myCommentDataset, ContentDetailListMain.this);
+        RVComment.setAdapter(mCommentAdapter);
 
         llBack.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -249,50 +260,14 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         if(intent.getIntExtra("comment_insert",-1) == 1){
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         }
-        bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
-            @Override
-            public void onStateChanged(@NonNull View bottomSheet, int newState) {
-                switch (newState) {
-                    case BottomSheetBehavior.STATE_EXPANDED:
-                        setTitle("댓글등록창");
-                        break;
 
-                    default:
-                        setTitle("Photovel");
-                        break;
-                }
-            }
-            @Override
-            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-
-            }
-        });
-
-        //recycleview사용선언
-        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        mRecyclerView.setHasFixedSize(true);
-        mLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.setNestedScrollingEnabled(false);
-        mAdapter = new ContentDetailListAdapter(myDataset, ContentDetailListMain.this);
-        mRecyclerView.setAdapter(mAdapter);
-
-        //comment
-        RVComment = (RecyclerView) findViewById(R.id.RVComment);
-        RVComment.setHasFixedSize(true);
-        RVComment.setNestedScrollingEnabled(false);
-        mCommentLayoutManager = new LinearLayoutManager(this);
-        RVComment.setLayoutManager(mCommentLayoutManager);
-        mCommentAdapter = new CommentAdapter(myCommentDataset, ContentDetailListMain.this);
-        RVComment.setAdapter(mCommentAdapter);
-
-
-        findViewById(R.id.btnComment).setOnClickListener(new View.OnClickListener() {
+        btnComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
             }
         });
+
         //코멘트 전송
         findViewById(R.id.btnCommentSubmit).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -309,49 +284,49 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
                 }
                 Log.i("1. comment", comment.toString());
 
-                final String url = Value.contentURL+"/"+content_id+"/comment";
-                Thread th = new Thread(new Runnable() {
+                Thread commentSend = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        HttpURLConnection conn = null;
-                        OutputStream dos = null;
-                        try {
-                            URL connectURL = new URL(url);
-                            Log.i("2. comment", url);
-                            conn = (HttpURLConnection) connectURL.openConnection();
-                            conn.setDoOutput(true);
-                            conn.setDoInput(true);
-                            conn.setRequestMethod("POST");
-                            conn.setRequestProperty("Connection", "Keep-Alive");
-                            conn.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
-                            dos = conn.getOutputStream();
-                            dos.write(comment.toString().getBytes());
-                            dos.flush();
-                            int responseCode = conn.getResponseCode();
-                            Log.i("3. comment", responseCode + "");
-
-                        } catch (MalformedURLException e) {
-                            e.printStackTrace();
-                        } catch (ProtocolException e) {
-                            e.printStackTrace();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+                        JsonConnection.getConnection(Value.contentURL+"/"+content_id+"/comment", "POST", comment);
                     }
                 });
-                th.start();
+                commentSend.start();
                 try {
-                    th.join();
+                    commentSend.join();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                //Toast.makeText(getApplicationContext(),"댓글달기성공",Toast.LENGTH_SHORT).show();
-                Intent cintent = new Intent(getApplicationContext(), ContentDetailListMain.class);
-                cintent.putExtra("content_id", content_id);
-                cintent.putExtra("comment_insert", 1);
-                cintent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
-                startActivity(cintent);
+                Intent intent = new Intent(getApplicationContext(), ContentDetailListMain.class);
+                intent.putExtra("content_id", content_id);
+                intent.putExtra("comment_insert", 1);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
+                startActivity(intent);
                 finish();
+            }
+        });
+
+        //좋아요 버튼
+        btnLike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final String id = "leeej9201@gmail.com";
+                Thread good = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        JsonConnection.getConnection(Value.contentURL+"/"+content_id+"/good/"+id, "POST", null);
+                    }
+                });
+                good.start();
+                try {
+                    good.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                Intent intent = new Intent(getApplicationContext(), ContentDetailListMain.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
+                intent.putExtra("content_id", content_id);
+                startActivity(intent);
+                Toast.makeText(getApplicationContext(),"좋아요 완료!",Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -460,53 +435,22 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
                                 new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        final String url = Value.contentURL+"/"+content_id;
-                                        Thread th = new Thread(new Runnable() {
+                                        Thread deleteContent = new Thread(new Runnable() {
                                             @Override
                                             public void run() {
-                                                DataOutputStream dos = null;
-                                                HttpURLConnection conn = null;
-                                                URL connectURL = null;
-                                                try {
-                                                    connectURL = new URL(url);
-
-                                                    conn = (HttpURLConnection) connectURL.openConnection();
-                                                    conn.setDoInput(true);
-                                                    conn.setDoOutput(true);
-                                                    conn.setUseCaches(false);
-                                                    conn.setRequestMethod("DELETE");
-
-                                                    int responseCode = conn.getResponseCode();
-                                                    Log.i("responseCode","삭제 : "+responseCode);
-
-                                                    switch (responseCode){
-                                                        case HttpURLConnection.HTTP_OK:
-                                                            Log.i("responseCode","삭제성공");
-                                                            break;
-                                                        default:
-                                                            Log.i("responseCode","삭제실패 responseCode: " +responseCode);
-                                                            break;
-                                                    }
-
-                                                } catch (MalformedURLException e) {
-                                                    e.printStackTrace();
-                                                } catch (ProtocolException e) {
-                                                    e.printStackTrace();
-                                                } catch (IOException e) {
-                                                    e.printStackTrace();
-                                                }
+                                                JsonConnection.getConnection(Value.contentURL+"/"+content_id, "DELETE", null);
                                             }
                                         });
-                                        th.start();
+                                        deleteContent.start();
                                         try {
-                                            th.join();
+                                            deleteContent.join();
                                         } catch (InterruptedException e) {
                                             e.printStackTrace();
                                         }
                                         Toast.makeText(getApplicationContext(),"삭제성공",Toast.LENGTH_SHORT).show();
-                                        Intent dintent = new Intent(getApplicationContext(), MainActivity.class);
-                                        dintent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
-                                        startActivity(dintent);
+                                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
+                                        startActivity(intent);
                                         finish();
                                     }
                                 }).setNegativeButton("취소",
@@ -525,41 +469,10 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
                                 new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        final String url = Value.contentURL+"/"+content_id+"/warning";
                                         Thread th = new Thread(new Runnable() {
                                             @Override
                                             public void run() {
-                                                DataOutputStream dos = null;
-                                                HttpURLConnection conn = null;
-                                                URL connectURL = null;
-                                                try {
-                                                    connectURL = new URL(url);
-
-                                                    conn = (HttpURLConnection) connectURL.openConnection();
-                                                    conn.setDoInput(true);
-                                                    conn.setDoOutput(true);
-                                                    conn.setUseCaches(false);
-                                                    conn.setRequestMethod("POST");
-
-                                                    int responseCode = conn.getResponseCode();
-                                                    Log.i("responseCode","신고 : "+responseCode);
-
-                                                    switch (responseCode){
-                                                        case HttpURLConnection.HTTP_OK:
-                                                            Log.i("responseCode","신고성공");
-                                                            break;
-                                                        default:
-                                                            Log.i("responseCode","신고실패 responseCode: " +responseCode);
-                                                            break;
-                                                    }
-
-                                                } catch (MalformedURLException e) {
-                                                    e.printStackTrace();
-                                                } catch (ProtocolException e) {
-                                                    e.printStackTrace();
-                                                } catch (IOException e) {
-                                                    e.printStackTrace();
-                                                }
+                                                JsonConnection.getConnection(Value.contentURL+"/"+content_id+"/warning", "POST", null);
                                             }
                                         });
                                         th.start();
@@ -569,9 +482,9 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
                                             e.printStackTrace();
                                         }
                                         Toast.makeText(getApplicationContext(),"신고성공",Toast.LENGTH_SHORT).show();
-                                        Intent wintent = new Intent(getApplicationContext(), MainActivity.class);
-                                        wintent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
-                                        startActivity(wintent);
+                                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
+                                        startActivity(intent);
                                         finish();
                                     }
                                 }).setNegativeButton("취소",
@@ -658,113 +571,6 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
             }
         });
         return true;
-    }
-
-    //DB에서 content정보 받아오기
-    public Content getContentData(int id){
-        Content content = null;
-        HttpURLConnection conn = null;
-        Log.i(TAG, "getPhotoData의 id= " + id);
-
-        String qry = contentURL+"/" + id;
-        Log.i(TAG, "1.getPhotoData의 qry= " + qry);
-
-        try {
-            URL strUrl = new URL(qry);
-            conn = (HttpURLConnection) strUrl.openConnection();
-            conn.setDoInput(true);//서버로부터 결과값을 응답받음
-            //conn.setDoOutput(true);//서버로 값을 출력. GET방식의 경우 이 설정을 하면 405에러가 난다. 왜???
-            //conn.connect();
-            conn.setRequestMethod("GET");
-            Log.i(TAG, "2.getPhotoData의 qry= " + qry);
-            /*
-            OutputStream os = conn.getOutputStream();
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-            // bw.write(id);
-
-            bw.flush();
-            bw.close();*/
-
-            final int responseCode = conn.getResponseCode(); //정상인 경우 200번, 그 외 오류있는 경우 오류 번호 반환
-            Log.i(TAG, "getPhotoData의 responseCode= " + responseCode);
-            switch (responseCode){
-                case HttpURLConnection.HTTP_OK:
-
-                    InputStream is = conn.getInputStream();
-                    Reader reader = new InputStreamReader(is, "UTF-8");
-                    BufferedReader br = new BufferedReader(reader);
-                    // while(br.read() != -1 ){
-                    String responseData = null;
-
-                    responseData = br.readLine();
-                    Log.i(TAG, "getPhotoData의 response data= " + responseData);
-
-                    content = JSON.parseObject(responseData, Content.class);
-
-                    br.close();
-                    reader.close();
-                    is.close();
-
-                    break;
-                case HttpURLConnection.HTTP_NOT_FOUND:
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getApplicationContext(), "페이지를 찾을 수 없습니다.", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-
-                    break;
-                default:
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getApplicationContext(), "response code: " + responseCode, Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                    break;
-            }
-
-            return content;
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-
-            conn.disconnect();
-        }
-
-        return null;
-    }
-
-    //DB에서 bitmap정보 받아오기
-    public void getImage(){
-        Thread thread2 = new Thread(){
-            @Override
-            public void run() {
-                super.run();
-                try {
-                    for (int i = 0; i < content.getDetails().size(); i++) {
-                        //Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL("http://photovel.com/upload/" + content.getContent_id() + "/" + content.getDetails().get(i).getPhoto().getPhoto_file_name()).getContent());
-                        Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL(contentPhotoURL+ "/" + content.getContent_id() + "/" + content.getDetails().get(i).getPhoto().getPhoto_file_name()).getContent());
-                        content.getDetails().get(i).getPhoto().setBitmap(bitmap);
-                        //File filePath = new File(Environment.getExternalStorageDirectory());
-                        //FileUtils.copyURLToFile(new URL("http://photovel.com/upload/" + contentData.getContent_id() + "/" + contentData.getDetails().get(i).getPhoto().getPhotoFileName()), );
-                    }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        thread2.start();
-        try {
-            thread2.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
     }
 
     //Android BackButton EventListener

@@ -1,28 +1,17 @@
 package com.photovel.content;
 
-import android.app.Activity;
-import android.app.DatePickerDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.photovel.R;
 import com.vo.ContentDetail;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -120,7 +109,9 @@ public class ContentDetailListAdapter extends RecyclerView.Adapter<ContentDetail
 
         //위치
         //Log.i("ddd address",mDataset.get(position).getPhoto().getAddress()+"");
-        holder.tvLocation.setText(mDataset.get(position).getPhoto().getAddress());
+        GetCurrentAddress getAddress = new GetCurrentAddress();
+        String address = getAddress.getAddress(mDataset.get(position).getPhoto().getPhoto_latitude(), mDataset.get(position).getPhoto().getPhoto_longitude());
+        holder.tvLocation.setText(address);
 
         //컨텐츠
         holder.tvDetailContent.setText(mDataset.get(position).getDetail_content());
