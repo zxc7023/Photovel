@@ -37,7 +37,6 @@
         <activity android:name=".FontActivity" />
         <activity android:name=".FontActivity2" />
         <activity android:name=".content.ContentClusterMain" android:theme="@style/AppTheme.NoActionBar"/>
-        <activity android:name=".content.ContentCluster" />
         <activity android:name=".content.ContentInsertMain" />
         <activity android:name=".content.ContentInsertGoogleMap" />
         <activity android:name=".content.ContentUpdateMain" />
