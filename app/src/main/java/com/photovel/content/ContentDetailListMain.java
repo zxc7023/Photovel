@@ -52,7 +52,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ContentDetailListMain extends FontActivity2 implements NavigationView.OnNavigationItemSelectedListener {
-    private SearchView searchView;
     private static final String TAG = "AppPermission";
     Toolbar toolbar;
     private RecyclerView mRecyclerView;
@@ -330,13 +329,13 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
             }
         });
 
-
+        //toolbar
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
+        //메뉴 navigationView
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         View hView =  navigationView.getHeaderView(0);
         TextView btnContentInsert = (TextView)hView.findViewById(R.id.btnContentInsert);
@@ -345,6 +344,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), ContentInsertMain.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 getApplicationContext().startActivity(intent);
             }
         });
@@ -378,6 +378,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
             }
         });
 
+        //user_content 더보기 버튼
         btnMoreUserContent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -389,28 +390,28 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
                 finish();
             }
         });
-    }
 
-    //onClick
-    public void goLook(View v){
-        switch (v.getId()){
-            case R.id.btnLookLeft:
-                Toast.makeText(getApplicationContext(),"지도로보기",Toast.LENGTH_SHORT).show();
-                Log.i("ddd","지도로 보기 클릭");
-                Intent intent=new Intent(this, ContentClusterMain.class);
+        //지도로보기 버튼
+        btnLookLeft.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent=new Intent(getApplicationContext(), ContentClusterMain.class);
                 intent.putExtra("content_id",content_id);
-                this.startActivity(intent);
+                startActivity(intent);
                 finish();
-                break;
-            case R.id.btnLookRight:
-                Toast.makeText(getApplicationContext(),"슬라이드로보기",Toast.LENGTH_SHORT).show();
-                Intent intent2=new Intent(this, ContentSlideShowMain.class);
+            }
+        });
+
+        //슬라이드로보기 버튼
+        btnLookRight.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent2=new Intent(getApplicationContext(), ContentSlideShowMain.class);
                 intent2.putExtra("content_id",content_id);
-                this.startActivity(intent2);
-                Log.i("ddd","슬라이드로 보기 클릭");
+                startActivity(intent2);
                 finish();
-                break;
-        }
+            }
+        });
     }
 
     //디테일 설정 메뉴클릭시
@@ -548,6 +549,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         ns.selected(id, getApplicationContext());
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
+        finish();
         return true;
     }
 

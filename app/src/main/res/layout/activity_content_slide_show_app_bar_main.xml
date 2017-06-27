@@ -47,7 +47,8 @@
             <include
                 layout="@layout/activity_content_slide_show"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                class="com.photovel.content.ContentSlideShow"/>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

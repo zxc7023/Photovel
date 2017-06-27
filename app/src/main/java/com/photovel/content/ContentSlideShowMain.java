@@ -341,13 +341,14 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
             }
         });
 
-
+        //toolbar
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
+        //메뉴 navigationView
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         View hView =  navigationView.getHeaderView(0);
         TextView btnContentInsert = (TextView)hView.findViewById(R.id.btnContentInsert);
@@ -356,6 +357,7 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), ContentInsertMain.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 getApplicationContext().startActivity(intent);
             }
         });
@@ -369,23 +371,25 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         });
         navigationView.setNavigationItemSelectedListener(this);
 
-        //top버튼
-        btnTop = (FloatingActionButton) findViewById(R.id.btnTop);
-        final NestedScrollView nsv = (NestedScrollView) findViewById(R.id.nestedScrollView);
-        nsv.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {   //스크롤내리면 보이게
-            @Override
-            public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-                if (oldScrollY > 200) {
-                    btnTop.show();
-                } else {
-                    btnTop.hide();
-                }
-            }
-        });
-        btnTop.setOnClickListener(new View.OnClickListener() {  //top으로 이동
+        //사진으로보기 버튼
+        btnLookLeft.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                nsv.fullScroll(View.FOCUS_UP);
+                Intent intent=new Intent(getApplicationContext(), ContentDetailListMain.class);
+                intent.putExtra("content_id",content_id);
+                startActivity(intent);
+                finish();
+            }
+        });
+
+        //지도로보기 버튼
+        btnLookRight.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent2=new Intent(getApplicationContext(), ContentClusterMain.class);
+                intent2.putExtra("content_id",content_id);
+                startActivity(intent2);
+                finish();
             }
         });
 
@@ -542,24 +546,6 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         Log.i(TAG, "availHeapSizeInMB= " + availHeapSizeInMB);
     }
 
-    //onClick
-    public void goLook(View v){
-        switch (v.getId()){
-            case R.id.btnLookLeft:
-                Intent intent=new Intent(this, ContentDetailListMain.class);
-                intent.putExtra("content_id",content_id);
-                this.startActivity(intent);
-                finish();
-                break;
-            case R.id.btnLookRight:
-                Intent intent2=new Intent(this, ContentClusterMain.class);
-                intent2.putExtra("content_id",content_id);
-                this.startActivity(intent2);
-                finish();
-                break;
-        }
-    }
-
     //디테일 설정 메뉴클릭시
     public void ContentMenuClick(View v){
         Context wrapper = new ContextThemeWrapper(this, R.style.MenuStyle);
@@ -695,6 +681,7 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         ns.selected(id, getApplicationContext());
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
+        finish();
         return true;
     }
 

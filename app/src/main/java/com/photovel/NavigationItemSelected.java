@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import com.photovel.content.ContentListMain;
 import com.photovel.http.Value;
+import com.photovel.setting.SettingMain;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -61,7 +62,10 @@ public class NavigationItemSelected extends FontActivity{
             context.startActivity(intent);
             finish();
         }else if(id==R.id.nav_setting){
-
+            intent = new Intent(context, SettingMain.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
+            finish();
         }else if(id==R.id.nav_qna){
 
         }else if(id==R.id.nav_howto){
