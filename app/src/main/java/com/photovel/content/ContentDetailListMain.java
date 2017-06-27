@@ -1,5 +1,6 @@
 package com.photovel.content;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -39,6 +40,7 @@ import com.photovel.FontActivity2;
 import com.photovel.MainActivity;
 import com.photovel.MainNewAdapter;
 import com.photovel.MainRecommendAdapter;
+import com.photovel.NavigationItemSelected;
 import com.photovel.R;
 import com.photovel.http.Value;
 import com.vo.Comment;
@@ -76,7 +78,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
     private RelativeLayout RldetailData;
     private LinearLayout RLdetailDate, LLmenu, btnMoreUserContent;
     private TextView icglobe, icleft, icright, tvleft, tvright, iccal, icmarker, icpow, icthumb, iccomment, icshare, btnDetailMenu;
-    private TextView tvContentInsertDate, tvContentSubject, tvContentLocation, tvUsername, tvDuring, tvdetailcount, tvdetailstate, tvContent;
+    private TextView tvContentInsertDate, tvContentSubject, tvContentLocation, tvUsername, tvUsername2, tvDuring, tvdetailcount, tvdetailstate, tvContent;
     private TextView tvLikeCount, tvCommentCount, tvShareCount;
     private LinearLayout btnLookLeft, btnLookRight;
     private ImageView ivTopPhoto;
@@ -135,6 +137,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         tvContentSubject = (TextView) findViewById(R.id.tvContentSubject);           //컨텐트 제목
         tvContentLocation = (TextView) findViewById(R.id.tvContentLocation);        //컨텐트 위치(마지막)
         tvUsername = (TextView) findViewById(R.id.tvUsername);                        //유저 네임
+        tvUsername2 = (TextView) findViewById(R.id.tvUsername2);                        //유저 네임
         tvDuring = (TextView) findViewById(R.id.tvDuring);                             //컨텐트 날짜첫날 ~ 날짜 끝날(2016.04.20 ~ 2016.06.20)
         tvdetailstate = (TextView) findViewById(R.id.tvdetailstate);                  //보고있는 화면 상태(사진/동영상/지도)
         tvContent = (TextView) findViewById(R.id.tvContent);                            //컨텐트 내용
@@ -198,6 +201,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         tvContentInsertDate.setText(new SimpleDateFormat("yyyy.MM.dd").format(content.getContent_written_date()));
         tvContentSubject.setText(content.getContent_subject());
         tvUsername.setText(content.getUser().getUser_nick_name());
+        tvUsername2.setText(content.getUser().getUser_nick_name());
 
         tvContent.setText(content.getContent());
         tvdetailcount.setText(String.valueOf(content.getDetails().size()));
@@ -359,18 +363,25 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+        View hView =  navigationView.getHeaderView(0);
+        TextView btnContentInsert = (TextView)hView.findViewById(R.id.btnContentInsert);
+        btnContentInsert.setTypeface(fontAwesomeFont);
+        btnContentInsert.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.getItemId()){
-                    case R.id.btnContentInsert :
-                        Toast.makeText(ContentDetailListMain.this,"여기",Toast.LENGTH_SHORT).show();
-                        TextView btnContentInsert = (TextView) findViewById(R.id.btnContentInsert);
-                        btnContentInsert.setTypeface(fontAwesomeFont);
-                }
-                return false;
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), ContentInsertMain.class);
+                getApplicationContext().startActivity(intent);
             }
         });
+        TextView tvProfileUpdate = (TextView)hView.findViewById(R.id.tvProfileUpdate);
+        tvProfileUpdate.setTypeface(fontAwesomeFont);
+        tvProfileUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getApplicationContext(),"프로필변경클릭",Toast.LENGTH_SHORT).show();
+            }
+        });
+        navigationView.setNavigationItemSelectedListener(this);
 
         //top버튼
         btnTop = (FloatingActionButton) findViewById(R.id.btnTop);
@@ -398,6 +409,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
                 Intent dintent = new Intent(getApplicationContext(), ContentListMain.class);
                 user_id = content.getUser().getUser_id();
                 dintent.putExtra("user_id",user_id);
+                dintent.putExtra("urlflag","");
                 getApplicationContext().startActivity(dintent);
                 finish();
             }
@@ -597,8 +609,6 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         popup.show();
     }
 
-
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -614,28 +624,13 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         return super.onOptionsItemSelected(item);
     }
 
+    //툴바 메뉴 클릭 시
     @Override
     @NonNull
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
         int id = item.getItemId();
-/*
-
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }
-*/
-
+        NavigationItemSelected ns = new NavigationItemSelected();
+        ns.selected(id, getApplicationContext());
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;

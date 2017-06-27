@@ -7,21 +7,11 @@
             android:icon="@drawable/ic_menu_camera"
             android:title="HOME" />
         <item
-            android:id="@+id/nav_all_story"
-            android:icon="@drawable/ic_menu_gallery"
+            android:id="@+id/nav_new_story"
             android:title="전체 스토리" />
         <item
-            android:id="@+id/nav_new_story"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="신규 스토리" />
-        <item
             android:id="@+id/nav_hot_story"
-            android:icon="@drawable/ic_menu_slideshow"
             android:title="인기 스토리" />
-        <item
-            android:id="@+id/nav_recommend_story"
-            android:icon="@drawable/ic_menu_share"
-            android:title="추천 스토리" />
     </group>
 
     <item android:title="General">

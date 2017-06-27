@@ -15,17 +15,11 @@
             android:id="@+id/nav_book_mark"
             android:title="북마크" />
         <item
-            android:id="@+id/nav_all_story"
-            android:title="전체 스토리" />
-        <item
             android:id="@+id/nav_new_story"
-            android:title="신규 스토리" />
+            android:title="전체 스토리" />
         <item
             android:id="@+id/nav_hot_story"
             android:title="인기 스토리" />
-        <item
-            android:id="@+id/nav_recommend_story"
-            android:title="추천 스토리" />
     </group>
 
     <item android:title="General">
