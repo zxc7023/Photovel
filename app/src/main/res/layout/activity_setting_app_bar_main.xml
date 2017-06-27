@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.photovel.content.ContentSlideShowMain">
+    tools:context="com.photovel.setting.SettingMain">
     <android.support.design.widget.AppBarLayout
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
@@ -18,7 +18,7 @@
             android:fitsSystemWindows="true"
             app:titleEnabled="false">
             <android.support.v7.widget.Toolbar
-                android:id="@+id/slideToolbar"
+                android:id="@+id/settingToolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:background="?attr/colorPrimary"
@@ -28,60 +28,69 @@
                 app:popupTheme="@style/AppTheme.PopupOverlay" />
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
+
     <android.support.v4.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/bgGrey"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        app:font="normal"
         android:fillViewport="true"
-        android:id="@+id/nestedScrollView">
+        app:font="normal"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:background="@color/bgprofileBeige">
+            android:background="@color/bgprofileBeige"
+            android:orientation="vertical">
+
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
+
                 <RelativeLayout
                     android:id="@+id/RLSettingTop"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginTop="20dp">
+                    android:layout_marginTop="20dp"
+                    android:orientation="vertical">
+
                     <com.mikhaellopez.circularimageview.CircularImageView
                         android:id="@+id/userProfile"
                         android:layout_width="100dp"
                         android:layout_height="100dp"
-                        android:src="@drawable/ic_profile_circle"
-                        app:civ_border_width="1dp"
-                        android:gravity="center"
+                        android:layout_centerHorizontal="true"
                         android:layout_marginRight="5dp"
-                        android:layout_centerHorizontal="true" />
+                        android:gravity="center"
+                        android:src="@drawable/ic_profile_circle"
+                        app:civ_border_width="1dp" />
+
                     <TextView
                         android:id="@+id/userProfileUpdate"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="프로필 사진 편집"
-                        android:textSize="20dp"
-                        android:textColor="@color/bgDarkGrey"
+                        android:layout_below="@+id/userProfile"
                         android:layout_centerHorizontal="true"
-                        android:layout_below="@+id/userProfile"/>
+                        android:text="프로필 사진 편집"
+                        android:textColor="@color/bgDarkGrey"
+                        android:textSize="@dimen/content_point_text__size" />
+
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true">
                         <Button
-                            android:layout_width="80dp"
-                            android:layout_height="50dp"
-                            android:text="확인"
-                            android:textColor="@color/bgWhite"
+                            android:id="@+id/btnSettingUpdate"
+                            android:layout_width="60dp"
+                            android:layout_height="40dp"
+                            android:layout_marginRight="@dimen/most_rignt_tv_margin"
                             android:background="@drawable/xml_border3"
-                            android:layout_marginRight="@dimen/most_rignt_tv_margin"/>
+                            android:text="확인"
+                            android:textColor="@color/bgWhite" />
                     </LinearLayout>
                 </RelativeLayout>
+
                 <LinearLayout
                     android:id="@+id/llline1"
                     android:layout_width="match_parent"
@@ -90,109 +99,128 @@
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:layout_centerInParent="true"
                         android:layout_alignParentEnd="true"
-                        android:background="@color/bgDarkGrey"
-                        android:layout_marginTop="20dp"
-                        android:layout_marginBottom="20dp"
+                        android:layout_centerInParent="true"
+                        android:layout_marginBottom="15dp"
+                        android:layout_marginLeft="@dimen/most_left_tv_margin"
                         android:layout_marginRight="@dimen/most_rignt_tv_margin"
-                        android:layout_marginLeft="@dimen/most_left_tv_margin"/>
+                        android:layout_marginTop="15dp"
+                        android:background="@color/bgGrey2" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:id="@+id/lluserInfo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/llline1"
-                    android:orientation="vertical"
                     android:layout_marginLeft="@dimen/most_left_tv_margin"
-                    android:layout_marginRight="@dimen/most_rignt_tv_margin">
+                    android:layout_marginRight="@dimen/most_rignt_tv_margin"
+                    android:orientation="vertical">
+
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="40dp"
+                        android:layout_height="50dp"
                         android:gravity="center_vertical">
                         <TextView
                             android:layout_width="100dp"
                             android:layout_height="wrap_content"
                             android:text="ID"
-                            android:textSize="@dimen/content_text_size"
-                            android:textColor="@color/bgDarkGrey"/>
+                            android:textColor="@color/bgDarkGrey"
+                            android:textSize="@dimen/content_text_size" />
                         <TextView
+                            android:id="@+id/tvUserID"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="userID"
-                            android:textSize="@dimen/content_text_size"
-                            android:textColor="@color/textGrey"/>
+                            android:textColor="@color/textGrey"
+                            android:textSize="@dimen/content_text_size" />
                     </LinearLayout>
+
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="40dp"
+                        android:layout_height="50dp"
                         android:gravity="center_vertical">
                         <TextView
                             android:layout_width="100dp"
                             android:layout_height="wrap_content"
                             android:text="닉네임"
-                            android:textSize="@dimen/content_text_size"
-                            android:textColor="@color/bgDarkGrey"/>
+                            android:textColor="@color/bgDarkGrey"
+                            android:textSize="@dimen/content_text_size" />
                         <TextView
+                            android:id="@+id/tvpen1"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/fa_icon_pen"
+                            android:textColor="@color/textBlue"
                             android:textSize="@dimen/icon_size"
-                            android:textColor="@color/textBlue"/>
+                            android:layout_marginRight="@dimen/between_tv_margin"/>
                         <EditText
+                            android:id="@+id/etUserNickName"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:background="@color/bgprofileBeige"
                             android:text="user Nick Name"
-                            android:textSize="@dimen/content_text_size"
-                            android:textColor="@color/textGrey"/>
+                            android:textColor="@color/textGrey"
+                            android:textSize="@dimen/content_text_size" />
                     </LinearLayout>
+
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="40dp"
+                        android:layout_height="50dp"
                         android:gravity="center_vertical">
                         <TextView
                             android:layout_width="100dp"
                             android:layout_height="wrap_content"
                             android:text="PASSWORD"
-                            android:textSize="@dimen/content_text_size"
-                            android:textColor="@color/bgDarkGrey"/>
+                            android:textColor="@color/bgDarkGrey"
+                            android:textSize="@dimen/content_text_size" />
                         <TextView
+                            android:id="@+id/tvpen2"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/fa_icon_pen"
+                            android:textColor="@color/textBlue"
                             android:textSize="@dimen/icon_size"
-                            android:textColor="@color/textBlue"/>
+                            android:layout_marginRight="@dimen/between_tv_margin"/>
                         <EditText
+                            android:id="@+id/etUserPassword"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:background="@color/bgprofileBeige"
                             android:text="user password"
-                            android:textSize="@dimen/content_text_size"
-                            android:textColor="@color/textGrey"/>
+                            android:textColor="@color/textGrey"
+                            android:textSize="@dimen/content_text_size" />
                     </LinearLayout>
+
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="40dp"
+                        android:layout_height="50dp"
                         android:gravity="center_vertical">
                         <TextView
                             android:layout_width="100dp"
                             android:layout_height="wrap_content"
                             android:text="전화번호"
-                            android:textSize="@dimen/content_text_size"
-                            android:textColor="@color/bgDarkGrey"/>
+                            android:textColor="@color/bgDarkGrey"
+                            android:textSize="@dimen/content_text_size" />
                         <TextView
+                            android:id="@+id/tvpen3"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/fa_icon_pen"
+                            android:textColor="@color/textBlue"
                             android:textSize="@dimen/icon_size"
-                            android:textColor="@color/textBlue"/>
+                            android:layout_marginRight="@dimen/between_tv_margin"/>
                         <EditText
+                            android:id="@+id/etUserPhone"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:background="@color/bgprofileBeige"
                             android:text="user phone"
-                            android:textSize="@dimen/content_text_size"
-                            android:textColor="@color/textGrey"/>
+                            android:textColor="@color/textGrey"
+                            android:textSize="@dimen/content_text_size" />
                     </LinearLayout>
                 </LinearLayout>
+
                 <LinearLayout
                     android:id="@+id/llline2"
                     android:layout_width="match_parent"
@@ -201,47 +229,55 @@
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:layout_centerInParent="true"
                         android:layout_alignParentEnd="true"
-                        android:background="@color/bgDarkGrey"
-                        android:layout_marginTop="20dp"
-                        android:layout_marginBottom="20dp"
+                        android:layout_centerInParent="true"
+                        android:layout_marginBottom="15dp"
+                        android:layout_marginLeft="@dimen/most_left_tv_margin"
                         android:layout_marginRight="@dimen/most_rignt_tv_margin"
-                        android:layout_marginLeft="@dimen/most_left_tv_margin"/>
+                        android:layout_marginTop="15dp"
+                        android:background="@color/bgGrey2" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:id="@+id/lluserfriend"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/llline2"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
                     android:layout_marginLeft="@dimen/most_left_tv_margin"
-                    android:layout_marginRight="@dimen/most_rignt_tv_margin">
+                    android:layout_marginRight="@dimen/most_rignt_tv_margin"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
                     <TextView
                         android:layout_width="100dp"
                         android:layout_height="wrap_content"
                         android:text="내친구"
-                        android:textSize="@dimen/content_text_size"
-                        android:textColor="@color/bgDarkGrey"/>
+                        android:textColor="@color/bgDarkGrey"
+                        android:textSize="@dimen/content_text_size" />
+
                     <TextView
+                        android:id="@+id/tvUserFriendCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="userfriendCount"
-                        android:textSize="@dimen/content_text_size"
-                        android:textColor="@color/textGrey"/>
+                        android:textColor="@color/textGrey"
+                        android:textSize="@dimen/content_text_size" />
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="right">
+
                         <Button
-                            android:layout_width="80dp"
-                            android:layout_height="50dp"
+                            android:id="@+id/btnUserFriendGo"
+                            android:layout_width="60dp"
+                            android:layout_height="40dp"
+                            android:background="@drawable/xml_border3"
                             android:text="go"
-                            android:textColor="@color/bgWhite"
-                            android:background="@drawable/xml_border3" />
+                            android:textColor="@color/bgWhite" />
                     </LinearLayout>
                 </LinearLayout>
+
                 <LinearLayout
                     android:id="@+id/llline3"
                     android:layout_width="match_parent"
@@ -250,66 +286,77 @@
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:layout_centerInParent="true"
                         android:layout_alignParentEnd="true"
-                        android:background="@color/bgDarkGrey"
-                        android:layout_marginTop="20dp"
-                        android:layout_marginBottom="20dp"
+                        android:layout_centerInParent="true"
+                        android:layout_marginBottom="15dp"
+                        android:layout_marginLeft="@dimen/most_left_tv_margin"
                         android:layout_marginRight="@dimen/most_rignt_tv_margin"
-                        android:layout_marginLeft="@dimen/most_left_tv_margin"/>
+                        android:layout_marginTop="15dp"
+                        android:background="@color/bgGrey2" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:id="@+id/lluserflag"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/llline3"
-                    android:orientation="vertical"
                     android:layout_marginLeft="@dimen/most_left_tv_margin"
-                    android:layout_marginRight="@dimen/most_rignt_tv_margin">
+                    android:layout_marginRight="@dimen/most_rignt_tv_margin"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="15dp">
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:gravity="center">
+
                         <TextView
                             android:layout_width="100dp"
                             android:layout_height="wrap_content"
                             android:text="친구추천 허용"
-                            android:textSize="@dimen/content_text_size"
-                            android:textColor="@color/bgDarkGrey"/>
+                            android:textColor="@color/bgDarkGrey"
+                            android:textSize="@dimen/content_text_size" />
+
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="right">
+
                             <Switch
                                 android:id="@+id/userfriendRecommendflag"
                                 android:layout_width="80dp"
                                 android:layout_height="50dp"
-                                android:track="@drawable/switch_track_selector"
-                                android:thumb="@drawable/switch_thumb_selector" />
+                                android:thumb="@drawable/switch_thumb_selector"
+                                android:track="@drawable/switch_track_selector" />
                         </LinearLayout>
                     </LinearLayout>
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:gravity="center">
+
                         <TextView
                             android:layout_width="100dp"
                             android:layout_height="wrap_content"
                             android:text="친구검색 허용"
-                            android:textSize="@dimen/content_text_size"
-                            android:textColor="@color/bgDarkGrey"/>
+                            android:textColor="@color/bgDarkGrey"
+                            android:textSize="@dimen/content_text_size" />
+
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="right">
+
                             <Switch
                                 android:id="@+id/userfriendSearchflag"
                                 android:layout_width="80dp"
                                 android:layout_height="50dp"
-                                android:track="@drawable/switch_track_selector"
-                                android:thumb="@drawable/switch_thumb_selector" />
+                                android:thumb="@drawable/switch_thumb_selector"
+                                android:track="@drawable/switch_track_selector" />
                         </LinearLayout>
                     </LinearLayout>
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
@@ -318,8 +365,8 @@
                             android:layout_width="100dp"
                             android:layout_height="wrap_content"
                             android:text="피드백 알림 허용"
-                            android:textSize="@dimen/content_text_size"
-                            android:textColor="@color/bgDarkGrey"/>
+                            android:textColor="@color/bgDarkGrey"
+                            android:textSize="@dimen/content_text_size" />
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -328,8 +375,8 @@
                                 android:id="@+id/userfeedflag"
                                 android:layout_width="80dp"
                                 android:layout_height="50dp"
-                                android:track="@drawable/switch_track_selector"
-                                android:thumb="@drawable/switch_thumb_selector" />
+                                android:thumb="@drawable/switch_thumb_selector"
+                                android:track="@drawable/switch_track_selector" />
                         </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>

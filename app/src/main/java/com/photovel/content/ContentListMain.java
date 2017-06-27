@@ -30,6 +30,7 @@ import android.widget.Toast;
 import com.alibaba.fastjson.JSON;
 import com.photovel.FontActivity;
 import com.photovel.FontActivity2;
+import com.photovel.MainActivity;
 import com.photovel.NavigationItemSelected;
 import com.photovel.R;
 import com.photovel.http.JsonConnection;
@@ -205,6 +206,7 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
         ns.selected(id, getApplicationContext());
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
+        finish();
         return true;
     }
 
@@ -212,5 +214,16 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.other_toolbar, menu);
         return true;
+    }
+
+    //Android BackButton EventListener
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
     }
 }

@@ -5,37 +5,62 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
-import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.DragEvent;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
+import com.photovel.R;
+
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
 import com.alibaba.fastjson.JSON;
-import com.photovel.R;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.vo.Content;
 import com.vo.ContentDetail;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.EOFException;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.acl.Group;
+import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 public class ContentSlideShow extends AppCompatActivity {
     private ViewFlipper mViewFlipper;
@@ -43,7 +68,7 @@ public class ContentSlideShow extends AppCompatActivity {
     int index;
 
 
-    private static final String TAG = "ContentSlideShow";
+    private static final String TAG = "SlideShow";
 
     RadioButton b1, b2, b3;//radio button for indicator
     Button play, stop;
@@ -321,7 +346,7 @@ public class ContentSlideShow extends AppCompatActivity {
         for(int i=0, size=contentData.getDetails().size(); i<size; i++){
             ImageView iView = new ImageView(this);
             iView.setImageBitmap(contentData.getDetails().get(i).getPhoto().getBitmap());
-            mViewFlipper.addView(iView,mViewFlipper.getWidth(),mViewFlipper.getHeight());
+            mViewFlipper.addView(iView);
         }
     }
 

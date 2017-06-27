@@ -366,12 +366,14 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
             }
         });
 
+        //toolbar
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
+        //메뉴 navigationView
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         View hView =  navigationView.getHeaderView(0);
         TextView btnContentInsert = (TextView)hView.findViewById(R.id.btnContentInsert);
@@ -380,6 +382,7 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), ContentInsertMain.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 getApplicationContext().startActivity(intent);
             }
         });
@@ -393,25 +396,27 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
         });
         navigationView.setNavigationItemSelectedListener(this);
 
-    }
-
-    //onClick
-    public void goLook(View v){
-        switch (v.getId()){
-            case R.id.btnLookLeft:
-                Intent intent=new Intent(this, ContentDetailListMain.class);
+        //사진으로보기 버튼
+        btnLookLeft.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent=new Intent(getApplicationContext(), ContentDetailListMain.class);
                 intent.putExtra("content_id",content_id);
-                this.startActivity(intent);
+                startActivity(intent);
                 finish();
-                break;
-            case R.id.btnLookRight:
-                Intent intent2=new Intent(this, ContentSlideShowMain.class);
-                intent2.putExtra("content_id",content_id);
-                this.startActivity(intent2);
-                finish();
-                break;
-        }
+            }
+        });
 
+        //슬라이드로보기 버튼
+        btnLookRight.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent2=new Intent(getApplicationContext(), ContentSlideShowMain.class);
+                intent2.putExtra("content_id",content_id);
+                startActivity(intent2);
+                finish();
+            }
+        });
     }
 
     //디테일 설정 메뉴클릭시
@@ -549,6 +554,7 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
         ns.selected(id, getApplicationContext());
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
+        finish();
         return true;
     }
 
