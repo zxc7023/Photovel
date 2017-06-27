@@ -28,6 +28,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -152,6 +153,17 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         btnLookRight = (LinearLayout) findViewById(R.id.btnLookRight);
         btnMoreUserContent = (LinearLayout) findViewById(R.id.btnMoreUserContent);
 
+        btnLookLeft.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getApplicationContext(),"지도로보기",Toast.LENGTH_SHORT).show();
+                Log.i("ddd","지도로 보기 클릭");
+                Intent intent=new Intent(getApplicationContext(), ContentClusterMain.class);
+                intent.putExtra("content_id",content_id);
+                startActivity(intent);
+                finish();
+            }
+        });
         //imageView를 font로 바꿔주기
         final Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
         icglobe.setTypeface(fontAwesomeFont);
@@ -419,14 +431,14 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
     //onClick
     public void goLook(View v){
         switch (v.getId()){
-            case R.id.btnLookLeft:
+/*            case R.id.btnLookLeft:
                 Toast.makeText(getApplicationContext(),"지도로보기",Toast.LENGTH_SHORT).show();
                 Log.i("ddd","지도로 보기 클릭");
                 Intent intent=new Intent(this, ContentClusterMain.class);
                 intent.putExtra("content_id",content_id);
                 this.startActivity(intent);
                 finish();
-                break;
+                break;*/
             case R.id.btnLookRight:
                 Toast.makeText(getApplicationContext(),"슬라이드로보기",Toast.LENGTH_SHORT).show();
                 Intent intent2=new Intent(this, ContentSlideShowMain.class);
