@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.NestedScrollView;
@@ -42,6 +43,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -107,18 +109,10 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_content_cluster_main);
 
-        //setContentView(R.layout.activity_content_cluster);
-
         //프래그먼트에 지도를 보여주기위해 싱크
-        MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-
-        //mMap = ((MySupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map)).getMapAsync(this);
-
         ns = (NestedScrollView)findViewById(R.id.cluster_nestedScrollView);
-        MySupportMapFragment mSupportMapFragment = (MySupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map);
-        //mSupportMapFragment.getMapAsync(this);
-
+        MySupportMapFragment mSupportMapFragment = (MySupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.cluster_map);
+        mSupportMapFragment.getMapAsync(this);
         if(mSupportMapFragment != null) {
             mSupportMapFragment.setListener(new MySupportMapFragment.OnTouchListener() {
                 @Override
@@ -616,6 +610,7 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
         }
     }
 
+    //cluster
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
