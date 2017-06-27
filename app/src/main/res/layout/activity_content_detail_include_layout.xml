@@ -442,6 +442,7 @@
                         android:includeFontPadding="false"/>
                 </LinearLayout>
                 <LinearLayout
+                    android:id="@+id/btnComment"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_weight="2"
@@ -458,7 +459,6 @@
                         android:layout_marginRight="@dimen/between_tv_margin"
                         android:includeFontPadding="false"/>
                     <TextView
-                        android:id="@+id/btnComment"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:background="@color/bgNo"

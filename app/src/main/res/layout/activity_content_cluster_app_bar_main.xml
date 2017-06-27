@@ -49,4 +49,17 @@
             android:layout_height="430dp"
             android:name="com.google.android.gms.maps.MapFragment"/>
     </android.support.v4.widget.NestedScrollView>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/btnTop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        android:layout_marginRight="@dimen/most_rignt_tv_margin"
+        android:layout_marginBottom="10dp"
+        android:clickable="true"
+        android:visibility="gone"
+        android:src="@drawable/btn_up"
+        app:backgroundTint="@color/bgWhite"/>
+    <include layout="@layout/activity_comment_main"/>
 </android.support.design.widget.CoordinatorLayout>

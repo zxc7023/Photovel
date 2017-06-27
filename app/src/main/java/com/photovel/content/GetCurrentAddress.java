@@ -18,12 +18,12 @@ import java.util.Locale;
 
 public class GetCurrentAddress extends Activity{
 
-    public String getAddress(Photo photo){
+    public String getAddress(double latitude, double longitude){
         // GPS를 주소로 변환후 반환
         Geocoder geocoder = new Geocoder(this, Locale.getDefault());
         List<Address> addresses = null;
         try {
-            addresses = geocoder.getFromLocation(photo.getPhoto_latitude(), photo.getPhoto_longitude(), 1);
+            addresses = geocoder.getFromLocation(latitude, longitude, 1);
         } catch (IOException ioException) {
             //네트워크 문제
             Toast.makeText(this, "지오코더 서비스 사용불가", Toast.LENGTH_LONG).show();

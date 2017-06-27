@@ -115,4 +115,5 @@
         android:visibility="gone"
         android:src="@drawable/btn_up"
         app:backgroundTint="@color/bgWhite"/>
+    <include layout="@layout/activity_comment_main"/>
 </android.support.design.widget.CoordinatorLayout>

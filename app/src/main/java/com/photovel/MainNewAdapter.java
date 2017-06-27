@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.photovel.content.ContentDetailListMain;
+import com.photovel.http.JsonConnection;
 import com.photovel.http.Value;
 import com.vo.Content;
 
@@ -128,37 +129,15 @@ public class MainNewAdapter extends RecyclerView.Adapter<MainNewAdapter.ViewHold
             @Override
             public void onClick(View v) {
                 final String id = "leeej9201@gmail.com";
-                final String url = Value.contentURL+"/"+mDataset.get(position).getContent_id()+"/good/"+id;
-                Thread th = new Thread(new Runnable() {
+                Thread good = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        HttpURLConnection conn = null;
-                        OutputStream dos = null;
-                        try {
-                            URL connectURL = new URL(url);
-                            Log.i("1. good", url);
-                            conn = (HttpURLConnection) connectURL.openConnection();
-                            conn.setDoOutput(true);
-                            conn.setDoInput(true);
-                            conn.setRequestMethod("POST");
-                            conn.setRequestProperty("Connection", "Keep-Alive");
-                            conn.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
-
-                            int responseCode = conn.getResponseCode();
-                            Log.i("2. good", responseCode + "");
-
-                        } catch (MalformedURLException e) {
-                            e.printStackTrace();
-                        } catch (ProtocolException e) {
-                            e.printStackTrace();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+                        JsonConnection.getConnection(Value.contentURL+"/"+mDataset.get(position).getContent_id()+"/good/"+id, "POST", null);
                     }
                 });
-                th.start();
+                good.start();
                 try {
-                    th.join();
+                    good.join();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

@@ -55,11 +55,12 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
     private static final String TAG = "Image";
     private SearchView searchView;
     Toolbar toolbar;
+
     //메인 이미지 케러셀뷰
     CarouselView carouselView;
     List<MainImage> images;
 
-    //추천 게시글 가로스크롤
+    //추천, 신규 게시글
     private RecyclerView RVrecommend, RVnew;
     private MainRecommendAdapter mRecommendAdapter;
     private MainNewAdapter mNewAdapter;
@@ -74,15 +75,13 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         //메인이미지 캐러셀뷰 부분
         carouselView = (CarouselView) findViewById(R.id.carouselView);
 
-        //db에 있는 메인이미지 받아오기
+        //메인이미지 객체 받아오기
         Thread getMainImage = new Thread(){
             @Override
             public void run() {
                 super.run();
-                //images = getMainImage();
                 String responseData = JsonConnection.getConnection(Value.mainImageURL, "GET", null);
                 images = JSON.parseArray(responseData, MainImage.class);
-                Log.i(TAG, "images= " + images);
             }
         };
         getMainImage.start();
@@ -91,22 +90,23 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        //getMainBitmap(); //메인 Image받아오기
-        List<Bitmap> bitmaps = JsonConnection.getBitmap(images, Value.mainImagePhotoURL);
+
+        //메인이미지 bitmap 받아오기
+        List<Bitmap> mainImageBitmaps = JsonConnection.getBitmap(images, Value.mainImagePhotoURL);
         for(int i = 0; i < images.size(); i++){
-            images.get(i).setBitmap(bitmaps.get(i));
+            images.get(i).setBitmap(mainImageBitmaps.get(i));
         }
 
         carouselView.setPageCount(images.size());
         carouselView.setImageListener(imageListener);
 
-        //추천 스토리 가로스크롤
-        //db에 있는 contentId별 content정보 받아오기
+        //추천 스토리 객체 받아오기
         Thread getRecommend = new Thread(){
             @Override
             public void run() {
                 super.run();
-                myRecommendDataset = getRecommendData();
+                String responseData = JsonConnection.getConnection(Value.contentURL+"/recommend", "GET", null);
+                myRecommendDataset = JSON.parseArray(responseData, Content.class);
             }
         };
         getRecommend.start();
@@ -115,10 +115,14 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        getRecommendBitmap(); //content Image받아오기
+        //추천 스토리 bitmap 받아오기
+        List<Bitmap> recommendBitmaps = JsonConnection.getBitmap(myRecommendDataset, Value.contentPhotoURL);
+        for(int i = 0; i < myRecommendDataset.size(); i++){
+            myRecommendDataset.get(i).setBitmap(recommendBitmaps.get(i));
+        }
 
 
-        //recycleview사용선언
+        //추천 스토리 recycleview사용선언
         RVrecommend = (RecyclerView) findViewById(R.id.RVrecommend);
         RVrecommend.setHasFixedSize(true);
         RVrecommend.setNestedScrollingEnabled(false);
@@ -127,13 +131,13 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         mRecommendAdapter = new MainRecommendAdapter(myRecommendDataset, MainActivity.this);
         RVrecommend.setAdapter(mRecommendAdapter);
 
-        //신규 스토리 세로스크롤
-        //db에 있는 contentId별 content정보 받아오기
+        //신규 스토리 객체 받아오기
         Thread getNew = new Thread(){
             @Override
             public void run() {
                 super.run();
-                myNewDataset = getNewData();
+                String responseData = JsonConnection.getConnection(Value.contentURL+"/new", "GET", null);
+                myNewDataset = JSON.parseArray(responseData, Content.class);
             }
         };
         getNew.start();
@@ -142,9 +146,13 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        getNewBitmap(); //content Image받아오기
+        //신규 스토리 bitmap 받아오기
+        List<Bitmap> newBitmaps = JsonConnection.getBitmap(myNewDataset, Value.contentPhotoURL);
+        for(int i = 0; i < myNewDataset.size(); i++){
+            myNewDataset.get(i).setBitmap(newBitmaps.get(i));
+        }
 
-        //recycleview사용선언
+        //신규 스토리 recycleview사용선언
         RVnew = (RecyclerView) findViewById(R.id.RVnew);
         RVnew.setHasFixedSize(true);
         RVnew.setNestedScrollingEnabled(false);
@@ -266,272 +274,4 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
             imageView.setImageBitmap(images.get(position).getBitmap());
         }
     };
-    //메인이미지 캐러셀뷰
-    public List<MainImage> getMainImage(){
-        HttpURLConnection conn = null;
-        List<MainImage> imgs = null;
-        String qry = Value.mainImageURL;
-        try {
-            URL strUrl = new URL(qry);
-            conn = (HttpURLConnection) strUrl.openConnection();
-            conn.setDoInput(true);//서버로부터 결과값을 응답받음
-
-            conn.setRequestMethod("GET");
-            Log.i(TAG, "1.메인이미지 qry= " + qry);
-
-            final int responseCode = conn.getResponseCode(); //정상인 경우 200번, 그 외 오류있는 경우 오류 번호 반환
-            Log.i(TAG, "2.메인이미지 responseCode= " + responseCode);
-            switch (responseCode){
-                case HttpURLConnection.HTTP_OK:
-
-                    InputStream is = conn.getInputStream();
-                    Reader reader = new InputStreamReader(is, "UTF-8");
-                    BufferedReader br = new BufferedReader(reader);
-
-                    String responseData = br.readLine();
-                    Log.i(TAG, "3.메인이미지 response data= " + responseData);
-
-                    imgs =  JSON.parseArray(responseData, MainImage.class);
-
-                    br.close();
-                    reader.close();
-                    is.close();
-
-                    break;
-                case HttpURLConnection.HTTP_NOT_FOUND:
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getApplicationContext(), "페이지를 찾을 수 없습니다.", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-
-                    break;
-                default:
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getApplicationContext(), "response code: " + responseCode, Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                    break;
-            }
-            return imgs;
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            conn.disconnect();
-        }
-        return null;
-    }
-    //DB에서 bitmap정보 받아오기
-    public void getMainBitmap(){
-        Thread thread2 = new Thread(){
-            @Override
-            public void run() {
-                super.run();
-                try {
-                    for (int i = 0; i < images.size(); i++) {
-                        Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL(Value.mainImagePhotoURL+"/"+images.get(i).getImage_file_name()).getContent());
-                        images.get(i).setBitmap(bitmap);
-                        Log.i(TAG, "4.메인이미지 bitmap= " + bitmap);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        thread2.start();
-        try {
-            thread2.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    //추천스토리 가로스크롤
-    public List<Content> getRecommendData(){
-        List<Content> contents = null;
-        HttpURLConnection conn = null;
-
-        String qry = Value.contentURL+"/recommend";
-        try {
-            URL strUrl = new URL(qry);
-            conn = (HttpURLConnection) strUrl.openConnection();
-            conn.setDoInput(true);//서버로부터 결과값을 응답받음
-            conn.setRequestMethod("GET");
-            Log.i(TAG, "1.추천스토리 qry= " + qry);
-
-
-            final int responseCode = conn.getResponseCode(); //정상인 경우 200번, 그 외 오류있는 경우 오류 번호 반환
-            Log.i(TAG, "2.추천스토리 responseCode= " + responseCode);
-            switch (responseCode){
-                case HttpURLConnection.HTTP_OK:
-
-                    InputStream is = conn.getInputStream();
-                    Reader reader = new InputStreamReader(is, "UTF-8");
-                    BufferedReader br = new BufferedReader(reader);
-                    String responseData = null;
-
-                    responseData = br.readLine();
-                    Log.i(TAG, "3.추천스토리 response data= " + responseData);
-
-                    contents = JSON.parseArray(responseData, Content.class);
-
-                    br.close();
-                    reader.close();
-                    is.close();
-
-                    break;
-                case HttpURLConnection.HTTP_NOT_FOUND:
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getApplicationContext(), "페이지를 찾을 수 없습니다.", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-
-                    break;
-                default:
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getApplicationContext(), "response code: " + responseCode, Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                    break;
-            }
-
-            return contents;
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            conn.disconnect();
-        }
-
-        return null;
-    }
-    //DB에서 bitmap정보 받아오기
-    public void getRecommendBitmap(){
-        Thread thread2 = new Thread(){
-            @Override
-            public void run() {
-                super.run();
-                try {
-                    for (int i = 0; i < myRecommendDataset.size(); i++) {
-                        Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL(Value.contentPhotoURL+"/" + myRecommendDataset.get(i).getContent_id() + "/" + myRecommendDataset.get(i).getPhoto_file_name()).getContent());
-                        myRecommendDataset.get(i).setBitmap(bitmap);
-                        Log.i(TAG, "4.추천스토리 bitmap= " + bitmap);
-                    }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        thread2.start();
-        try {
-            thread2.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    //신규스토리 가로스크롤
-    public List<Content> getNewData(){
-        List<Content> contents = null;
-        HttpURLConnection conn = null;
-
-        String qry = Value.contentURL+"/new";
-
-        try {
-            URL strUrl = new URL(qry);
-            conn = (HttpURLConnection) strUrl.openConnection();
-            conn.setDoInput(true);//서버로부터 결과값을 응답받음
-            conn.setRequestMethod("GET");
-            Log.i(TAG, "1.신규스토리 qry= " + qry);
-
-
-            final int responseCode = conn.getResponseCode(); //정상인 경우 200번, 그 외 오류있는 경우 오류 번호 반환
-            Log.i(TAG, "2.신규스토리 responseCode= " + responseCode);
-            switch (responseCode){
-                case HttpURLConnection.HTTP_OK:
-
-                    InputStream is = conn.getInputStream();
-                    Reader reader = new InputStreamReader(is, "UTF-8");
-                    BufferedReader br = new BufferedReader(reader);
-                    String responseData = null;
-
-                    responseData = br.readLine();
-                    Log.i(TAG, "3.신규스토리 response data= " + responseData);
-
-                    contents = JSON.parseArray(responseData, Content.class);
-
-                    br.close();
-                    reader.close();
-                    is.close();
-
-                    break;
-                case HttpURLConnection.HTTP_NOT_FOUND:
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getApplicationContext(), "페이지를 찾을 수 없습니다.", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-
-                    break;
-                default:
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getApplicationContext(), "response code: " + responseCode, Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                    break;
-            }
-
-            return contents;
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            conn.disconnect();
-        }
-
-        return null;
-    }
-    //DB에서 bitmap정보 받아오기
-    public void getNewBitmap(){
-        Thread thread2 = new Thread(){
-            @Override
-            public void run() {
-                super.run();
-                try {
-                    for (int i = 0; i < myNewDataset.size(); i++) {
-                        Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL(Value.contentPhotoURL+"/" + myNewDataset.get(i).getContent_id() + "/" + myNewDataset.get(i).getPhoto_file_name()).getContent());
-                        myNewDataset.get(i).setBitmap(bitmap);
-                        Log.i(TAG, "4.신규스토리 bitmap= " + bitmap);
-                    }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        thread2.start();
-        try {
-            thread2.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-    }
 }
