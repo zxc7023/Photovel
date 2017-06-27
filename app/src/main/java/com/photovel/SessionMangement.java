@@ -77,6 +77,7 @@ public class SessionMangement extends FontActivity2 {
                 if(!isRemovable.equals("notFound")){
                     SharedPreferences.Editor editor2 = test.edit();
                     editor2.remove("Set-Cookie");
+                    editor2.remove("user_id");
                     editor2.commit();
                 }
                 Intent intent = new Intent(getApplication(), UserLogin.class);

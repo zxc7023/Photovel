@@ -182,6 +182,7 @@ public class UserLogin extends FontActivity2 {
                             if(!isRemovable.equals("notFound")){
                                 SharedPreferences.Editor editor2 = test.edit();
                                 editor2.remove("Set-Cookie");
+                                editor2.remove("user_id");
                                 editor2.commit();
                             }
 
@@ -204,6 +205,7 @@ public class UserLogin extends FontActivity2 {
                             SharedPreferences loginInfo = getSharedPreferences("loginInfo", MODE_PRIVATE);
                             SharedPreferences.Editor editor = loginInfo.edit();
                             editor.putString("Set-Cookie", cookieValues); //First라는 key값으로 infoFirst 데이터를 저장한다.
+                            editor.putString("user_id",user_id);
                             editor.commit(); //완료한다.
 
                             break;
