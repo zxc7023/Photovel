@@ -13,10 +13,18 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.photovel.content.ContentDetailListMain;
+import com.photovel.http.Value;
 import com.vo.Content;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
 import java.util.List;
 
 public class MainNewAdapter extends RecyclerView.Adapter<MainNewAdapter.ViewHolder>{
@@ -119,7 +127,45 @@ public class MainNewAdapter extends RecyclerView.Adapter<MainNewAdapter.ViewHold
         holder.llthumb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("click","좋아요가 클릭되었당!");
+                final String id = "leeej9201@gmail.com";
+                final String url = Value.contentURL+"/"+mDataset.get(position).getContent_id()+"/good/"+id;
+                Thread th = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        HttpURLConnection conn = null;
+                        OutputStream dos = null;
+                        try {
+                            URL connectURL = new URL(url);
+                            Log.i("1. good", url);
+                            conn = (HttpURLConnection) connectURL.openConnection();
+                            conn.setDoOutput(true);
+                            conn.setDoInput(true);
+                            conn.setRequestMethod("POST");
+                            conn.setRequestProperty("Connection", "Keep-Alive");
+                            conn.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
+
+                            int responseCode = conn.getResponseCode();
+                            Log.i("2. good", responseCode + "");
+
+                        } catch (MalformedURLException e) {
+                            e.printStackTrace();
+                        } catch (ProtocolException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                th.start();
+                try {
+                    th.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                Intent intent = new Intent(mcontext, MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
+                mcontext.startActivity(intent);
+                Toast.makeText(mcontext,"좋아요 완료!",Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -127,7 +173,10 @@ public class MainNewAdapter extends RecyclerView.Adapter<MainNewAdapter.ViewHold
         holder.llcomment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("click","댓글 클릭되었당!");
+                Intent intent = new Intent(mcontext, ContentDetailListMain.class);
+                intent.putExtra("content_id", mDataset.get(position).getContent_id());
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
+                mcontext.startActivity(intent);
             }
         });
 
@@ -144,3 +193,4 @@ public class MainNewAdapter extends RecyclerView.Adapter<MainNewAdapter.ViewHold
         return mDataset.size();
     }
 }
+
