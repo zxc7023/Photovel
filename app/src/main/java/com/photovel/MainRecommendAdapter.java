@@ -3,6 +3,7 @@ package com.photovel;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.photovel.content.ContentDetailListMain;
+import com.photovel.http.JsonConnection;
 import com.photovel.http.Value;
 import com.vo.Content;
 
@@ -113,10 +115,9 @@ public class MainRecommendAdapter extends RecyclerView.Adapter<MainRecommendAdap
         holder.RlmainTop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("click","메인이 클릭되었당!");
                 Intent intent = new Intent(mcontext, ContentDetailListMain.class);
                 intent.putExtra("content_id", mDataset.get(position).getContent_id());
-                ((Activity)mcontext).startActivity(intent);
+                mcontext.startActivity(intent);
             }
         });
 
@@ -124,33 +125,12 @@ public class MainRecommendAdapter extends RecyclerView.Adapter<MainRecommendAdap
         holder.llthumb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final String id = "leeej9201@gmail.com";
-                final String url = Value.contentURL+"/"+mDataset.get(position).getContent_id()+"/good/"+id;
+                SharedPreferences get_to_eat = mcontext.getSharedPreferences("loginInfo", mcontext.MODE_PRIVATE);
+                final String user_id = get_to_eat.getString("user_id","notFound");
                 Thread th = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        HttpURLConnection conn = null;
-                        OutputStream dos = null;
-                        try {
-                            URL connectURL = new URL(url);
-                            Log.i("1. good", url);
-                            conn = (HttpURLConnection) connectURL.openConnection();
-                            conn.setDoOutput(true);
-                            conn.setDoInput(true);
-                            conn.setRequestMethod("POST");
-                            conn.setRequestProperty("Connection", "Keep-Alive");
-                            conn.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
-
-                            int responseCode = conn.getResponseCode();
-                            Log.i("2. good", responseCode + "");
-
-                        } catch (MalformedURLException e) {
-                            e.printStackTrace();
-                        } catch (ProtocolException e) {
-                            e.printStackTrace();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+                        JsonConnection.getConnection(Value.contentURL+"/"+mDataset.get(position).getContent_id()+"/good/"+user_id, "POST", null);
                     }
                 });
                 th.start();

@@ -6,6 +6,7 @@ import android.content.ClipData;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -258,23 +259,30 @@ public class ContentInsertMain extends FontActivity {
                                 //json 처리
                                 final JSONObject obj = new JSONObject();  //결과 json
                                 try {
-                                    JSONArray jArray = new JSONArray();
+                                    JSONArray details = new JSONArray();
                                     for(int i=0; i<resultContent.getDetails().size(); i++){
-                                        JSONObject sObject = new JSONObject();  //배열 내에 들어갈 json
-                                        sObject.put("detail_content",resultContent.getDetails().get(i).getDetail_content());
-                                        JSONObject sbObject = new JSONObject();
-                                        sbObject.put("photo_date",new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(resultContent.getDetails().get(i).getPhoto().getPhoto_date()));
-                                        sbObject.put("photo_latitude",resultContent.getDetails().get(i).getPhoto().getPhoto_latitude());
-                                        sbObject.put("photo_longitude",resultContent.getDetails().get(i).getPhoto().getPhoto_longitude());
-                                        sbObject.put("photo_top_flag",resultContent.getDetails().get(i).getPhoto().getPhoto_top_flag());
-                                        sObject.put("photo",sbObject);
-                                        jArray.put(sObject);
+                                        JSONObject detail = new JSONObject();  //배열 내에 들어갈 json
+                                        detail.put("detail_content",resultContent.getDetails().get(i).getDetail_content());
+                                        JSONObject photo = new JSONObject();
+                                        photo.put("photo_date",new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(resultContent.getDetails().get(i).getPhoto().getPhoto_date()));
+                                        photo.put("photo_latitude",resultContent.getDetails().get(i).getPhoto().getPhoto_latitude());
+                                        photo.put("photo_longitude",resultContent.getDetails().get(i).getPhoto().getPhoto_longitude());
+                                        photo.put("photo_top_flag",resultContent.getDetails().get(i).getPhoto().getPhoto_top_flag());
+                                        detail.put("photo", photo);
+                                        details.put(detail);
                                     }
+                                    obj.put("details",details);
+
+                                    SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
+                                    final String user_id = get_to_eat.getString("user_id","notFound");
+                                    JSONObject user = new JSONObject();
+                                    user.put("user_id", user_id);
+                                    obj.put("user", user);
+
                                     obj.put("content_subject",resultContent.getContent_subject());
                                     obj.put("content",resultContent.getContent());
                                     obj.put("content_written_date",new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(resultContent.getContent_written_date()));
                                     obj.put("content_private_flag",resultContent.getContent_private_flag());
-                                    obj.put("details",jArray);
 
                                     Log.i("ddd",obj.toString());
 

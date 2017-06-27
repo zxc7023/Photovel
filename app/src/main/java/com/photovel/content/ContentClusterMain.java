@@ -3,6 +3,7 @@ package com.photovel.content;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -311,7 +312,9 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
                 final JSONObject comment = new JSONObject();
                 try {
                     JSONObject user = new JSONObject();
-                    user.put("user_id", "leeej9201@gmail.com");
+                    SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
+                    final String user_id = get_to_eat.getString("user_id","notFound");
+                    user.put("user_id", user_id);
                     comment.put("content_id", content_id);
                     comment.put("comment_content", etComment.getText());
                     comment.put("user",user);
@@ -345,11 +348,12 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
         btnLike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final String id = "leeej9201@gmail.com";
+                SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
+                final String user_id = get_to_eat.getString("user_id","notFound");
                 Thread good = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        JsonConnection.getConnection(contentURL+"/"+content_id+"/good/"+id, "POST", null);
+                        JsonConnection.getConnection(contentURL+"/"+content_id+"/good/"+user_id, "POST", null);
                     }
                 });
                 good.start();

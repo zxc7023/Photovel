@@ -3,6 +3,7 @@ package com.photovel;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -120,7 +121,7 @@ public class MainNewAdapter extends RecyclerView.Adapter<MainNewAdapter.ViewHold
                 Log.i("click","메인이 클릭되었당!");
                 Intent intent = new Intent(mcontext, ContentDetailListMain.class);
                 intent.putExtra("content_id", mDataset.get(position).getContent_id());
-                ((Activity)mcontext).startActivity(intent);
+                mcontext.startActivity(intent);
             }
         });
 
@@ -128,11 +129,12 @@ public class MainNewAdapter extends RecyclerView.Adapter<MainNewAdapter.ViewHold
         holder.llthumb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final String id = "leeej9201@gmail.com";
+                SharedPreferences get_to_eat = mcontext.getSharedPreferences("loginInfo", mcontext.MODE_PRIVATE);
+                final String user_id = get_to_eat.getString("user_id","notFound");
                 Thread good = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        JsonConnection.getConnection(Value.contentURL+"/"+mDataset.get(position).getContent_id()+"/good/"+id, "POST", null);
+                        JsonConnection.getConnection(Value.contentURL+"/"+mDataset.get(position).getContent_id()+"/good/"+user_id, "POST", null);
                     }
                 });
                 good.start();

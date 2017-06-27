@@ -3,6 +3,7 @@ package com.photovel.content;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
@@ -206,11 +207,12 @@ public class ContentListAdapter extends RecyclerView.Adapter<ContentListAdapter.
         holder.btnLike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final String id = "leeej9201@gmail.com";
+                SharedPreferences get_to_eat = mcontext.getSharedPreferences("loginInfo", mcontext.MODE_PRIVATE);
+                final String user_id = get_to_eat.getString("user_id","notFound");
                 Thread good = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        JsonConnection.getConnection(Value.contentURL+"/"+mDataset.get(position).getContent_id()+"/good/"+id, "POST", null);
+                        JsonConnection.getConnection(Value.contentURL+"/"+mDataset.get(position).getContent_id()+"/good/"+user_id, "POST", null);
                     }
                 });
                 good.start();
@@ -221,7 +223,7 @@ public class ContentListAdapter extends RecyclerView.Adapter<ContentListAdapter.
                 }
                 Intent intent = new Intent(mcontext, ContentListMain.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
-                intent.putExtra("user_id", id);
+                intent.putExtra("user_id", user_id);
                 intent.putExtra("urlflag", "");
                 mcontext.startActivity(intent);
                 Toast.makeText(mcontext,"좋아요 완료!",Toast.LENGTH_SHORT).show();

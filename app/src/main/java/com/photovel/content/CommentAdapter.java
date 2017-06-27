@@ -3,6 +3,7 @@ package com.photovel.content;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
@@ -133,13 +134,14 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         PopupMenu popup = new PopupMenu(wrapper, v);
         MenuInflater inflater = popup.getMenuInflater();
         inflater.inflate(R.menu.comment_setting_menu, popup.getMenu());
-        final String id = "leeej9201@gmail.com";
+        SharedPreferences get_to_eat = mcontext.getSharedPreferences("loginInfo", mcontext.MODE_PRIVATE);
+        final String user_id = get_to_eat.getString("user_id","notFound");
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.action_update:
-                        if(mDataset.get(ca.getPosition()).getUser().getUser_id().equals(id)){
+                        if(mDataset.get(ca.getPosition()).getUser().getUser_id().equals(user_id)){
                             ca.getHolder().llupdate.setVisibility(View.VISIBLE);
                             ca.getHolder().llselect.setVisibility(View.GONE);
                             ca.getHolder().LLmenu.setVisibility(View.INVISIBLE);
@@ -149,7 +151,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
                                     final JSONObject comment = new JSONObject();
                                     try {
                                         JSONObject user = new JSONObject();
-                                        user.put("user_id", id);
+                                        user.put("user_id", user_id);
                                         comment.put("content_id", mDataset.get(ca.getPosition()).getContent_id());
                                         comment.put("comment_id", mDataset.get(ca.getPosition()).getComment_id());
                                         comment.put("comment_content", ca.getHolder().etComment.getText());
@@ -183,7 +185,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
                         }
                         break;
                     case R.id.action_delete:
-                        if(mDataset.get(ca.getPosition()).getUser().getUser_id().equals(id)) {
+                        if(mDataset.get(ca.getPosition()).getUser().getUser_id().equals(user_id)) {
                             AlertDialog.Builder dalert_confirm = new AlertDialog.Builder(mcontext);
                             dalert_confirm.setMessage("정말 댓글을 삭제 하시겠습니까?").setCancelable(false).setPositiveButton("확인",
                                     new DialogInterface.OnClickListener() {
