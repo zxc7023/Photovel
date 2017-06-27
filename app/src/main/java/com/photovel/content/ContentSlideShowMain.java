@@ -638,23 +638,7 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
-        searchView = (SearchView) toolbar.getMenu().findItem(R.id.menu_search).getActionView();
-        MenuItem searchItem = menu.findItem(R.id.menu_search);
-        searchView = (SearchView) searchItem.getActionView();
-        searchView.setQueryHint(getString(R.string.app_name));
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-
-            @Override
-            public boolean onQueryTextSubmit(String s) {
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String s) {
-                return false;
-            }
-        });
+        getMenuInflater().inflate(R.menu.other_toolbar, menu);
         return true;
     }
 
