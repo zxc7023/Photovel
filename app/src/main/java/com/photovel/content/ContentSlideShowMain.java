@@ -43,6 +43,7 @@ import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
 import com.alibaba.fastjson.JSON;
 import com.photovel.FontActivity2;
 import com.photovel.MainActivity;
+import com.photovel.NavigationItemSelected;
 import com.photovel.R;
 import com.photovel.http.Value;
 import com.vo.Content;
@@ -224,6 +225,24 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        View hView =  navigationView.getHeaderView(0);
+        TextView btnContentInsert = (TextView)hView.findViewById(R.id.btnContentInsert);
+        btnContentInsert.setTypeface(fontAwesomeFont);
+        btnContentInsert.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), ContentInsertMain.class);
+                getApplicationContext().startActivity(intent);
+            }
+        });
+        TextView tvProfileUpdate = (TextView)hView.findViewById(R.id.tvProfileUpdate);
+        tvProfileUpdate.setTypeface(fontAwesomeFont);
+        tvProfileUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getApplicationContext(),"프로필변경클릭",Toast.LENGTH_SHORT).show();
+            }
+        });
         navigationView.setNavigationItemSelectedListener(this);
 
         //top버튼
@@ -605,28 +624,13 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         return super.onOptionsItemSelected(item);
     }
 
+    //툴바 메뉴 클릭 시
     @Override
     @NonNull
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
         int id = item.getItemId();
-/*
-
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }
-*/
-
+        NavigationItemSelected ns = new NavigationItemSelected();
+        ns.selected(id, getApplicationContext());
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;

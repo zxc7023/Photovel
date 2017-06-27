@@ -85,7 +85,7 @@ public class ContentInsertMain extends FontActivity {
     private EditText contentSubject, contentText;
     private int flag = 0;
     private Switch swPrivate;
-    private boolean flagSwitch;
+    private boolean flagSwitch = true;
 
     private String isSucess;
 
