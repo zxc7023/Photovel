@@ -19,7 +19,7 @@
         android:theme="@style/AppTheme">
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAiudYhFEK-5EW9nzlu8Tbv1FoUNyLRWz8" />
+            android:value="AIzaSyAoropfQgcXeJI0nf6iyz36wDc9pZIBJUw" />
         <!-- AIzaSyDHhbAmLoQolRIfA6C2Xdm-NzKa9naq3XA
         준기키-->
         <activity
@@ -34,7 +34,6 @@
         <activity android:name=".FontActivity" />
         <activity android:name=".FontActivity2" />
         <activity android:name=".content.ContentClusterMain" android:theme="@style/AppTheme.NoActionBar"/>
-        <activity android:name=".content.ContentCluster" />
         <activity android:name=".content.ContentInsertMain" />
         <activity android:name=".content.ContentInsertGoogleMap" />
         <activity android:name=".content.ContentUpdateMain" />

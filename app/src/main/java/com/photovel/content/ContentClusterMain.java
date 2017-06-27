@@ -19,6 +19,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
@@ -52,7 +53,6 @@ import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import com.google.maps.android.ui.IconGenerator;
 import com.photovel.FontActivity2;
-import com.photovel.FontActivity3;
 import com.photovel.MainActivity;
 import com.photovel.NavigationItemSelected;
 import com.photovel.R;
@@ -76,7 +76,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class ContentClusterMain extends FontActivity3 implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, ClusterManager.OnClusterClickListener<Photo>,
+public class ContentClusterMain extends FontActivity2 implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, ClusterManager.OnClusterClickListener<Photo>,
         ClusterManager.OnClusterInfoWindowClickListener<Photo>, ClusterManager.OnClusterItemClickListener<Photo>, ClusterManager.OnClusterItemInfoWindowClickListener<Photo> {
     private SearchView searchView;
     private static final String TAG = "AppPermission";
@@ -88,12 +88,12 @@ public class ContentClusterMain extends FontActivity3 implements NavigationView.
     private TextView tvContentInsertDate, tvContentSubject, tvContentLocation, tvUsername, tvUsername2, tvDuring, tvdetailcount, tvdetailstate, tvContent;
     private TextView tvLikeCount, tvCommentCount, tvShareCount;
     private ImageView ivTopPhoto;
-    private FloatingActionButton btnTop;
     private Button btnLike, btnComment, btnShare;
     private LinearLayout btnLookLeft, btnLookRight;
     private List<ContentDetail> myDataset;
     private Content content;
     private int content_id=0;
+    private NestedScrollView ns;
 
     private final String contentURL = Value.contentURL;
     private final String contentPhotoURL = Value.contentPhotoURL;
@@ -113,6 +113,21 @@ public class ContentClusterMain extends FontActivity3 implements NavigationView.
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        //mMap = ((MySupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map)).getMapAsync(this);
+
+        ns = (NestedScrollView)findViewById(R.id.cluster_nestedScrollView);
+        MySupportMapFragment mSupportMapFragment = (MySupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map);
+        //mSupportMapFragment.getMapAsync(this);
+
+        if(mSupportMapFragment != null) {
+            mSupportMapFragment.setListener(new MySupportMapFragment.OnTouchListener() {
+                @Override
+                public void onTouch() {
+                    ns.requestDisallowInterceptTouchEvent(true);
+                }
+            });
+        }
+
         Intent intent = getIntent();
         content_id = intent.getIntExtra("content_id",1);
         if(content_id==-1){
@@ -122,8 +137,8 @@ public class ContentClusterMain extends FontActivity3 implements NavigationView.
         }
 
         // Adding Toolbar to the activity
-        /*toolbar = (Toolbar) findViewById(R.id.clusterToolbar);
-        setSupportActionBar(toolbar);*/
+        toolbar = (Toolbar) findViewById(R.id.clusterToolbar);
+        setSupportActionBar(toolbar);
 
         icglobe = (TextView)findViewById(R.id.icglobe);
         icleft = (TextView)findViewById(R.id.icleft);
@@ -143,7 +158,7 @@ public class ContentClusterMain extends FontActivity3 implements NavigationView.
         tvContentSubject = (TextView) findViewById(R.id.tvContentSubject);           //컨텐트 제목
         tvContentLocation = (TextView) findViewById(R.id.tvContentLocation);        //컨텐트 위치(마지막)
         tvUsername = (TextView) findViewById(R.id.tvUsername);                        //유저 네임
-        tvUsername2 = (TextView) findViewById(R.id.tvUsername2);                        //유저 네임
+        //tvUsername2 = (TextView) findViewById(R.id.tvUsername2);                        //유저 네임
         tvDuring = (TextView) findViewById(R.id.tvDuring);                             //컨텐트 날짜첫날 ~ 날짜 끝날(2016.04.20 ~ 2016.06.20)
         tvdetailstate = (TextView) findViewById(R.id.tvdetailstate);                   //디테일 수
         tvContent = (TextView) findViewById(R.id.tvContent);                            //보고있는 화면 상태(사진/동영상/지도)
@@ -202,7 +217,7 @@ public class ContentClusterMain extends FontActivity3 implements NavigationView.
         tvContentInsertDate.setText(new SimpleDateFormat("yyyy.MM.dd").format(content.getContent_written_date()));
         tvContentSubject.setText(content.getContent_subject());
         tvUsername.setText(content.getUser().getUser_nick_name());
-        tvUsername2.setText(content.getUser().getUser_nick_name());
+        //tvUsername2.setText(content.getUser().getUser_nick_name());
         tvContent.setText(content.getContent());
         tvdetailcount.setText(String.valueOf(content.getDetails().size()));
         tvLikeCount.setText(String.valueOf(content.getGood_count()));
@@ -255,26 +270,6 @@ public class ContentClusterMain extends FontActivity3 implements NavigationView.
             }
         });
         navigationView.setNavigationItemSelectedListener(this);
-
-        //top버튼
-        btnTop = (FloatingActionButton) findViewById(R.id.btnTop);
-        final NestedScrollView nsv = (NestedScrollView) findViewById(R.id.nestedScrollView);
-        nsv.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {   //스크롤내리면 보이게
-            @Override
-            public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-                if (oldScrollY > 200) {
-                    btnTop.show();
-                } else {
-                    btnTop.hide();
-                }
-            }
-        });
-        btnTop.setOnClickListener(new View.OnClickListener() {  //top으로 이동
-            @Override
-            public void onClick(View view) {
-                nsv.fullScroll(View.FOCUS_UP);
-            }
-        });
 
     }
 
@@ -499,23 +494,7 @@ public class ContentClusterMain extends FontActivity3 implements NavigationView.
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
-        searchView = (SearchView) toolbar.getMenu().findItem(R.id.menu_search).getActionView();
-        MenuItem searchItem = menu.findItem(R.id.menu_search);
-        searchView = (SearchView) searchItem.getActionView();
-        searchView.setQueryHint(getString(R.string.app_name));
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-
-            @Override
-            public boolean onQueryTextSubmit(String s) {
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String s) {
-                return false;
-            }
-        });
+        getMenuInflater().inflate(R.menu.other_toolbar, menu);
         return true;
     }
 

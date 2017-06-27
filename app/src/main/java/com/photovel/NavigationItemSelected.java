@@ -1,13 +1,11 @@
 package com.photovel;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.photovel.content.ContentDetailListMain;
 import com.photovel.content.ContentListMain;
 import com.photovel.http.Value;
 
@@ -54,8 +52,8 @@ public class NavigationItemSelected extends FontActivity{
             finish();
         }else if(id==R.id.nav_log_out){
             Toast.makeText(context, "로그아웃", Toast.LENGTH_SHORT).show();
-            logout(Value.userLogoutURL);
-            intent = new Intent(getApplicationContext(),SessionMangement.class);
+            logout(Value.userLogoutURL, context);
+            intent = new Intent(context, SessionMangement.class);
             context.startActivity(intent);
             finish();
         }else if(id==R.id.nav_setting){
@@ -67,7 +65,7 @@ public class NavigationItemSelected extends FontActivity{
         }
     }
 
-    public void logout(final String userLogoutURL){
+    public void logout(final String userLogoutURL, final Context context){
         Thread logoutThread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -90,7 +88,7 @@ public class NavigationItemSelected extends FontActivity{
                     switch (responseCode){
                         case HttpURLConnection.HTTP_OK :
                             //로그아웃이되면 공유객체의 jSession 삭제
-                            SharedPreferences test = getSharedPreferences("loginInfo", MODE_PRIVATE);
+                            SharedPreferences test = context.getSharedPreferences("loginInfo", MODE_PRIVATE);
                             String isRemovable = test.getString("Set-Cookie","notFound");
                             if(!isRemovable.equals("notFound")){
                                 SharedPreferences.Editor editor2 = test.edit();
