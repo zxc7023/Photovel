@@ -1,13 +1,10 @@
 package com.photovel.content;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.media.MediaPlayer;
-import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.DragEvent;
 import android.view.View;
@@ -15,109 +12,64 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.RadioButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.ViewFlipper;
 
-import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
-import com.alibaba.fastjson.JSON;
 import com.photovel.R;
+
+import com.alibaba.fastjson.JSON;
+import com.photovel.http.JsonConnection;
+import com.photovel.http.Value;
 import com.vo.Content;
 import com.vo.ContentDetail;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 
 public class ContentSlideShow extends AppCompatActivity {
     private ViewFlipper mViewFlipper;
-    private Context mContext;
     int index;
+    private int content_id = -1;
+    private Content content;
 
+    private static final String TAG = "SlideShow";
 
-    private static final String TAG = "ContentSlideShow";
-
-    RadioButton b1, b2, b3;//radio button for indicator
     Button play, stop;
     SeekBar slideSeekBar;
     TextView tvCurrPage;
-    RoundCornerProgressBar rcpb;
 
-    Content contentData;
-    List<ContentDetail> contentDetailList;
+    private List<ContentDetail> myDataset;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_content_slide_show);
 
-        mContext = this;
-
         Intent intent = getIntent();
-        final int id = intent.getIntExtra("content_id", 1);
+        content_id = intent.getIntExtra("content_id", 1);
 
-        Log.i(TAG, "onCreate의 id= " + id);
+        Log.i(TAG, "onCreate의 id= " + content_id);
 
-
-        final PhotoData photoData = new PhotoData(id);
-
-        Thread newThread = new Thread(){
+        Thread slideShow = new Thread(){
             @Override
             public void run() {
                 super.run();
-                contentData = photoData.getContentData(id);
-                Log.i(TAG, "onCreate의 contentDataList= " + contentData);
+                String responseData = JsonConnection.getConnection(Value.contentURL+"/"+content_id, "GET", null);
+                content = JSON.parseObject(responseData, Content.class);
+                myDataset = content.getDetails();
             }
         };
-        newThread.start();
+        slideShow.start();
         try {
-            newThread.join();
+            slideShow.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
-
-
-        getImage();
-
-
-
-        //SequenceEncoder enc = new SequenceEncoder();
-// GOP size will be supported in 0.2
-// enc.getEncoder().setKeyInterval(25);
-        /*for(...) {
-            BufferedImage image = ... // Obtain an image to encode
-            enc.encodeImage(image);
+        List<Bitmap> detailBitmaps = JsonConnection.getBitmap(myDataset, Value.contentPhotoURL);
+        for(int i = 0; i < myDataset.size(); i++){
+            myDataset.get(i).getPhoto().setBitmap(detailBitmaps.get(i));
         }
-        enc.finish();*/
-
-
-
-
-        contentDetailList = contentData.getDetails();
-        Log.i(TAG, "onCreate의 contentDetailList= " + contentDetailList.toString());
-
-        String photoFileName = null;
-        for(ContentDetail cd : contentDetailList){
-            photoFileName = cd.getPhoto().getPhoto_file_name();
-            Log.i(TAG, "onCreate의 photoFileName= " + photoFileName);
-        }
-
-
-
-        getImage();
-
-        //((ImageView)findViewById(R.id.testImageVIew)).setImageBitmap(contentData.getDetails().get(0).getPhoto().getBitmap());
-
-
 
         //find  view
         mViewFlipper = (ViewFlipper) this.findViewById(R.id.view_flipper);
@@ -126,17 +78,12 @@ public class ContentSlideShow extends AppCompatActivity {
 
         //SeekBar 찾아오기
         slideSeekBar = (SeekBar) findViewById(R.id.slide_seek_bar);
-        //SeekBar 분할
-//        slideSeekBar.setMax(contentData.getDetails().size()-1);
-
         //현재 페이지 표시할 TextView
         tvCurrPage = (TextView)findViewById(R.id.tv_curr_page);
 
         final long frameInterval = 1000;
-        final long maxTime = 30000;
-        final int totalTime = (int) (maxTime / frameInterval);
-        final int secPerFrame = totalTime / contentData.getDetails().size();
-
+        final int secPerFrame = 3;
+        final int totalTime = secPerFrame * myDataset.size()*1000;
 
         mViewFlipper.setFlipInterval(secPerFrame*1000);// set interval time
 
@@ -145,70 +92,43 @@ public class ContentSlideShow extends AppCompatActivity {
         mViewFlipper.setOutAnimation(outFromLeft);
         mViewFlipper.setInAnimation(inFromLeft);//set  animatio style
 
+        for(int i=0; i<myDataset.size(); i++){
+            ImageView iView = new ImageView(this);
+            iView.setImageBitmap(myDataset.get(i).getPhoto().getBitmap());
+            mViewFlipper.addView(iView);
+        }
 
+        slideSeekBar.setMax(totalTime/1000);
 
-
-        MediaPlayer mp = new MediaPlayer();
-
-
-
-
-        setFlipperImage();
-
-/*      상현이형 나중에 추가수정할때 TargetAPI를 높여서 쓰시면 됩니다.
-        slideSeekBar.setOnScrollChangeListener(new View.OnScrollChangeListener() {
-            @Override
-            public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-
-                int currIndex = mViewFlipper.indexOfChild(mViewFlipper.getCurrentView());
-                Log.i(TAG, "slideSeekBar.setOnClickListener의 currIndex= " + currIndex);
-                Log.i(TAG, "slideSeekBar.setOnClickListener의 scrollX= " + scrollX);
-                Log.i(TAG, "slideSeekBar.setOnClickListener의 oldScrollX= " + oldScrollX);
-            }
-        });
-*/
-
-
-        rcpb = (RoundCornerProgressBar) findViewById(R.id.slide_progress_bar);
-        rcpb.setMax(contentData.getDetails().size());
-//        pb.setMax(contentData.getDetails().size());
-
-        final CountDownTimer cdt = new CountDownTimer(maxTime, frameInterval) {
+        final CountDownTimer cdt = new CountDownTimer(totalTime-1000, frameInterval) {
             @Override
             public void onTick(long millisUntilFinished) {
-                Log.i(TAG, "onTick의 millisUntilFinished= " + millisUntilFinished);
-                /*int i = (int)(maxTime - millisUntilFinished);
-                slideSeekBar.setProgress(index);*/
+
                 int remainSeconds = (int)millisUntilFinished/1000;
-                int currSeconds = totalTime - remainSeconds;
+                int currSeconds = totalTime/1000 - remainSeconds;
                 index = currSeconds / secPerFrame;
-                slideSeekBar.setProgress(currSeconds);
+                slideSeekBar.setProgress(currSeconds-1);
 
-                //long seconds = TimeUnit.SECONDS.toSeconds(millisUntilFinished);
-                String result = String.format("%02d", 00) + ":"
-                        + String.format("%02d", currSeconds);
-
+                String result = String.format("%02d", 00) + ":" + String.format("%02d", currSeconds-1);
                 tvCurrPage.setText("현재 시간 : " + result);
             }
 
             @Override
             public void onFinish() {
-
+                slideSeekBar.setProgress(totalTime/1000);
+                mViewFlipper.stopFlipping();
+                play.setVisibility(View.VISIBLE);
+                String result = String.format("%02d", 00) + ":" + String.format("%02d", totalTime/1000);
+                tvCurrPage.setText("현재 시간 : " + result);
             }
         };
-
-        //slideSeekBar.setMax((int)TimeUnit.MILLISECONDS.toSeconds(maxTime));
-        slideSeekBar.setMax(totalTime);
-
 
         //play  animation
         play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 play.setVisibility(View.INVISIBLE);
-
                 mViewFlipper.startFlipping();
-
                 cdt.start();
             }
         });
@@ -218,13 +138,12 @@ public class ContentSlideShow extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 play.setVisibility(View.VISIBLE);
-                cdt.cancel();
                 mViewFlipper.stopFlipping();
+                cdt.cancel();
             }
         });
 
 
-        //slideSeekBar.setAnimation();
         //SeekBar의 Progress 진행 위한 Thread
         new Thread(){
             @Override
@@ -233,7 +152,6 @@ public class ContentSlideShow extends AppCompatActivity {
                 mViewFlipper.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
                     @Override
                     public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-
                         //UI에 접근하기 위한 runOnUiThread 구현
                         runOnUiThread(new Runnable() {
                             @Override
@@ -246,21 +164,17 @@ public class ContentSlideShow extends AppCompatActivity {
                                 slideSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                                     @Override
                                     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                                        Log.i(TAG, "onProgressChanged의 progress= " + progress);
                                         index = progress / secPerFrame;
-                                        Log.i(TAG, "onProgressChanged의 index= " + index);
                                     }
 
                                     @Override
                                     public void onStartTrackingTouch(SeekBar seekBar) {
-                                        Log.i(TAG, "onStartTrackingTouch의 index= " + index);
+
                                     }
 
                                     @Override
                                     public void onStopTrackingTouch(SeekBar seekBar) {
-                                        Log.i(TAG, "onStopTrackingTouch의 index= " + index);
                                         index = seekBar.getProgress() / secPerFrame;
-                                        Log.i(TAG, "onStopTrackingTouch index= " + index);
                                         mViewFlipper.setDisplayedChild(index);
                                     }
                                 });
@@ -272,187 +186,11 @@ public class ContentSlideShow extends AppCompatActivity {
                                     }
                                 });
 
-                                rcpb.setProgress(index);
-
-                               /* slideSeekBar.setProgress(index);
-                                tvCurrPage.setText("현재 페이지 : " + String.valueOf(index+1));*/
                             }
                         });
                     }
                 });
             }
         }.start();
-
-//        slideSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-//            @Override
-//            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-//                Log.i(TAG, "onProgressChanged의 progress= " + progress);
-//                index = progress;
-//            }
-//
-//            @Override
-//            public void onStartTrackingTouch(SeekBar seekBar) {
-//                mViewFlipper.stopFlipping();
-//            }
-//
-//            @Override
-//            public void onStopTrackingTouch(SeekBar seekBar) {
-//                index = seekBar.getProgress() + 1;
-//                Log.i(TAG, "onStopTrackingTouch의 index= " + index);
-//                mViewFlipper.setDisplayedChild(index);
-//                mViewFlipper.startFlipping();
-//            }
-//        });
-
-        final Runtime runtime = Runtime.getRuntime();
-        final long usedMemInMB=(runtime.totalMemory() - runtime.freeMemory()) / 1048576L;
-        final long maxHeapSizeInMB=runtime.maxMemory() / 1048576L;
-        final long availHeapSizeInMB = maxHeapSizeInMB;
-        Log.i(TAG, "usedMemInMB= " + usedMemInMB);
-        Log.i(TAG, "maxHeapSizeInMB= " + maxHeapSizeInMB);
-        Log.i(TAG, "availHeapSizeInMB= " + availHeapSizeInMB);
-
     }
-
-
-
-
-    public void setFlipperImage(){
-        for(int i=0, size=contentData.getDetails().size(); i<size; i++){
-            ImageView iView = new ImageView(this);
-            iView.setImageBitmap(contentData.getDetails().get(i).getPhoto().getBitmap());
-            mViewFlipper.addView(iView,mViewFlipper.getWidth(),mViewFlipper.getHeight());
-        }
-    }
-
-
-
-    /**
-     * 이미지를 서버에서 가져오는 메서드입니다.
-     */
-    public void getImage(){
-
-
-        Thread thread = new Thread(){
-            @Override
-            public void run() {
-                super.run();
-                try {
-                    for (int i = 0; i < contentData.getDetails().size(); i++) {
-                        Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL("http://photovel.com/upload/" + contentData.getContent_id() + "/" + contentData.getDetails().get(i).getPhoto().getPhoto_file_name()).getContent());
-                        contentData.getDetails().get(i).getPhoto().setBitmap(bitmap);
-                        //File filePath = new File(Environment.getExternalStorageDirectory());
-                        //FileUtils.copyURLToFile(new URL("http://photovel.com/upload/" + contentData.getContent_id() + "/" + contentData.getDetails().get(i).getPhoto().getPhotoFileName()), );
-                    }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-
-        thread.start();
-
-        try {
-            thread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-
-    public class PhotoData extends Thread{
-        int id;
-        private int responseCode;
-
-        public PhotoData(int id){
-            this.id = id;
-        }
-
-        @Override
-        public void run() {
-            super.run();
-            getContentData(id);
-        }
-
-        public Content getContentData(int id){
-            Content content = null;
-            HttpURLConnection conn = null;
-            Log.i(TAG, "getPhotoData의 id= " + id);
-            String qry = "http://www.photovel.com/content/photo/" + id;
-            Log.i(TAG, "1.getPhotoData의 qry= " + qry);
-            try {
-                URL strUrl = new URL(qry);
-                conn = (HttpURLConnection) strUrl.openConnection();
-                conn.setDoInput(true);//서버로부터 결과값을 응답받음
-                //conn.setDoOutput(true);//서버로 값을 출력. GET방식의 경우 이 설정을 하면 405에러가 난다. 왜???
-                //conn.connect();
-                conn.setRequestMethod("GET");
-                Log.i(TAG, "2.getPhotoData의 qry= " + qry);
-/*
-                OutputStream os = conn.getOutputStream();
-                BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-//                bw.write(id);
-
-                bw.flush();
-                bw.close();*/
-
-                responseCode = conn.getResponseCode(); //정상인 경우 200번, 그 외 오류있는 경우 오류 번호 반환
-                Log.i(TAG, "getPhotoData의 responseCode= " + responseCode);
-                switch (responseCode){
-                    case HttpURLConnection.HTTP_OK:
-
-                        InputStream is = conn.getInputStream();
-                        Reader reader = new InputStreamReader(is, "UTF-8");
-                        BufferedReader br = new BufferedReader(reader);
-                        // while(br.read() != -1 ){
-                        String responseData = null;
-
-                        responseData = br.readLine();
-                        Log.i(TAG, "getPhotoData의 response data= " + responseData);
-
-                        content = JSON.parseObject(responseData, Content.class);
-
-                        br.close();
-                        reader.close();
-                        is.close();
-
-                        break;
-                    case HttpURLConnection.HTTP_NOT_FOUND:
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(getApplicationContext(), "페이지를 찾을 수 없습니다.", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-
-                        break;
-                    default:
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(getApplicationContext(), "response code: " + responseCode, Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                        break;
-                }
-
-                return content;
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-
-                conn.disconnect();
-            }
-
-            return null;
-        }
-
-
-
-    }
-
 }

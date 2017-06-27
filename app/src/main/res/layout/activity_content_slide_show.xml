@@ -25,18 +25,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="300dp">
             </ViewFlipper>
-            <com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar
-                android:id="@+id/slide_progress_bar"
-                android:layout_width="match_parent"
-                android:layout_height="30dp"
-                app:rcBackgroundPadding="1dp"
-                app:rcProgressColor="@color/colorPrimaryDark"
-                app:rcBackgroundColor="@color/common_google_signin_btn_text_dark" />
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_centerInParent="true"
             android:gravity="center"
             android:orientation="horizontal"
