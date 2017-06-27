@@ -43,7 +43,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
-import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
 import com.alibaba.fastjson.JSON;
 import com.photovel.FontActivity2;
 import com.photovel.MainActivity;
@@ -54,21 +53,10 @@ import com.photovel.http.Value;
 import com.vo.Comment;
 import com.vo.Content;
 import com.vo.ContentDetail;
-import com.vo.Photo;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -114,7 +102,6 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
     Button play, stop;
     SeekBar slideSeekBar;
     TextView tvCurrPage;
-    RoundCornerProgressBar rcpb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -427,8 +414,6 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
             mViewFlipper.addView(iView,mViewFlipper.getWidth(),mViewFlipper.getHeight());
         }
 
-        rcpb = (RoundCornerProgressBar) findViewById(R.id.slide_progress_bar);
-        rcpb.setMax(content.getDetails().size());
 
         final CountDownTimer cdt = new CountDownTimer(maxTime, frameInterval) {
             @Override
@@ -526,7 +511,6 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
                                     }
                                 });
 
-                                rcpb.setProgress(index);
 
                                /* slideSeekBar.setProgress(index);
                                 tvCurrPage.setText("현재 페이지 : " + String.valueOf(index+1));*/
