@@ -34,7 +34,7 @@ import java.util.Set;
  * Created by Junki on 2017-06-23.
  */
 
-public class SessionMangement extends Activity {
+public class SessionMangement extends FontActivity2 {
 
     String cookieValues;
     String sessionCheckValue="0";
