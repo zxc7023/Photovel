@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -22,8 +23,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.photovel.http.JsonConnection;
 import com.photovel.user.UserLogin;
 import com.alibaba.fastjson.JSON;
 import com.photovel.content.ContentInsertMain;
@@ -76,8 +79,10 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
             @Override
             public void run() {
                 super.run();
-                //images = new ArrayList<>();
-                images = getMainImage();
+                //images = getMainImage();
+                String responseData = JsonConnection.getConnection(Value.mainImageURL, "GET", null);
+                images = JSON.parseArray(responseData, MainImage.class);
+                Log.i(TAG, "images= " + images);
             }
         };
         getMainImage.start();
@@ -86,7 +91,11 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        getMainBitmap(); //메인 Image받아오기
+        //getMainBitmap(); //메인 Image받아오기
+        List<Bitmap> bitmaps = JsonConnection.getBitmap(images, Value.mainImagePhotoURL);
+        for(int i = 0; i < images.size(); i++){
+            images.get(i).setBitmap(bitmaps.get(i));
+        }
 
         carouselView.setPageCount(images.size());
         carouselView.setImageListener(imageListener);
@@ -165,28 +174,30 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
+        Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
+
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        View hView =  navigationView.getHeaderView(0);
+        TextView btnContentInsert = (TextView)hView.findViewById(R.id.btnContentInsert);
+        btnContentInsert.setTypeface(fontAwesomeFont);
+        btnContentInsert.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), ContentInsertMain.class);
+                getApplicationContext().startActivity(intent);
+            }
+        });
+        TextView tvUserName = (TextView)hView.findViewById(R.id.tvUserName);
+        tvUserName.setText("userID");   //로그인 상태 userID받아오면됨.
+        TextView tvProfileUpdate = (TextView)hView.findViewById(R.id.tvProfileUpdate);
+        tvProfileUpdate.setTypeface(fontAwesomeFont);
+        tvProfileUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getApplicationContext(),"프로필변경클릭",Toast.LENGTH_SHORT).show();
+            }
+        });
         navigationView.setNavigationItemSelectedListener(this);
-
-        HashMap<Integer,Class> map = new HashMap<>();
-        map.put(R.id.loginModuel, UserLogin.class);
-        map.put(R.id.contentInsert,ContentInsertMain.class);
-        map.put(R.id.cok,TestActivity.class);
-
-
-        Set<Integer> keys = map.keySet();
-        for(int key: keys){
-
-            final Class clazz = map.get(key);
-            Button bt = (Button) findViewById(key);
-            bt.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(getApplicationContext(),clazz);
-                    startActivity(intent);
-                }
-            });
-        }
     }
 
     //Android BackButton EventListener
@@ -214,35 +225,13 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         return super.onOptionsItemSelected(item);
     }
 
+    //툴바 메뉴 클릭 시
     @Override
     @NonNull
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
         int id = item.getItemId();
-        if(id==R.id.nav_log_out){
-            Toast.makeText(this, "로그아웃", Toast.LENGTH_SHORT).show();
-            logout(Value.userLogoutURL);
-            Intent intent = new Intent(getApplicationContext(),SessionMangement.class);
-            startActivity(intent);
-            finish();
-        }
-        /*
-
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }
-*/
-
+        NavigationItemSelected ns = new NavigationItemSelected();
+        ns.selected(id, getApplicationContext());
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
@@ -544,54 +533,5 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
             e.printStackTrace();
         }
 
-    }
-    public void logout(final String userLogoutURL){
-        Thread logoutThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                HttpURLConnection conn = null;
-                InputStream is = null;
-                URL connectURL = null;
-                OutputStream dos= null;
-                ByteArrayOutputStream baos;
-
-
-                try {
-                    connectURL = new URL(userLogoutURL);
-                    conn = (HttpURLConnection) connectURL.openConnection();
-                    conn.setDoInput(true);
-                    conn.setRequestMethod("GET");
-                    conn.setRequestProperty("Connection", "Keep-Alive");
-                    conn.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
-
-                    int responseCode = conn.getResponseCode();
-                    Log.i("myResponseCode", responseCode + "");
-                    switch (responseCode){
-                        case HttpURLConnection.HTTP_OK :
-                            //로그아웃이되면 공유객체의 jSession 삭제
-                            SharedPreferences test = getSharedPreferences("loginInfo", MODE_PRIVATE);
-                            String isRemovable = test.getString("Set-Cookie","notFound");
-                            if(!isRemovable.equals("notFound")){
-                                SharedPreferences.Editor editor2 = test.edit();
-                                editor2.remove("Set-Cookie");
-                                editor2.commit();
-                            }
-                            break;
-                    }
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }finally {
-                }
-            }
-        });
-
-        logoutThread.start();
-        try {
-            logoutThread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 }

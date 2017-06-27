@@ -4,6 +4,7 @@ import android.content.ClipData;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -22,11 +23,13 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.photovel.FontActivity;
 import com.photovel.FontActivity2;
+import com.photovel.NavigationItemSelected;
 import com.photovel.R;
 import com.photovel.http.Value;
 import com.vo.Content;
@@ -51,7 +54,8 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
     private RecyclerView.LayoutManager mLayoutManager;
     private List<Content> myDataset;
     private static final String TAG = "";
-    private String user_id;
+    private String user_id = "";
+    private String urlflag = "";
 
     Toolbar toolbar;
     private SearchView searchView;
@@ -73,6 +77,14 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
         }else{
             Log.i("user_id","list_user_id : "+user_id);
         }
+
+        urlflag = intent.getStringExtra("urlflag");
+        if(urlflag.equals("")){
+            urlflag = "C";
+        }else{
+            Log.i("urlflag","list_urlflag : "+urlflag);
+        }
+
 
         //db에 있는 userId별 content정보 받아오기
         Thread thread1 = new Thread(){
@@ -107,8 +119,29 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
+        Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
+
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        View hView =  navigationView.getHeaderView(0);
+        TextView btnContentInsert = (TextView)hView.findViewById(R.id.btnContentInsert);
+        btnContentInsert.setTypeface(fontAwesomeFont);
+        btnContentInsert.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), ContentInsertMain.class);
+                getApplicationContext().startActivity(intent);
+            }
+        });
+        TextView tvProfileUpdate = (TextView)hView.findViewById(R.id.tvProfileUpdate);
+        tvProfileUpdate.setTypeface(fontAwesomeFont);
+        tvProfileUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getApplicationContext(),"프로필변경클릭",Toast.LENGTH_SHORT).show();
+            }
+        });
         navigationView.setNavigationItemSelectedListener(this);
+
 
         //top버튼
         btnTop = (FloatingActionButton) findViewById(R.id.btnTop);
@@ -137,7 +170,16 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
         HttpURLConnection conn = null;
         Log.i(TAG, "getPhotoData의 id= " + id);
 
-        String qry = Value.contentURL+"/user/" + id;
+        String qry="";
+        if(urlflag.equals("C")){
+            qry = Value.contentURL+"/user/" + id;
+        }else if(urlflag.equals("M")){
+            qry = Value.contentURL+"/my/" + id;
+        }else if(urlflag.equals("N")){
+            qry = Value.contentURL+"/new";
+        }else if(urlflag.equals("R")){
+            qry = Value.contentURL+"/recommend";
+        }
         Log.i(TAG, "1.getPhotoData의 qry= " + qry);
 
         try {
@@ -252,28 +294,13 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
         return super.onOptionsItemSelected(item);
     }
 
+    //툴바 메뉴 클릭 시
     @Override
     @NonNull
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
         int id = item.getItemId();
-/*
-
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }
-*/
-
+        NavigationItemSelected ns = new NavigationItemSelected();
+        ns.selected(id, getApplicationContext());
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
