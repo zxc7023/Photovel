@@ -14,6 +14,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -26,7 +27,7 @@ import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
+//import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -41,6 +42,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.MultiAutoCompleteTextView;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
@@ -84,6 +86,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+//import android.widget.SearchView;
+
 
 public class MainActivity
         extends FontActivity2
@@ -109,7 +113,7 @@ public class MainActivity
     private MultiAutoCompleteTextView.Tokenizer tokenizer;
 
     //검색 리스트
-    private ArrayList<Content> contents;
+    private List<Content> contents;
 
     //커서
     MatrixCursor matrixCursor;
@@ -139,10 +143,10 @@ public class MainActivity
     List<MainImage> images;
 
     //추천 게시글 가로스크롤
-    private RecyclerView RVrecommend, RVnew;
+    private RecyclerView RVrecommend, RVnew, RVsearchRow;
     private MainRecommendAdapter mRecommendAdapter;
-    private MainNewAdapter mNewAdapter;
-    private RecyclerView.LayoutManager mRecommendLayoutManager, mNewLayoutManager;
+    private MainNewAdapter mNewAdapter, mSearchAdapter;
+    private RecyclerView.LayoutManager mRecommendLayoutManager, mNewLayoutManager, mSearchLayoutManager;
     private List<Content> myRecommendDataset, myNewDataset;
 
     @Override
@@ -254,6 +258,12 @@ public class MainActivity
         RVnew.setAdapter(mNewAdapter);
 
 
+        //검색 결과를 리사이클러 뷰에 사용
+        RVsearchRow = (RecyclerView) findViewById(R.id.anchor_dropdown_recycler_view);
+        RVsearchRow.setHasFixedSize(true);
+        RVsearchRow.setNestedScrollingEnabled(false);
+        mSearchLayoutManager = new LinearLayoutManager(getApplicationContext());
+        RVsearchRow.setLayoutManager(mSearchLayoutManager);
 
         // Adding Toolbar to the activity
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -355,46 +365,92 @@ public class MainActivity
     //appbar의 메뉴 생성
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
+        getMenuInflater().inflate(R.menu.app_bar_menu, menu);
 
-        searchItem = menu.findItem(R.id.menu_search);
+        searchItem = menu.findItem(R.id.action_search);
 
-        searchItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+        if(searchItem != null) {
+            //menu의 item으로부터 view를 가져옴
+            searchView = (SearchView) searchItem.getActionView();
+        }
+
+        searchView.setSuggestionsAdapter(searchListAdapter);
+
+        searchView.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
             @Override
-            public boolean onMenuItemClick(MenuItem item) {
+            public boolean onSuggestionSelect(int position) {
+                searchView.getSuggestionsAdapter().getItem(position);
+                return true;
+            }
+
+            @Override
+            public boolean onSuggestionClick(int position) {
                 return true;
             }
         });
 
-        /*// Get the SearchView and set the searchable configuration
-        searchManager = (SearchManager) MainActivity.this.getSystemService(Context.SEARCH_SERVICE);
-        if(searchItem != null) {
-            searchView = (SearchView) searchItem.getActionView();
-        }
 
-        if(searchView != null){
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                Log.i(TAG, "onQueryTextChange= " + newText);
+                int size = searchSuggestionsList.size();
+
+                //자료 필터
+                matrixCursor = new MatrixCursor(new String[]{BaseColumns._ID, "user_id", "content_subject", "main_ivphoto"});
+                Log.i(TAG, "onQueryTextChange의 searchSuggestionsList.size()= " + size);
+
+                for(int i=0; i<size; i++) {
+                    if ("".equals(newText)) {
+
+                    } else if (searchSuggestionsList.get(i).getUser().getUser_id().toLowerCase().startsWith(newText.toLowerCase()) //입력되는 문자열의 시작부분이 "user_id"의 value와 같은지 검사
+                            || searchSuggestionsList.get(i).getContent_subject().toLowerCase().startsWith(newText.toLowerCase())) {
+                        matrixCursor.addRow(new Object[]{i,
+                                searchSuggestionsList.get(i).getUser().getUser_id(),
+                                searchSuggestionsList.get(i).getContent_subject(),
+                                searchSuggestionsList.get(i).getBitmap()});
+                    }
+                }
+                /*if(matrixCursor.getExtras() != null) {
+                    Log.i(TAG, "onQueryTextChange의 matrixCursor 객체= " + matrixCursor.getExtras().get("user_id").toString());
+                    Log.i(TAG, "onQueryTextChange의 matrixCursor 객체= " + matrixCursor.getExtras().get("content_subject").toString());
+                }*/
+//                searchListAdapter.changeCursor(matrixCursor);
+                searchView.getSuggestionsAdapter().changeCursor(matrixCursor);
+
+                return true;
+            }
+        });
+
+        // Get the SearchView and set the searchable configuration
+        //searchManager = (SearchManager) MainActivity.this.getSystemService(Context.SEARCH_SERVICE);
+
+        //searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        /*if(searchItem != null) {
+            //menu의 item으로부터 view를 가져옴
+            searchView = (SearchView) searchItem.getActionView();
+        }*/
+
+       /* if(searchView != null){
             Log.i(TAG, "onCreateOptionsMenu에서 searchView가 있는 경우");
-            searchView.setFitsSystemWindows(true);
-            Rect rect = new Rect();
-            //rect.
 
             // Assumes current activity is the searchable activity
             searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-            //기본 아이콘 상태. 클릭하면 확장
-            searchView.setIconifiedByDefault(true);
+
+
             //커스텀 어댑터 또는 기본 어댑터 선택 가능. 기본 어댑터는 searchableinfo와 관련된 제안 제공자로부터 제안을 보여주는 데 사용
-            searchView.setSuggestionsAdapter(simpleCursorAdapter);
+            searchView.setSuggestionsAdapter(searchListAdapter);
 
             //제안 감시
             searchView.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
                 @Override
                 public boolean onSuggestionSelect(int position) {
-                    CursorAdapter cursorAdapter = searchView.getSuggestionsAdapter();
-                    Cursor cursor = cursorAdapter.getCursor();
-                    cursor.moveToPosition(position);
-                                                            //컬럼 이름에 대한 인덱스 반환
-                    searchView.setQuery(cursor.getString(cursor.getColumnIndex("user_id")), false);
-                    //searchView.setQuery(cursor.getString(cursor.getColumnIndex("subject")), false);
+
                     return true;
                 }
 
@@ -467,6 +523,12 @@ public class MainActivity
             });
         }*/
 
+       searchItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+           @Override
+           public boolean onMenuItemClick(MenuItem item) {
+               return true;
+           }
+       });
         //SearchView를 굳이 가져올 필요 없이 메뉴 아이콘 눌러서 확장될 때 레이아웃 지정
         MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
             @Override
@@ -515,7 +577,7 @@ public class MainActivity
 
     //content 가져오기
     private void getContentList(){
-        final String strUrl = "http://192.168.12.23:8888/content/photo/new";
+        final String strUrl = Value.photovelURL + "/content/photo/new";
         HashMap<String, String> headers = new HashMap<>();
 
         contents = new ArrayList<>();
@@ -523,9 +585,9 @@ public class MainActivity
         //volley 테스트
         requestQueue = Volley.newRequestQueue(getApplicationContext());
 
-        ContentRequest cr = new ContentRequest(strUrl, Content.class, headers, new Response.Listener<ArrayList<Content>>() {
+        ContentRequest cr = new ContentRequest(strUrl, Content.class, headers, new Response.Listener<List<Content>>() {
             @Override
-            public void onResponse(ArrayList<Content> response) {
+            public void onResponse(List<Content> response) {
                 if(response != null) {
                     Log.i(TAG, "onResponse의 response= " + response);
                     contents = response;
@@ -561,14 +623,14 @@ public class MainActivity
 
 
     //volley로 서버의 content 정보를 가져오기 위한 클래스
-    public class ContentRequest extends Request<ArrayList<Content>>{
+    public class ContentRequest extends Request<List<Content>>{
         private final Class<Content> clazz;
         private final Map<String, String> headers;
-        private final Response.Listener<ArrayList<Content>> listener;
+        private final Response.Listener<List<Content>> listener;
 
         //초기화용 생성자
         //url 주소, 받은 Json을 파싱할 타입(클래스), 헤더 정보, 리스너를 받아서 초기화
-        public ContentRequest(String url, Class<Content> clazz, Map<String, String> headers, Response.Listener<ArrayList<Content>> listener, Response.ErrorListener errorListener){
+        public ContentRequest(String url, Class<Content> clazz, Map<String, String> headers, Response.Listener<List<Content>> listener, Response.ErrorListener errorListener){
             super(Method.GET, url, errorListener);
             this.clazz = clazz;
             this.headers = headers;
@@ -583,13 +645,13 @@ public class MainActivity
 
         //전달(delivery) 위해서 파싱된 응답을 주어진 타입으로 캡슐화
         @Override
-        protected Response<ArrayList<Content>> parseNetworkResponse(NetworkResponse response) {
-            ArrayList<Content> contents = null;
+        protected Response<List<Content>> parseNetworkResponse(NetworkResponse response) {
+            List<Content> contents = null;
             try {
                 if(response != null){
                     String strJson = new String(response.data, "UTF-8");
 
-                    contents =(ArrayList<Content>) JSON.parseArray(strJson, clazz);
+                    contents = JSON.parseArray(strJson, clazz);
                 }
                 Log.i(TAG, "parseNetworkResponse의 response" + URLEncoder.encode(response.data.toString(), "UTF-8"));
 
@@ -606,7 +668,7 @@ public class MainActivity
         //대부분의 요청은 callback interface를 호출
         //파싱에 실패한 응답은 전달하지 않는다. non-null보장
         @Override
-        protected void deliverResponse(ArrayList<Content> response) {
+        protected void deliverResponse(List<Content> response) {
             listener.onResponse(response);
         }
 

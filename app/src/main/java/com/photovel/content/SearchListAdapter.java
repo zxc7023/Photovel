@@ -4,15 +4,19 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.support.v4.widget.CursorAdapter;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.photovel.R;
+
+//import android.support.v4.widget.CursorAdapter;
+
+//import android.widget.CursorAdapter;
 
 public class SearchListAdapter extends CursorAdapter {
 
@@ -48,7 +52,7 @@ public class SearchListAdapter extends CursorAdapter {
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        return View.inflate(context, R.layout.activity_main_new_list_adapter, parent);
+        return View.inflate(context, R.layout.activity_main_new_list_adapter, null);
     }
 
     //커서가 가리키는 데이터에 뷰를 묶는다
@@ -58,6 +62,7 @@ public class SearchListAdapter extends CursorAdapter {
         //이미 존재하는 뷰 객체의 main_ivphoto에 커서가 가리키는 정보의 이미지 저장
         main_ivphoto = (ImageView)view.findViewById(R.id.main_ivphoto);
 
+        //photoBytes = cursor.getBlob(cursor.getColumnIndex("content_subject"));
         photoBytes = cursor.getBlob(cursor.getColumnIndex("main_ivphoto"));
         if(photoBytes != null){
             Bitmap mainIvPhoto = BitmapFactory.decodeByteArray(photoBytes, 0, photoBytes.length);
