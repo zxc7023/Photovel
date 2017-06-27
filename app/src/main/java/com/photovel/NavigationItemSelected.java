@@ -26,12 +26,14 @@ public class NavigationItemSelected extends FontActivity{
         Intent intent;
         if(id == R.id.nav_home){
             intent = new Intent(context, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
             finish();
         }else if(id==R.id.nav_my_story){
             intent = new Intent(context, ContentListMain.class);
             intent.putExtra("urlflag","M");
             intent.putExtra("user_id","");
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
             finish();
         }else if(id==R.id.nav_my_friend){
@@ -42,6 +44,7 @@ public class NavigationItemSelected extends FontActivity{
             intent = new Intent(context, ContentListMain.class);
             intent.putExtra("urlflag","N");
             intent.putExtra("user_id","");
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
             finish();
         }else if(id==R.id.nav_hot_story){
@@ -54,6 +57,7 @@ public class NavigationItemSelected extends FontActivity{
             Toast.makeText(context, "로그아웃", Toast.LENGTH_SHORT).show();
             logout(Value.userLogoutURL, context);
             intent = new Intent(context, SessionMangement.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
             finish();
         }else if(id==R.id.nav_setting){

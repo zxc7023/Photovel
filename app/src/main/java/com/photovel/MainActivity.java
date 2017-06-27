@@ -192,6 +192,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), ContentInsertMain.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 getApplicationContext().startActivity(intent);
             }
         });
@@ -229,7 +230,6 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         /*if (id == R.id.action_settings) {
             return true;
         }*/
-
         return super.onOptionsItemSelected(item);
     }
 
