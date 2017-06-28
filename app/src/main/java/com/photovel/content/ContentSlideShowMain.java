@@ -7,10 +7,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -28,6 +30,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -53,11 +56,26 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class ContentSlideShowMain extends FontActivity2 implements NavigationView.OnNavigationItemSelectedListener {
     private SearchView searchView;
     private static final String TAG = "AppPermission";
     Toolbar toolbar;
+
+////////////////슬라이드쇼용 필드//////////////////
+    private ViewPager vpSlideShow;
+    private Context mContext;
+    private ArrayList<Bitmap> images = new ArrayList<>();
+    private SeekBar slideSeekBar;
+
+    private static int currPage = 0;
+    private static int MAX_PAGES = 0;
+    private int maxOffset;
+    private int currOffset;
+    int index;
+/////////////////////////////////////////////////
 
     private RelativeLayout RldetailData;
     private LinearLayout RLdetailDate, LLmenu;
@@ -80,15 +98,17 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_content_slide_show_main);
 
+        //게시글 번호 가져오기
         Intent intent = getIntent();
         content_id = intent.getIntExtra("content_id",1);
+
         if(content_id==-1){
             Log.i("content_id","slide_content_id 못받아옴!!!");
         }else {
             Log.i("content_id","slide_content_id : "+content_id);
         }
 
-        // Adding Toolbar to the activity
+        ////////// Adding Toolbar to the activity //////////
         toolbar = (Toolbar) findViewById(R.id.slideToolbar);
         setSupportActionBar(toolbar);
 
@@ -147,7 +167,9 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         LLmenu.bringToFront();
         RldetailData.bringToFront();
 
-        //db에 있는 contentId별 content정보 받아오기
+        ///////////////////////////////////////////////////////////////
+
+        ////////db에 있는 contentId별 content정보 받아오기
         Thread thread1 = new Thread(){
             @Override
             public void run() {
@@ -161,7 +183,12 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        getImage(); //content Image받아오기
+
+
+        getImage(); //content Image받아와서 images 리스트에 저장
+
+        ///////////////////////////////////////////////
+
 
         //content정보 추가하기
         tvdetailstate.setText("슬라이드");
@@ -216,6 +243,102 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
             @Override
             public void onClick(View view) {
                 nsv.fullScroll(View.FOCUS_UP);
+            }
+        });
+
+        ///////////////////////슬라이드쇼 테스트/////////////////////
+
+        init();
+        ////////////////////////////////////////////////////////////
+
+    }
+
+    private void init(){
+        //find  view
+        vpSlideShow = (ViewPager) this.findViewById(R.id.VP_slide_show);
+/*        play = (Button) findViewById(R.id.play);
+        stop = (Button) findViewById(R.id.stop);*/
+
+//        PageIndicator indicator = (PageIndicator) findViewById(R.id.slide_seek_bar);
+
+        //SeekBar 찾아오기
+        slideSeekBar = (SeekBar) findViewById(R.id.slide_seek_bar);
+
+        //현재 페이지 표시할 TextView
+//        tvCurrPage = (TextView)findViewById(R.id.tv_curr_page);
+        MAX_PAGES = images.size();
+        Log.i(TAG, "MAX_PAGES= " + images.size());
+
+        /*final long frameInterval = 1000;
+        final long maxTime = 30000;
+        final int totalTime = (int) (maxTime / frameInterval);
+        final int secPerFrame = totalTime / contentData.getDetails().size();*/
+
+        //슬라이드쇼 어댑터 등록
+        if(vpSlideShow != null){
+            Log.i(TAG, "vpSlideShow 있음");
+            vpSlideShow.setAdapter(new ContentSlideShowAdapter(images, getApplicationContext()));
+        }
+
+        //이미지 ArrayList에 추가
+        //setViewPagerImage();
+
+
+        //뷰 페이저 자동 실행
+        final Handler handler = new Handler();
+
+        final Runnable update = new Runnable() {
+            @Override
+            public void run() {
+                if(currPage == MAX_PAGES){
+                    currPage = 0;
+                }
+                Log.i(TAG, "update의 currpage= "+ currPage);
+                vpSlideShow.setCurrentItem(currPage++, true);
+                Log.i(TAG, "update의 vpSlideShow= "+ vpSlideShow.getCurrentItem());
+
+            }
+        };
+
+
+        //시간 설정
+        Timer timer = new Timer();
+        //시작할 때까지의 딜레이 시간과 각 작업 사이의 딜레이 시간 설정
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                //핸들러가 등록된 곳에서 runnable이 실행된다
+                handler.post(update);
+            }
+        }, 3000, 3000);
+
+
+
+        slideSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if(vpSlideShow.isFakeDragging()){
+                    //seekbar 클릭시 뷰페이저의 전체 너비 가져온다
+                    //전체 너비를 100등분(100%로 표현)해서 현재 progress(위치)와 곱하면 현재 위치
+                    int offset = (int) ((maxOffset/100.0) * progress);
+                    int dragBy = -1 * (offset - currOffset);
+                    //fakeDragBy를 사용하려면 먼저 반드시 beginFakeDrag 사용해야 함
+                    vpSlideShow.fakeDragBy(dragBy);
+                    currOffset = offset;
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                maxOffset = vpSlideShow.getWidth();
+                vpSlideShow.beginFakeDrag();
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                vpSlideShow.endFakeDrag();
+                currOffset = 0;
+                seekBar.setProgress(0);
             }
         });
     }
@@ -456,7 +579,7 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
-        searchView = (SearchView) toolbar.getMenu().findItem(R.id.menu_search).getActionView();
+       /* searchView = (SearchView) toolbar.getMenu().findItem(R.id.menu_search).getActionView();
         MenuItem searchItem = menu.findItem(R.id.menu_search);
         searchView = (SearchView) searchItem.getActionView();
         searchView.setQueryHint(getString(R.string.app_name));
@@ -471,9 +594,10 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
             public boolean onQueryTextChange(String s) {
                 return false;
             }
-        });
+        });*/
         return true;
     }
+
 
     //DB에서 content정보 받아오기
     public Content getContentData(int id){
@@ -564,6 +688,8 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
                         //Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL("http://photovel.com/upload/" + content.getContent_id() + "/" + content.getDetails().get(i).getPhoto().getPhoto_file_name()).getContent());
                         Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL(contentPhotoURL+ "/" + content.getContent_id() + "/" + content.getDetails().get(i).getPhoto().getPhoto_file_name()).getContent());
                         content.getDetails().get(i).getPhoto().setBitmap(bitmap);
+                        //리스트에 이미지 저장
+                        images.add(bitmap);
                         //File filePath = new File(Environment.getExternalStorageDirectory());
                         //FileUtils.copyURLToFile(new URL("http://photovel.com/upload/" + contentData.getContent_id() + "/" + contentData.getDetails().get(i).getPhoto().getPhotoFileName()), );
                     }

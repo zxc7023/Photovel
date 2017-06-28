@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<!--<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/activity_main"
@@ -9,69 +9,42 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.photovel.content.ContentSlideShow">
+    tools:context="com.photovel.content.ContentSlideShow">-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
 
-    <LinearLayout
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="wrap_content">
 
-        <LinearLayout
+        <!--<ViewFlipper
+            android:id="@+id/view_flipper"
+            android:layout_width="match_parent"
+            android:layout_height="300dp">
+        </ViewFlipper>-->
+        <android.support.v4.view.ViewPager
+            android:id="@+id/VP_slide_show"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"/>
+
+
+        <SeekBar
+            android:id="@+id/slide_seek_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
-            <ViewFlipper
-                android:id="@+id/view_flipper"
-                android:layout_width="match_parent"
-                android:layout_height="300dp">
-            </ViewFlipper>
-            <com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar
-                android:id="@+id/slide_progress_bar"
-                android:layout_width="match_parent"
-                android:layout_height="30dp"
-                app:rcBackgroundPadding="1dp"
-                app:rcProgressColor="@color/colorPrimaryDark"
-                app:rcBackgroundColor="@color/common_google_signin_btn_text_dark" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:visibility="visible">
-
-            <Button
-                android:id="@+id/play"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_marginRight="10dp"
-                android:background="@android:drawable/ic_media_play" />
-
-            <Button
-                android:id="@+id/stop"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:background="@android:drawable/ic_media_pause" />
-        </LinearLayout>
-        <LinearLayout
+            android:layout_below="@id/VP_slide_show"/>
+        <TextView
+            android:id="@+id/tv_curr_page"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
-            <SeekBar
-                android:id="@+id/slide_seek_bar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-            <TextView
-                android:id="@+id/tv_curr_page"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                />
-        </LinearLayout>
-    </LinearLayout>
+            android:layout_below="@id/slide_seek_bar"
+            />
+    </RelativeLayout>
+</LinearLayout>
 
-
-</ScrollView>
+<!--</ScrollView>-->
 
 

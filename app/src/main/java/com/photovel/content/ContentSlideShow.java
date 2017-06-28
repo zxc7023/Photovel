@@ -4,22 +4,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.os.CountDownTimer;
+import android.os.Handler;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.DragEvent;
-import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ViewFlipper;
 
 import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
 import com.alibaba.fastjson.JSON;
@@ -35,11 +29,20 @@ import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class ContentSlideShow extends AppCompatActivity {
-    private ViewFlipper mViewFlipper;
+    private ViewPager vpSlideShow;
     private Context mContext;
+    private ArrayList<Bitmap> images;
+
+    private static int currPage = 0;
+    private static int MAX_PAGES = 0;
+    private int maxOffset;
+    private int currOffset;
     int index;
 
 
@@ -69,6 +72,7 @@ public class ContentSlideShow extends AppCompatActivity {
 
         final PhotoData photoData = new PhotoData(id);
 
+        //자료 갖고 오기
         Thread newThread = new Thread(){
             @Override
             public void run() {
@@ -85,7 +89,7 @@ public class ContentSlideShow extends AppCompatActivity {
         }
 
 
-
+        //이미지 서버에서 가져오기
         getImage();
 
 
@@ -120,40 +124,94 @@ public class ContentSlideShow extends AppCompatActivity {
 
 
         //find  view
-        mViewFlipper = (ViewFlipper) this.findViewById(R.id.view_flipper);
-        play = (Button) findViewById(R.id.play);
-        stop = (Button) findViewById(R.id.stop);
+        vpSlideShow = (ViewPager) this.findViewById(R.id.VP_slide_show);
+//        play = (Button) findViewById(R.id.play);
+//        stop = (Button) findViewById(R.id.stop);
 
         //SeekBar 찾아오기
         slideSeekBar = (SeekBar) findViewById(R.id.slide_seek_bar);
-        //SeekBar 분할
-//        slideSeekBar.setMax(contentData.getDetails().size()-1);
 
         //현재 페이지 표시할 TextView
         tvCurrPage = (TextView)findViewById(R.id.tv_curr_page);
+        MAX_PAGES = images.size();
+        Log.i(TAG, "MAX_PAGES= " + images.size());
 
         final long frameInterval = 1000;
         final long maxTime = 30000;
         final int totalTime = (int) (maxTime / frameInterval);
         final int secPerFrame = totalTime / contentData.getDetails().size();
 
+        //슬라이드쇼 어댑터 등록
+        vpSlideShow.setAdapter(new ContentSlideShowAdapter(images, this));
 
-        mViewFlipper.setFlipInterval(secPerFrame*1000);// set interval time
-
-        final Animation inFromLeft = AnimationUtils.loadAnimation(this, R.anim.in_from_left);
-        Animation outFromLeft = AnimationUtils.loadAnimation(this, R.anim.out_from_left);
-        mViewFlipper.setOutAnimation(outFromLeft);
-        mViewFlipper.setInAnimation(inFromLeft);//set  animatio style
+        //이미지 ArrayList에 추가
+        //setViewPagerImage();
 
 
+        //뷰 페이저 자동 실행
+        final Handler handler = new Handler();
+
+        final Runnable update = new Runnable() {
+            @Override
+            public void run() {
+                if(currPage == MAX_PAGES){
+                    currPage = 0;
+                }
+                vpSlideShow.setCurrentItem(currPage++, true);
+            }
+        };
+
+        //시간 설정
+        Timer timer = new Timer();
+        //시작할 때까지의 딜레이 시간과 각 작업 사이의 딜레이 시간 설정
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                //핸들러가 등록된 곳에서 runnable이 실행된다
+                handler.post(update);
+            }
+        }, 3000, 3000);
+
+        slideSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if(vpSlideShow.isFakeDragging()){
+                    //seekbar 클릭시 뷰페이저의 전체 너비 가져온다
+                    //전체 너비를 100등분(100%로 표현)해서 현재 progress(위치)와 곱하면 현재 위치
+                    int offset = (int) ((maxOffset/100.0) * progress);
+                    int dragBy = -1 * (offset - currOffset);
+                    //fakeDragBy를 사용하려면 먼저 반드시 beginFakeDrag 사용해야 함
+                    vpSlideShow.fakeDragBy(dragBy);
+                    currOffset = offset;
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                maxOffset = vpSlideShow.getWidth();
+                vpSlideShow.beginFakeDrag();
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                vpSlideShow.endFakeDrag();
+                currOffset = 0;
+                seekBar.setProgress(0);
+            }
+        });
 
 
-        MediaPlayer mp = new MediaPlayer();
+        //mViewFlipper.setFlipInterval(secPerFrame*1000);// set interval time
+
+        //뷰 플리퍼 이미지 애니메이션
+        //final Animation inFromLeft = AnimationUtils.loadAnimation(this, R.anim.in_from_left);
+        //Animation outFromLeft = AnimationUtils.loadAnimation(this, R.anim.out_from_left);
+        //mViewFlipper.setOutAnimation(outFromLeft);
+        //mViewFlipper.setInAnimation(inFromLeft);//set  animatio style
 
 
 
-
-        setFlipperImage();
+        //setFlipperImage();
 
 /*      상현이형 나중에 추가수정할때 TargetAPI를 높여서 쓰시면 됩니다.
         slideSeekBar.setOnScrollChangeListener(new View.OnScrollChangeListener() {
@@ -168,17 +226,16 @@ public class ContentSlideShow extends AppCompatActivity {
         });
 */
 
-
-        rcpb = (RoundCornerProgressBar) findViewById(R.id.slide_progress_bar);
-        rcpb.setMax(contentData.getDetails().size());
-//        pb.setMax(contentData.getDetails().size());
+/*
 
         final CountDownTimer cdt = new CountDownTimer(maxTime, frameInterval) {
             @Override
             public void onTick(long millisUntilFinished) {
                 Log.i(TAG, "onTick의 millisUntilFinished= " + millisUntilFinished);
-                /*int i = (int)(maxTime - millisUntilFinished);
-                slideSeekBar.setProgress(index);*/
+                */
+/*int i = (int)(maxTime - millisUntilFinished);
+                slideSeekBar.setProgress(index);*//*
+
                 int remainSeconds = (int)millisUntilFinished/1000;
                 int currSeconds = totalTime - remainSeconds;
                 index = currSeconds / secPerFrame;
@@ -196,8 +253,9 @@ public class ContentSlideShow extends AppCompatActivity {
 
             }
         };
+*/
 
-        //slideSeekBar.setMax((int)TimeUnit.MILLISECONDS.toSeconds(maxTime));
+        /*//slideSeekBar.setMax((int)TimeUnit.MILLISECONDS.toSeconds(maxTime));
         slideSeekBar.setMax(totalTime);
 
 
@@ -207,7 +265,7 @@ public class ContentSlideShow extends AppCompatActivity {
             public void onClick(View view) {
                 play.setVisibility(View.INVISIBLE);
 
-                mViewFlipper.startFlipping();
+                //mViewFlipper.startFlipping();
 
                 cdt.start();
             }
@@ -219,14 +277,14 @@ public class ContentSlideShow extends AppCompatActivity {
             public void onClick(View view) {
                 play.setVisibility(View.VISIBLE);
                 cdt.cancel();
-                mViewFlipper.stopFlipping();
+                //mViewFlipper.stopFlipping();
             }
         });
 
 
         //slideSeekBar.setAnimation();
         //SeekBar의 Progress 진행 위한 Thread
-        new Thread(){
+        *//*new Thread(){
             @Override
             public void run() {
                 //ViewFlipper의 레이아웃이 변할 경우
@@ -274,14 +332,14 @@ public class ContentSlideShow extends AppCompatActivity {
 
                                 rcpb.setProgress(index);
 
-                               /* slideSeekBar.setProgress(index);
-                                tvCurrPage.setText("현재 페이지 : " + String.valueOf(index+1));*/
+                               *//**//* slideSeekBar.setProgress(index);
+                                tvCurrPage.setText("현재 페이지 : " + String.valueOf(index+1));*//**//*
                             }
                         });
                     }
                 });
             }
-        }.start();
+        }.start();*//*
 
 //        slideSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 //            @Override
@@ -304,26 +362,27 @@ public class ContentSlideShow extends AppCompatActivity {
 //            }
 //        });
 
-        final Runtime runtime = Runtime.getRuntime();
-        final long usedMemInMB=(runtime.totalMemory() - runtime.freeMemory()) / 1048576L;
-        final long maxHeapSizeInMB=runtime.maxMemory() / 1048576L;
-        final long availHeapSizeInMB = maxHeapSizeInMB;
-        Log.i(TAG, "usedMemInMB= " + usedMemInMB);
-        Log.i(TAG, "maxHeapSizeInMB= " + maxHeapSizeInMB);
-        Log.i(TAG, "availHeapSizeInMB= " + availHeapSizeInMB);
 
     }
 
 
 
 
-    public void setFlipperImage(){
+   *//* public void setFlipperImage(){
         for(int i=0, size=contentData.getDetails().size(); i<size; i++){
             ImageView iView = new ImageView(this);
             iView.setImageBitmap(contentData.getDetails().get(i).getPhoto().getBitmap());
             mViewFlipper.addView(iView,mViewFlipper.getWidth(),mViewFlipper.getHeight());
         }
+        */
     }
+    /*public void setViewPagerImage(){
+        for(int i=0, size=contentData.getDetails().size(); i<size; i++) {
+            Log.i(TAG, "setViewPagerImage의 contentData 정보= " + contentData.getContent_subject());
+            Bitmap bitmap = contentData.getDetails().get(i).getPhoto().getBitmap();
+            images.add(bitmap);
+        }
+   }*/
 
 
 
@@ -341,6 +400,7 @@ public class ContentSlideShow extends AppCompatActivity {
                     for (int i = 0; i < contentData.getDetails().size(); i++) {
                         Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL("http://photovel.com/upload/" + contentData.getContent_id() + "/" + contentData.getDetails().get(i).getPhoto().getPhoto_file_name()).getContent());
                         contentData.getDetails().get(i).getPhoto().setBitmap(bitmap);
+                        images.add(bitmap);
                         //File filePath = new File(Environment.getExternalStorageDirectory());
                         //FileUtils.copyURLToFile(new URL("http://photovel.com/upload/" + contentData.getContent_id() + "/" + contentData.getDetails().get(i).getPhoto().getPhotoFileName()), );
                     }

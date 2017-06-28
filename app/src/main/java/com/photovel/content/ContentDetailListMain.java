@@ -35,8 +35,6 @@ import android.widget.Toast;
 import com.alibaba.fastjson.JSON;
 import com.photovel.FontActivity2;
 import com.photovel.MainActivity;
-import com.photovel.MainNewAdapter;
-import com.photovel.MainRecommendAdapter;
 import com.photovel.R;
 import com.photovel.http.Value;
 import com.vo.Content;
@@ -487,6 +485,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
+/*
         searchView = (SearchView) toolbar.getMenu().findItem(R.id.menu_search).getActionView();
         MenuItem searchItem = menu.findItem(R.id.menu_search);
         searchView = (SearchView) searchItem.getActionView();
@@ -502,8 +501,10 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
             public boolean onQueryTextChange(String s) {
                 return false;
             }
-        });
+        });*/
+
         return true;
+
     }
 
     //DB에서 content정보 받아오기

@@ -26,7 +26,6 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="center_vertical"
                 android:background="@null"
-                android:dropDownAnchor="@id/anchor_dropdown"
                 android:dropDownHeight="wrap_content"
                 android:dropDownHorizontalOffset="0dp"
                 android:dropDownVerticalOffset="0dp"

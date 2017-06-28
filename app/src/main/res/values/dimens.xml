@@ -16,4 +16,7 @@
     <dimen name="icon_size">22dp</dimen>
     <dimen name="content_text_size">14dp</dimen>
     <dimen name="content_point_text__size">16dp</dimen>
+
+    <dimen name="search_icon_padding">12dp</dimen>
+    <dimen name="search_view_text_padding">65dp</dimen>
 </resources>
