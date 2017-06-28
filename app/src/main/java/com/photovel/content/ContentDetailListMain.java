@@ -11,6 +11,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.NestedScrollView;
@@ -40,6 +41,7 @@ import com.photovel.FontActivity2;
 import com.photovel.MainActivity;
 import com.photovel.NavigationItemSelected;
 import com.photovel.R;
+import com.photovel.common.BookMarkMain;
 import com.photovel.http.JsonConnection;
 import com.photovel.http.Value;
 import com.photovel.setting.SettingMain;
@@ -63,7 +65,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
 
     private RelativeLayout RldetailData;
     private LinearLayout RLdetailDate, LLmenu, btnMoreUserContent, btnLike, btnComment, btnBookmark;
-    private TextView icglobe, icleft, icright, tvleft, tvright, iccal, icmarker, icpow, icthumb, iccomment, icshare, btnDetailMenu;
+    private TextView icglobe, icleft, icright, tvleft, tvright, iccal, icmarker, icbookmark, icthumb, iccomment, icshare, btnDetailMenu;
     private TextView tvContentInsertDate, tvContentSubject, tvContentLocation, tvUsername, tvUsername2, tvDuring, tvdetailcount, tvdetailstate, tvContent;
     private TextView tvLikeCount, tvCommentCount, tvShareCount;
     private LinearLayout btnLookLeft, btnLookRight;
@@ -95,8 +97,11 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         if(content_id==-1){
             Log.i("content_id","detail_content_id를 못받아옴");
         }else {
-            Log.i("content_id","detail_content_id : "+content_id);
+            Log.i("content_id", "detail_content_id : " + content_id);
         }
+
+        SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
+        user_id = get_to_eat.getString("user_id","notFound");
 
         // Adding Toolbar to the activity
         toolbar = (Toolbar) findViewById(R.id.detailListToolbar);
@@ -105,7 +110,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         icglobe = (TextView)findViewById(R.id.icglobe);
         iccal = (TextView)findViewById(R.id.iccal);
         icmarker = (TextView)findViewById(R.id.icmarker);
-        icpow = (TextView)findViewById(R.id.icpow);
+        icbookmark = (TextView)findViewById(R.id.icbookmark);
         icthumb = (TextView)findViewById(R.id.icthumb);
         iccomment = (TextView)findViewById(R.id.iccomment);
         icshare = (TextView)findViewById(R.id.icshare);
@@ -157,7 +162,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         icright.setTypeface(fontAwesomeFont);
         iccal.setTypeface(fontAwesomeFont);
         icmarker.setTypeface(fontAwesomeFont);
-        icpow.setTypeface(fontAwesomeFont);
+        icbookmark.setTypeface(fontAwesomeFont);
         icthumb.setTypeface(fontAwesomeFont);
         iccomment.setTypeface(fontAwesomeFont);
         icshare.setTypeface(fontAwesomeFont);
@@ -177,14 +182,12 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         LLmenu.bringToFront();
         RldetailData.bringToFront();
 
-
-
         //사진 스토리, 댓글 객체 받아오기
         Thread detailList = new Thread(){
             @Override
             public void run() {
                 super.run();
-                String responseData = JsonConnection.getConnection(Value.contentURL+"/"+content_id, "GET", null);
+                String responseData = JsonConnection.getConnection(Value.contentURL+"/"+content_id+"/"+user_id, "GET", null);
                 content = JSON.parseObject(responseData, Content.class);
                 myDataset = content.getDetails();
                 myCommentDataset = content.getComments();
@@ -211,9 +214,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         }
 
         //디테일 메뉴 보이기 전에 글쓴이 == 내계정 확인
-        SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
-        user_id = get_to_eat.getString("user_id","notFound");
-        if(!content.getUser().getUser_id().equals(user_id)){
+        if(!user_id.equals(content.getUser().getUser_id())){
             LLmenu.setVisibility(View.GONE);
         }
 
@@ -229,6 +230,16 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         tvCommentCount.setText(String.valueOf(content.getComment_count()));
         tvShareCount.setText(String.valueOf(content.getContent_share_count()));
 
+        //bookmark유무
+        if(content.getBookmark_status() == 1){
+            icbookmark.setText(R.string.fa_bookmark);
+            icbookmark.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.textBlue));
+        }
+
+        //좋아요 유무
+        if(content.getGood_status() == 1){
+            icthumb.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.textBlue));
+        }
 
         //메인 사진 저장
         ivTopPhoto.setImageBitmap(content.getBitmap());
@@ -372,6 +383,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
                 intent.putExtra("content_id", content_id);
                 startActivity(intent);
                 Toast.makeText(getApplicationContext(),"북마크 완료!",Toast.LENGTH_SHORT).show();
+                finish();
             }
         });
 
@@ -618,9 +630,6 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         }else if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
             super.onBackPressed();
         }
     }

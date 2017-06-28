@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -53,16 +54,17 @@ public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHo
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public RelativeLayout RlmainTop;
+        public RelativeLayout RlmainTop, RLBookmark;
         public ImageView main_ivphoto;
         public TextView contentSubject, userNickname;
         public TextView main_icthumb, main_iccomment, main_icshare;
-        public TextView thumbCount, commentCount, shareCount;
+        public TextView thumbCount, commentCount, shareCount, tvbookmark;
         public LinearLayout llthumb, llcomment, llshare;
 
         public ViewHolder(View view) {
             super(view);
             RlmainTop = (RelativeLayout)view.findViewById(R.id.RlmainTop);
+            RLBookmark = (RelativeLayout)view.findViewById(R.id.RLBookmark);
             main_ivphoto = (ImageView)view.findViewById(R.id.main_ivphoto);
             contentSubject = (TextView)view.findViewById(R.id.contentSubject);
             userNickname = (TextView)view.findViewById(R.id.userNickname);
@@ -72,6 +74,7 @@ public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHo
             thumbCount = (TextView)view.findViewById(R.id.thumbCount);
             commentCount = (TextView)view.findViewById(R.id.commentCount);
             shareCount = (TextView)view.findViewById(R.id.shareCount);
+            tvbookmark = (TextView)view.findViewById(R.id.tvbookmark);
             llthumb = (LinearLayout)view.findViewById(R.id.llthumb);
             llcomment = (LinearLayout)view.findViewById(R.id.llcomment);
             llshare = (LinearLayout)view.findViewById(R.id.llshare);
@@ -94,6 +97,15 @@ public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHo
         holder.main_icthumb.setTypeface(fontAwesomeFont);
         holder.main_iccomment.setTypeface(fontAwesomeFont);
         holder.main_icshare.setTypeface(fontAwesomeFont);
+        holder.tvbookmark.setTypeface(fontAwesomeFont);
+
+        if(mDataset.get(position).getBookmark_status() == 1){ //bookmark유무
+            holder.RLBookmark.setVisibility(View.VISIBLE);
+            holder.RLBookmark.bringToFront();
+        }
+        if(mDataset.get(position).getGood_status() == 1){   //좋아요 유무
+            holder.main_icthumb.setTextColor(ContextCompat.getColor(mcontext, R.color.textBlue));
+        }
 
         holder.main_ivphoto.setImageBitmap(mDataset.get(position).getBitmap());
         //subject 15자 이상이면 ... 붙이기

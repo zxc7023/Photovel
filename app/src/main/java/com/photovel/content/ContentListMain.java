@@ -101,16 +101,16 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
 
                 String qry = null;
                 if(urlflag.equals("C")){
-                    qry = Value.contentURL+"/user/" + user_id;
+                    qry = Value.contentURL+"/user/";
                 }else if(urlflag.equals("M")){
-                    qry = Value.contentURL+"/my/" + user_id;
+                    qry = Value.contentURL+"/my/";
                 }else if(urlflag.equals("N")){
-                    qry = Value.contentURL+"/new";
+                    qry = Value.contentURL+"/new/";
                 }else if(urlflag.equals("R")){
-                    qry = Value.contentURL+"/recommend";
+                    qry = Value.contentURL+"/recommend/";
                 }
 
-                String responseData = JsonConnection.getConnection(qry, "GET", null);
+                String responseData = JsonConnection.getConnection(qry+user_id, "GET", null);
                 myDataset = JSON.parseArray(responseData, Content.class);
             }
         };
@@ -132,7 +132,7 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setNestedScrollingEnabled(false);
-        mAdapter = new ContentListAdapter(myDataset, ContentListMain.this);
+        mAdapter = new ContentListAdapter(myDataset, ContentListMain.this, urlflag);
         mRecyclerView.setAdapter(mAdapter);
 
 

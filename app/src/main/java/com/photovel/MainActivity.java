@@ -112,7 +112,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
             @Override
             public void run() {
                 super.run();
-                String responseData = JsonConnection.getConnection(Value.contentURL+"/recommend", "GET", null);
+                String responseData = JsonConnection.getConnection(Value.contentURL+"/recommend/"+user_id, "GET", null);
                 myRecommendDataset = JSON.parseArray(responseData, Content.class);
             }
         };
@@ -143,7 +143,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
             @Override
             public void run() {
                 super.run();
-                String responseData = JsonConnection.getConnection(Value.contentURL+"/new", "GET", null);
+                String responseData = JsonConnection.getConnection(Value.contentURL+"/new/"+user_id, "GET", null);
                 myNewDataset = JSON.parseArray(responseData, Content.class);
             }
         };

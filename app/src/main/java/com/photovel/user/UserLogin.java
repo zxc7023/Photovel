@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 
+import com.alibaba.fastjson.JSON;
 import com.photovel.MainActivity;
 import com.photovel.R;
 
@@ -24,6 +25,7 @@ import com.photovel.FontActivity2;
 
 import com.photovel.TestActivity;
 import com.photovel.http.Value;
+import com.vo.User;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -111,14 +113,13 @@ public class UserLogin extends FontActivity2 {
                     }
                     Log.i("myJsonString", job.toString());
                     login(job.toString(),url);
-                    if(isSucess.equals("1")){
+                    if(isSucess.equals("")){
+                        Toast.makeText(mContext, "로그인실패", Toast.LENGTH_SHORT).show();
+                    }else{
                         Toast.makeText(mContext, "로그인성공", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                         startActivity(intent);
                         finish();
-
-                    }else{
-                        Toast.makeText(mContext, "로그인실패", Toast.LENGTH_SHORT).show();
                     }
 
                 }
@@ -175,7 +176,13 @@ public class UserLogin extends FontActivity2 {
                             }
                             byteData=baos.toByteArray();
                             isSucess = new String(byteData);
-                            Log.i("isSucess",isSucess);
+                            if(isSucess.equals("")){
+                                Log.i("ddd","로그인실패");
+                                break;
+                            }
+                            User temp = JSON.parseObject(isSucess, User.class);
+                            Log.i("temp","temp : "+temp.toString());
+
                             //로그인이 삭제되건 성공하건 이전의 세션은 삭제해줘야한다.
                             SharedPreferences test = getSharedPreferences("loginInfo", MODE_PRIVATE);
                             String isRemovable = test.getString("Set-Cookie","notFound");
@@ -183,6 +190,7 @@ public class UserLogin extends FontActivity2 {
                                 SharedPreferences.Editor editor2 = test.edit();
                                 editor2.remove("Set-Cookie");
                                 editor2.remove("user_id");
+                                editor2.remove("user_nick_name");
                                 editor2.commit();
                             }
 
@@ -206,6 +214,8 @@ public class UserLogin extends FontActivity2 {
                             SharedPreferences.Editor editor = loginInfo.edit();
                             editor.putString("Set-Cookie", cookieValues); //First라는 key값으로 infoFirst 데이터를 저장한다.
                             editor.putString("user_id",user_id);
+                            editor.putString("user_nick_name",temp.getUser_nick_name());
+
                             editor.commit(); //완료한다.
 
                             break;

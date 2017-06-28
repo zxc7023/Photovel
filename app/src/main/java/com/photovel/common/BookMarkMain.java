@@ -2,6 +2,7 @@ package com.photovel.common;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -59,6 +61,7 @@ public class BookMarkMain extends FontActivity2 implements NavigationView.OnNavi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_mark_main);
 
+        //로그인중인 user_id받아오기
         SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
         user_id = get_to_eat.getString("user_id","notFound");
 
@@ -67,18 +70,18 @@ public class BookMarkMain extends FontActivity2 implements NavigationView.OnNavi
         Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
         tvbookmark.setTypeface(fontAwesomeFont);
 
-        //신규 스토리 객체 받아오기
-        Thread getNew = new Thread(){
+        //북마크 스토리 객체 받아오기
+        Thread getBookmark = new Thread(){
             @Override
             public void run() {
                 super.run();
-                String responseData = JsonConnection.getConnection(Value.contentURL+"/new", "GET", null);
+                String responseData = JsonConnection.getConnection(Value.photovelURL+"/bookmark/"+user_id, "GET", null);
                 myNewDataset = JSON.parseArray(responseData, Content.class);
             }
         };
-        getNew.start();
+        getBookmark.start();
         try {
-            getNew.join();  //모든처리 thread처리 기다리기
+            getBookmark.join();  //모든처리 thread처리 기다리기
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -88,10 +91,10 @@ public class BookMarkMain extends FontActivity2 implements NavigationView.OnNavi
             myNewDataset.get(i).setBitmap(newBitmaps.get(i));
         }
 
-        //recyclerview데코레이션
+        /*//recyclerview데코레이션
         int spanCount = 3; // 3 columns
         int spacing = 50; // 50px
-        boolean includeEdge = true;
+        boolean includeEdge = true;*/
 
         //신규 스토리 recycleview사용선언
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
@@ -99,9 +102,9 @@ public class BookMarkMain extends FontActivity2 implements NavigationView.OnNavi
         recyclerView.setNestedScrollingEnabled(false);
         mNewLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(mNewLayoutManager);
+        recyclerView.addItemDecoration(new GridSpacingItemDecoration(2, dpToPx(10), true));
         mNewAdapter = new MainNewAdapter(myNewDataset, BookMarkMain.this);
         recyclerView.setAdapter(mNewAdapter);
-        recyclerView.addItemDecoration(new GridSpacingItemDecoration(spanCount, spacing, includeEdge));
 
         // Adding Toolbar to the activity
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -113,8 +116,6 @@ public class BookMarkMain extends FontActivity2 implements NavigationView.OnNavi
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-
-
 
         //메뉴 navigation
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
@@ -142,6 +143,12 @@ public class BookMarkMain extends FontActivity2 implements NavigationView.OnNavi
             }
         });
         navigationView.setNavigationItemSelectedListener(this);
+    }
+
+    //decoration에서필요한거
+    private int dpToPx(int dp) {
+        Resources r = getResources();
+        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics()));
     }
 
     @Override

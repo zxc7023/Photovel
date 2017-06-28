@@ -11,6 +11,23 @@
         android:id="@+id/RlmainTop"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
+        <RelativeLayout
+            android:id="@+id/RLBookmark"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_margin="5dp"
+            android:visibility="invisible">
+            <TextView
+                android:id="@+id/tvbookmark"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/fa_bookmark"
+                android:textColor="@color/bgWhite"
+                android:textSize="@dimen/icon_size"
+                android:layout_marginTop="@dimen/most_rignt_tv_margin"
+                android:layout_marginRight="@dimen/most_rignt_tv_margin"/>
+        </RelativeLayout>
         <ImageView
             android:id="@+id/main_ivphoto"
             android:layout_width="match_parent"

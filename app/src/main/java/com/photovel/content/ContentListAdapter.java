@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -46,6 +47,7 @@ public class ContentListAdapter extends RecyclerView.Adapter<ContentListAdapter.
     private ViewHolder holder;
     private int position, content_id=-1;
     private String user_id;
+    private String urlflag;
 
     public int getPosition() {
         return position;
@@ -64,15 +66,16 @@ public class ContentListAdapter extends RecyclerView.Adapter<ContentListAdapter.
     public ContentListAdapter() {
     }
 
-    public ContentListAdapter(List<Content> myDataset, Context mycontext) {
+    public ContentListAdapter(List<Content> myDataset, Context mycontext, String urlflag) {
         mDataset = myDataset;
         mcontext = mycontext;
+        this.urlflag = urlflag;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public RelativeLayout RldetailData;
         public LinearLayout RLdetailDate, LLmenu;
-        public TextView icglobe, icleft, icright, tvleft, tvright, iccal, icmarker, icpow, icthumb, iccomment, icshare, btnDetailMenu;
+        public TextView icglobe, icleft, icright, tvleft, tvright, iccal, icmarker, icbookmark, icthumb, iccomment, icshare, btnDetailMenu;
         public TextView tvContentInsertDate, tvContentSubject, tvContentLocation, tvUsername, tvDuring, tvdetailcount, tvContent;
         public TextView tvLikeCount, tvCommentCount, tvShareCount, btnComment;
         public LinearLayout btnLookLeft, btnLookRight, btnLike, btnBookmark;
@@ -87,7 +90,7 @@ public class ContentListAdapter extends RecyclerView.Adapter<ContentListAdapter.
             icglobe = (TextView)view.findViewById(R.id.icglobe);
             iccal = (TextView)view.findViewById(R.id.iccal);
             icmarker = (TextView)view.findViewById(R.id.icmarker);
-            icpow = (TextView)view.findViewById(R.id.icpow);
+            icbookmark = (TextView)view.findViewById(R.id.icbookmark);
             icthumb = (TextView)view.findViewById(R.id.icthumb);
             iccomment = (TextView)view.findViewById(R.id.iccomment);
             icshare = (TextView)view.findViewById(R.id.icshare);
@@ -138,7 +141,7 @@ public class ContentListAdapter extends RecyclerView.Adapter<ContentListAdapter.
         holder.icright.setTypeface(fontAwesomeFont);
         holder.iccal.setTypeface(fontAwesomeFont);
         holder.icmarker.setTypeface(fontAwesomeFont);
-        holder.icpow.setTypeface(fontAwesomeFont);
+        holder.icbookmark.setTypeface(fontAwesomeFont);
         holder.icthumb.setTypeface(fontAwesomeFont);
         holder.iccomment.setTypeface(fontAwesomeFont);
         holder.icshare.setTypeface(fontAwesomeFont);
@@ -155,6 +158,17 @@ public class ContentListAdapter extends RecyclerView.Adapter<ContentListAdapter.
 
         holder.tvContentInsertDate.setText(new SimpleDateFormat("yyyy.MM.dd").format(mDataset.get(position).getContent_written_date()));
         holder.tvContentSubject.setText(mDataset.get(position).getContent_subject());
+
+        //bookmark유무
+        if(mDataset.get(position).getBookmark_status() == 1){
+            holder.icbookmark.setText(R.string.fa_bookmark);
+            holder.icbookmark.setTextColor(ContextCompat.getColor(mcontext, R.color.textBlue));
+        }
+
+        //좋아요 유무
+        if(mDataset.get(position).getGood_status() == 1){
+            holder.icthumb.setTextColor(ContextCompat.getColor(mcontext, R.color.textBlue));
+        }
 
         //주소처리
         GetCurrentAddress getAddress = new GetCurrentAddress();
@@ -230,7 +244,7 @@ public class ContentListAdapter extends RecyclerView.Adapter<ContentListAdapter.
                 Intent intent = new Intent(mcontext, ContentListMain.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
                 intent.putExtra("user_id", user_id);
-                intent.putExtra("urlflag", "");
+                intent.putExtra("urlflag", urlflag);
                 mcontext.startActivity(intent);
                 Toast.makeText(mcontext,"좋아요 완료!",Toast.LENGTH_SHORT).show();
             }
@@ -254,7 +268,7 @@ public class ContentListAdapter extends RecyclerView.Adapter<ContentListAdapter.
                 Intent intent = new Intent(mcontext, ContentListMain.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
                 intent.putExtra("user_id", user_id);
-                intent.putExtra("urlflag", "");
+                intent.putExtra("urlflag", "B");
                 mcontext.startActivity(intent);
                 Toast.makeText(mcontext,"북마크 완료!",Toast.LENGTH_SHORT).show();
             }
