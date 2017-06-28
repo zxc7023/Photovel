@@ -10,7 +10,7 @@
     tools:openDrawer="start">
 
     <include
-        layout="@layout/activity_content_list_app_bar_main"
+        layout="@layout/activity_book_mark_app_bar_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:font="normal"/>

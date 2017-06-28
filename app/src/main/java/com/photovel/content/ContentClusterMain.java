@@ -3,6 +3,7 @@ package com.photovel.content;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -62,6 +63,7 @@ import com.photovel.NavigationItemSelected;
 import com.photovel.R;
 import com.photovel.http.JsonConnection;
 import com.photovel.http.Value;
+import com.photovel.setting.SettingMain;
 import com.vo.Comment;
 import com.vo.Content;
 import com.vo.ContentDetail;
@@ -104,6 +106,7 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
     private Content content;
     private int content_id=0;
     private NestedScrollView ns;
+    private String user_id;
 
     //은지 수정
     private ClusterManager<Photo> cm;
@@ -125,6 +128,9 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_content_cluster_main);
+
+        SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
+        user_id = get_to_eat.getString("user_id","notFound");
 
         //프래그먼트에 지도를 보여주기위해 싱크
         ns = (NestedScrollView)findViewById(R.id.cluster_nestedScrollView);
@@ -386,12 +392,16 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
                 getApplicationContext().startActivity(intent);
             }
         });
+        TextView tvUserName = (TextView)hView.findViewById(R.id.tvUserName);
+        tvUserName.setText(user_id);
         TextView tvProfileUpdate = (TextView)hView.findViewById(R.id.tvProfileUpdate);
         tvProfileUpdate.setTypeface(fontAwesomeFont);
         tvProfileUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(),"프로필변경클릭",Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getApplicationContext(), SettingMain.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                getApplicationContext().startActivity(intent);
             }
         });
         navigationView.setNavigationItemSelectedListener(this);

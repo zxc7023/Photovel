@@ -313,7 +313,7 @@
                         android:id="@+id/icpow"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:text="@string/fa_paw"
+                        android:text="@string/fa_bookmark_o"
                         android:textSize="@dimen/icon_size"
                         android:textColor="@color/bgDarkGrey"
                         android:gravity="center_vertical"

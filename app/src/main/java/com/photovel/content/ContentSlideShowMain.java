@@ -3,6 +3,7 @@ package com.photovel.content;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
@@ -51,6 +52,7 @@ import com.photovel.NavigationItemSelected;
 import com.photovel.R;
 import com.photovel.http.JsonConnection;
 import com.photovel.http.Value;
+import com.photovel.setting.SettingMain;
 import com.vo.Comment;
 import com.vo.Content;
 import com.vo.ContentDetail;
@@ -90,6 +92,7 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
     private List<ContentDetail> myDataset;
     private Content content;
     private int content_id=-1;
+    private String user_id;
 
     private final String contentURL = Value.contentURL;
     private final String contentPhotoURL = Value.contentPhotoURL;
@@ -128,6 +131,9 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         }else {
             Log.i("content_id","slide_content_id : "+content_id);
         }
+
+        SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
+        user_id = get_to_eat.getString("user_id","notFound");
 
         // Adding Toolbar to the activity
         toolbar = (Toolbar) findViewById(R.id.slideToolbar);
@@ -361,12 +367,16 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
                 getApplicationContext().startActivity(intent);
             }
         });
+        TextView tvUserName = (TextView)hView.findViewById(R.id.tvUserName);
+        tvUserName.setText(user_id);
         TextView tvProfileUpdate = (TextView)hView.findViewById(R.id.tvProfileUpdate);
         tvProfileUpdate.setTypeface(fontAwesomeFont);
         tvProfileUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(),"프로필변경클릭",Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getApplicationContext(), SettingMain.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                getApplicationContext().startActivity(intent);
             }
         });
         navigationView.setNavigationItemSelectedListener(this);

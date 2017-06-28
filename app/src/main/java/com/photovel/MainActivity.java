@@ -28,6 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.photovel.http.JsonConnection;
+import com.photovel.setting.SettingMain;
 import com.photovel.user.UserLogin;
 import com.alibaba.fastjson.JSON;
 import com.photovel.content.ContentInsertMain;
@@ -56,6 +57,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
     private static final String TAG = "Image";
     private SearchView searchView;
     Toolbar toolbar;
+    private String user_id;
 
     //메인 이미지 케러셀뷰
     CarouselView carouselView;
@@ -73,6 +75,9 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
+        user_id = get_to_eat.getString("user_id","notFound");
 
         //메인이미지 캐러셀뷰 부분
         carouselView = (CarouselView) findViewById(R.id.carouselView);
@@ -199,13 +204,15 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
             }
         });
         TextView tvUserName = (TextView)hView.findViewById(R.id.tvUserName);
-        tvUserName.setText("userID");   //로그인 상태 userID받아오면됨.
+        tvUserName.setText(user_id);   //로그인 상태 userID받아오면됨.
         TextView tvProfileUpdate = (TextView)hView.findViewById(R.id.tvProfileUpdate);
         tvProfileUpdate.setTypeface(fontAwesomeFont);
         tvProfileUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(),"프로필변경클릭",Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getApplicationContext(), SettingMain.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                getApplicationContext().startActivity(intent);
             }
         });
         navigationView.setNavigationItemSelectedListener(this);
@@ -256,6 +263,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         ns.selected(id, getApplicationContext());
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
+        finish();
         return true;
     }
 
