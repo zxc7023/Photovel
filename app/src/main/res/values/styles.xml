@@ -7,6 +7,10 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
+
+
+
+
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
@@ -30,6 +34,42 @@
         <item name="android:textSize">@dimen/content_text_size</item>
         <item name="android:colorBackground">@color/bgDarkGrey</item>
         <item name="android:textColor">@color/bgWhite</item>
+    </style>
+
+    <style name="ContentSearchViewStyle">
+        <!-- Background for the search bar -->
+        <item name="searchBackground">@color/material_ripple_light</item>
+
+        <!-- Change clear text icon -->
+        <item name="searchCloseIcon">@mipmap/ic_navigation_close</item>
+
+        <!-- Change up icon -->
+        <item name="searchBackIcon">@mipmap/ic_back_arrow</item>
+
+        <!-- Change icon for the suggestions
+        <item name="searchSuggestionIcon">@drawable/ic_suggestion</item>-->
+
+        <!-- Change background for the suggestions list view -->
+        <item name="searchSuggestionBackground">@color/bgGrey2</item>
+
+        <!-- Change text color for edit text. This will also be the color of the cursor -->
+        <item name="android:textColor">@color/bgBlackAlpha</item>
+
+        <!-- Change hint text color for edit text -->
+        <item name="android:textColorHint">@color/bgGrey2</item>
+
+        <!-- Hint for edit text -->
+        <item name="android:hint">@string/search_hint</item>
+
+        <item name="android:inputType">text|textAutoComplete</item>
+    </style>
+
+    <style name="ContentSearchView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:background">?android:attr/selectableItemBackgroundBorderless</item>
+        <item name="android:paddingLeft">@dimen/search_icon_padding</item>
+        <item name="android:paddingRight">@dimen/search_icon_padding</item>
     </style>
 
 </resources>

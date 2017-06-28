@@ -2,11 +2,13 @@ package com.photovel;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.MatrixCursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.BaseColumns;
+import android.speech.RecognizerIntent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -18,18 +20,20 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.photovel.content.ContentSearchView;
+import com.photovel.content.SearchListAdapter;
 import com.photovel.http.JsonConnection;
 import com.photovel.setting.SettingMain;
-import com.photovel.user.UserLogin;
 import com.alibaba.fastjson.JSON;
 import com.photovel.content.ContentInsertMain;
 import com.photovel.http.Value;
@@ -38,24 +42,10 @@ import com.synnapps.carouselview.ImageListener;
 import com.vo.Content;
 import com.vo.MainImage;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class MainActivity extends FontActivity2 implements NavigationView.OnNavigationItemSelectedListener {
-    private static final String TAG = "Image";
-    private SearchView searchView;
+    private static final String TAG = "MainActivity";
     Toolbar toolbar;
     private String user_id;
 
@@ -71,6 +61,21 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
     private List<Content> myRecommendDataset, myNewDataset;
     private boolean doubleBackToExitPressedOnce = false;
 
+    //검색
+    //search 아이콘
+    private MenuItem searchItem;
+
+    //커서
+    MatrixCursor matrixCursor;
+
+    //검색 제안 위한 커서 어댑터
+    private SearchListAdapter searchListAdapter;
+
+    //굳이 클래스로 객체 만들 필요 없이 xml에 태그로 정의하여 호출 가능
+    ContentSearchView searchView;
+    ListView suggestionsListView;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,6 +83,13 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
 
         SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
         user_id = get_to_eat.getString("user_id","notFound");
+
+        searchView = (ContentSearchView) findViewById(R.id.search_view);
+
+        suggestionsListView = (ListView) findViewById(R.id.suggestion_list);
+        searchListAdapter = new SearchListAdapter(this, matrixCursor, true, suggestionsListView);
+
+        searchView.setAdapter(searchListAdapter);
 
         //메인이미지 캐러셀뷰 부분
         carouselView = (CarouselView) findViewById(R.id.carouselView);
@@ -216,6 +228,63 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
             }
         });
         navigationView.setNavigationItemSelectedListener(this);
+
+
+
+        //검색 제안 목록 등록
+        searchView.setSuggestions(myNewDataset, matrixCursor, true);
+
+        //리스너 등록
+        searchView.setOnQueryTextListener(new ContentSearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                //Do some magic
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                Log.i(TAG, "onQueryTextChange= " + newText);
+                int size = myNewDataset.size();
+
+                //자료 필터
+                matrixCursor = new MatrixCursor(new String[]{BaseColumns._ID, "user_id", "content_subject", "main_ivphoto"});
+                Log.i(TAG, "onQueryTextChange의 searchSuggestionsList.size()= " + size);
+
+                for(int i=0; i<size; i++) {
+                    if ("".equals(newText)) {
+
+                    } else if (myNewDataset.get(i).getUser().getUser_id().toLowerCase().startsWith(newText.toLowerCase()) //입력되는 문자열의 시작부분이 "user_id"의 value와 같은지 검사
+                            || myNewDataset.get(i).getContent_subject().toLowerCase().startsWith(newText.toLowerCase())) {
+                        Log.i(TAG, "onQueryTextChange 들어온 contentList= " + myNewDataset);
+                        Log.i(TAG, "onQueryTextChange 들어온 getUser_id()= " + myNewDataset.get(i).getUser().getUser_id().toLowerCase());
+                        Log.i(TAG, "onQueryTextChange 들어온 getContent_subject()= " + myNewDataset.get(i).getContent_subject().toLowerCase());
+                        matrixCursor.addRow(new Object[]{i,
+                                myNewDataset.get(i).getUser().getUser_id(),
+                                myNewDataset.get(i).getContent_subject(),
+                                myNewDataset.get(i).getBitmap()});
+                    }else{
+                        Log.i(TAG, "onQueryTextChange 못들어옴엉엉 " + myNewDataset);
+                    }
+                }
+                searchListAdapter.changeCursor(matrixCursor);
+                searchListAdapter.notifyDataSetChanged();
+                searchView.setAdapter(searchListAdapter);
+                return true;
+            }
+        });
+
+        searchView.setOnSearchViewListener(new ContentSearchView.SearchViewListener() {
+            @Override
+            public void onSearchViewShown() {
+                //Do some magic
+            }
+
+            @Override
+            public void onSearchViewClosed() {
+                //Do some magic
+            }
+        });
     }
 
     //Android BackButton EventListener
@@ -224,6 +293,8 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
+        } else if (searchView.isSearchOpen()) {
+            searchView.closeSearch();
         } else {
             if (doubleBackToExitPressedOnce) {
                 super.onBackPressed();
@@ -239,6 +310,21 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
                 }
             }, 2000);
         }
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            List<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            if (matches != null && matches.size() > 0) {
+                String searchWrd = matches.get(0);
+                if (!TextUtils.isEmpty(searchWrd)) {
+                    searchView.setQuery(searchWrd, false);
+                }
+            }
+
+            return;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -270,22 +356,11 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
-        searchView = (SearchView) toolbar.getMenu().findItem(R.id.menu_search).getActionView();
-        MenuItem searchItem = menu.findItem(R.id.menu_search);
-        searchView = (SearchView) searchItem.getActionView();
-        searchView.setQueryHint(getString(R.string.app_name));
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-
-            @Override
-            public boolean onQueryTextSubmit(String s) {
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String s) {
-                return false;
-            }
-        });
+        searchItem = menu.findItem(R.id.menu_search);
+        if(searchItem != null){
+            Log.i(TAG, "searchItem != null");
+            searchView.setMenuItem(searchItem);
+        }
         return true;
     }
 
