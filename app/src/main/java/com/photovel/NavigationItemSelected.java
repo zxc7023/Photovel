@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.photovel.common.BookMarkMain;
 import com.photovel.content.ContentListMain;
 import com.photovel.http.Value;
 import com.photovel.setting.SettingMain;
@@ -25,6 +26,8 @@ import java.net.URL;
 public class NavigationItemSelected extends FontActivity{
     public void selected(int id, Context context){
         Intent intent;
+        SharedPreferences get_to_eat = context.getSharedPreferences("loginInfo", MODE_PRIVATE);
+        String user_id = get_to_eat.getString("user_id","notFound");
         if(id == R.id.nav_home){
             intent = new Intent(context, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -33,14 +36,17 @@ public class NavigationItemSelected extends FontActivity{
         }else if(id==R.id.nav_my_story){
             intent = new Intent(context, ContentListMain.class);
             intent.putExtra("urlflag","M");
-            intent.putExtra("user_id","");
+            intent.putExtra("user_id",user_id);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
             finish();
         }else if(id==R.id.nav_my_friend){
 
         }else if(id==R.id.nav_book_mark){
-
+            intent = new Intent(context, BookMarkMain.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
+            finish();
         }else if(id==R.id.nav_new_story){
             intent = new Intent(context, ContentListMain.class);
             intent.putExtra("urlflag","N");

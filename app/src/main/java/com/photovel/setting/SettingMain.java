@@ -83,7 +83,7 @@ import java.util.List;
 
 public class SettingMain extends FontActivity2 implements NavigationView.OnNavigationItemSelectedListener{
     Toolbar toolbar;
-
+    private String user_id;
     private int content_id=0;
     private TextView tvpen1, tvpen2, tvpen3, tvUserID, tvUserFriendCount;
     private EditText etUserNickName, etUserPassword, etUserPhone;
@@ -99,18 +99,30 @@ public class SettingMain extends FontActivity2 implements NavigationView.OnNavig
         setSupportActionBar(toolbar);
 
         SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
-        String user_id = get_to_eat.getString("user_id","notFound");
-        Log.i("ddd","user_id:"+user_id);
+        user_id = get_to_eat.getString("user_id","notFound");
 
         tvpen1 = (TextView)findViewById(R.id.tvpen1);
         tvpen2 = (TextView)findViewById(R.id.tvpen2);
         tvpen3 = (TextView)findViewById(R.id.tvpen3);
+
+        tvUserID = (TextView)findViewById(R.id.tvUserID);
+        tvUserFriendCount = (TextView)findViewById(R.id.tvUserFriendCount);
+        etUserNickName = (EditText)findViewById(R.id.etUserNickName);
+        etUserPassword = (EditText)findViewById(R.id.etUserPassword);
+        etUserPhone = (EditText)findViewById(R.id.etUserPhone);
+
+        btnSettingUpdate = (Button)findViewById(R.id.btnSettingUpdate);
+        btnUserFriendGo = (Button)findViewById(R.id.btnUserFriendGo);
 
         //imageView를 font로 바꿔주기
         Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
         tvpen1.setTypeface(fontAwesomeFont);
         tvpen2.setTypeface(fontAwesomeFont);
         tvpen3.setTypeface(fontAwesomeFont);
+
+
+        tvUserID.setText(user_id);
+
 
         //toolbar
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

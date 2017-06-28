@@ -36,6 +36,7 @@ import com.photovel.NavigationItemSelected;
 import com.photovel.R;
 import com.photovel.http.JsonConnection;
 import com.photovel.http.Value;
+import com.photovel.setting.SettingMain;
 import com.vo.Content;
 import com.vo.ContentDetail;
 import com.vo.Photo;
@@ -151,15 +152,20 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), ContentInsertMain.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 getApplicationContext().startActivity(intent);
             }
         });
+        TextView tvUserName = (TextView)hView.findViewById(R.id.tvUserName);
+        tvUserName.setText(user_id);
         TextView tvProfileUpdate = (TextView)hView.findViewById(R.id.tvProfileUpdate);
         tvProfileUpdate.setTypeface(fontAwesomeFont);
         tvProfileUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(),"프로필변경클릭",Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getApplicationContext(), SettingMain.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                getApplicationContext().startActivity(intent);
             }
         });
         navigationView.setNavigationItemSelectedListener(this);
@@ -227,6 +233,9 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
             super.onBackPressed();
         }
     }

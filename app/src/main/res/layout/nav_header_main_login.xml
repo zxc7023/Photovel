@@ -9,59 +9,72 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:theme="@style/ThemeOverlay.AppCompat.Dark"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:layout_marginTop="10dp">
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/bgSlideMenuBlack"
+        android:layout_height="70dp"
         android:orientation="horizontal"
-        android:layout_marginRight="@dimen/most_rignt_tv_margin"
-        android:layout_weight="1">
+        android:layout_marginBottom="5dp">
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:gravity="center"
-            android:layout_marginRight="@dimen/between_tv_margin">
-            <com.mikhaellopez.circularimageview.CircularImageView
-                android:id="@+id/userProfile"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/ic_profile_circle"
-                android:layout_gravity="center"
-                app:civ_border_width="1dp"/>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:gravity="center_vertical">
-            <TextView
-                android:id="@+id/tvUserName"
+            android:background="@color/bgSlideMenuBlack"
+            android:orientation="horizontal"
+            android:layout_marginRight="@dimen/most_rignt_tv_margin">
+            <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="jeon hara"
-                android:textSize="@dimen/content_text_size"
-                android:includeFontPadding="false"/>
-            <TextView
-                android:id="@+id/tvProfileUpdate"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:layout_marginRight="@dimen/between_tv_margin">
+                <com.mikhaellopez.circularimageview.CircularImageView
+                    android:id="@+id/userProfile"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/ic_profile_circle"
+                    android:layout_gravity="center"
+                    app:civ_border_width="1dp"/>
+            </LinearLayout>
+            <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="프로필 수정"
-                android:textColor="@color/textBlue"
-                android:textSize="10dp"/>
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center_vertical">
+                <TextView
+                    android:id="@+id/tvUserName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="jeon hara"
+                    android:textSize="@dimen/content_text_size"
+                    android:includeFontPadding="false"/>
+                <TextView
+                    android:id="@+id/tvProfileUpdate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="프로필 수정"
+                    android:textColor="@color/textBlue"
+                    android:textSize="10dp"/>
+            </LinearLayout>
         </LinearLayout>
+        <TextView
+            android:id="@+id/btnContentInsert"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/fa_plus_circle"
+            android:textSize="30dp"
+            android:gravity="top|right"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:background="@color/bgSlideMenuBlack"/>
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/btnContentInsert"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/fa_plus_circle"
-        android:textSize="30dp"
-        android:gravity="top|right"
-        android:layout_gravity="center"
-        android:layout_weight="1"
-        android:background="@color/bgSlideMenuBlack"/>
-
+        android:layout_height="match_parent">
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerInParent="true"
+            android:background="@color/bgWhite" />
+    </LinearLayout>
 </LinearLayout>
