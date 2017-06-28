@@ -55,27 +55,29 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
                     android:orientation="vertical">
-
-                    <com.mikhaellopez.circularimageview.CircularImageView
-                        android:id="@+id/userProfile"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        android:layout_centerHorizontal="true"
-                        android:layout_marginRight="5dp"
-                        android:gravity="center"
-                        android:src="@drawable/ic_profile_circle"
-                        app:civ_border_width="1dp" />
-
-                    <TextView
+                    <LinearLayout
                         android:id="@+id/userProfileUpdate"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/userProfile"
-                        android:layout_centerHorizontal="true"
-                        android:text="프로필 사진 편집"
-                        android:textColor="@color/bgDarkGrey"
-                        android:textSize="@dimen/content_point_text__size" />
-
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:layout_centerInParent="true">
+                        <com.mikhaellopez.circularimageview.CircularImageView
+                            android:id="@+id/userProfile"
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            android:layout_marginRight="5dp"
+                            android:gravity="center"
+                            android:src="@drawable/ic_profile_circle"
+                            app:civ_border_width="1dp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/userProfile"
+                            android:text="프로필 사진 편집"
+                            android:textColor="@color/bgDarkGrey"
+                            android:textSize="14dp" />
+                    </LinearLayout>
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
