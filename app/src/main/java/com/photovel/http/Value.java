@@ -5,8 +5,8 @@ public class Value {
 
     //public static String photovelURL = "http://www.photovel.com"; //서버님꺼
     //public static String photovelURL = "http://192.168.12.197:8080"; //은디님꺼
-    //public static String photovelURL = "http://192.168.12.44:8888"; //준기님꺼
-    public static String photovelURL = "http://192.168.12.22:8080"; //하라님꺼
+    public static String photovelURL = "http://192.168.12.44:8888"; //준기님꺼
+    //public static String photovelURL = "http://192.168.12.22:8080"; //하라님꺼
 
     //content selectALL(GET), insert(POST), update(POST), delete 작업
     public static String contentURL = photovelURL+"/content/photo";

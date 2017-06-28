@@ -5,7 +5,12 @@
 
     <ImageView
         android:id="@+id/photo_detail"
-        android:layout_width="50dp"
-        android:layout_height="50dp" />
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:scaleType="fitXY"/>
+    <TextView
+        android:id="@+id/clusterInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
 </LinearLayout>

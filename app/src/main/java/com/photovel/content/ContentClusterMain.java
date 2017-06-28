@@ -84,6 +84,7 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static com.photovel.http.Value.contentURL;
@@ -778,8 +779,12 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
 
             @Override
             public View getInfoContents(Marker marker) {
+                GetCurrentAddress getCurrentAddress = new GetCurrentAddress();
+                String address = getCurrentAddress.getAddress(photo.getPhoto_latitude(),photo.getPhoto_longitude());
+                String date = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(photo.getPhoto_date());
                 View testView = getLayoutInflater().inflate(R.layout.multi_photo_detail, null);
                 ((ImageView) testView.findViewById(R.id.photo_detail)).setImageBitmap(photo.getBitmap());
+                ((TextView)testView.findViewById(R.id.clusterInfo)).setText(date+"\n"+address);
                 return testView;
             }
         });

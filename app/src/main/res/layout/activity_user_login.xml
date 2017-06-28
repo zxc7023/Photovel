@@ -44,11 +44,11 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/layout_round2"
-            android:weightSum="1.0">
+            android:layout_marginTop="20dp">
+            <!--android:background="@drawable/layout_round2"
+            android:weightSum="1.0"-->
 
-            <TextView
+            <!--<TextView
                 android:id="@+id/fa_commenting"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -76,7 +76,12 @@
                 android:gravity="center"
                 android:text="Log in with KAKAO"
                 android:textAllCaps="false"
-                android:textColor="@color/kakaoIconColor" />
+                android:textColor="@color/kakaoIconColor" />-->
+
+            <com.kakao.usermgmt.LoginButton
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.6"/>
 
         </LinearLayout>
 
