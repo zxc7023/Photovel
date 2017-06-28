@@ -26,6 +26,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -47,7 +48,7 @@ import java.util.List;
 public class MainActivity extends FontActivity2 implements NavigationView.OnNavigationItemSelectedListener {
     private static final String TAG = "MainActivity";
     Toolbar toolbar;
-    private String user_id;
+    private String user_id, user_nick_name;
 
     //메인 이미지 케러셀뷰
     CarouselView carouselView;
@@ -83,6 +84,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
 
         SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
         user_id = get_to_eat.getString("user_id","notFound");
+        user_nick_name = get_to_eat.getString("user_nick_name","notFound");
 
         searchView = (ContentSearchView) findViewById(R.id.search_view);
 
@@ -217,7 +219,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
             }
         });
         TextView tvUserName = (TextView)hView.findViewById(R.id.tvUserName);
-        tvUserName.setText(user_id);
+        tvUserName.setText(user_nick_name);
         TextView tvProfileUpdate = (TextView)hView.findViewById(R.id.tvProfileUpdate);
         tvProfileUpdate.setTypeface(fontAwesomeFont);
         tvProfileUpdate.setOnClickListener(new View.OnClickListener() {

@@ -48,7 +48,7 @@ import java.util.List;
 public class BookMarkMain extends FontActivity2 implements NavigationView.OnNavigationItemSelectedListener {
     private static final String TAG = "Image";
     Toolbar toolbar;
-    private String user_id;
+    private String user_id, user_nick_name;
 
     //추천, 신규 게시글
     private RecyclerView recyclerView;
@@ -65,6 +65,7 @@ public class BookMarkMain extends FontActivity2 implements NavigationView.OnNavi
         //로그인중인 user_id받아오기
         SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
         user_id = get_to_eat.getString("user_id","notFound");
+        user_nick_name = get_to_eat.getString("user_nick_name","notFound");
 
         tvbookmark = (TextView)findViewById(R.id.tvbookmark);
 
@@ -126,7 +127,7 @@ public class BookMarkMain extends FontActivity2 implements NavigationView.OnNavi
             }
         });
         TextView tvUserName = (TextView)hView.findViewById(R.id.tvUserName);
-        tvUserName.setText(user_id);   //로그인 상태 userID받아오면됨.
+        tvUserName.setText(user_nick_name);   //로그인 상태 userID받아오면됨.
         TextView tvProfileUpdate = (TextView)hView.findViewById(R.id.tvProfileUpdate);
         tvProfileUpdate.setTypeface(fontAwesomeFont);
         tvProfileUpdate.setOnClickListener(new View.OnClickListener() {

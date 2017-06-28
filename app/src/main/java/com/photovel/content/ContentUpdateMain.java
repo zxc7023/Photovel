@@ -160,20 +160,6 @@ public class ContentUpdateMain extends FontActivity {
         //content정보 추가하기
         contentSubject.setText(content.getContent_subject());
         contentText.setText(content.getContent());
-        /*myDataset = new ArrayList<>();
-        originData = new ArrayList<>();
-        for(int i=0; i<content.getDetails().size(); i++){
-            Photo ph = new Photo();
-            ph.setPhoto_latitude(content.getDetails().get(i).getPhoto().getPhoto_latitude());
-            ph.setPhoto_longitude(content.getDetails().get(i).getPhoto().getPhoto_longitude());
-
-            GetCurrentAddress getAddress = new GetCurrentAddress();
-            String address = getAddress.getAddress(content.getDetails().get(i).getPhoto().getPhoto_latitude(),
-                    content.getDetails().get(i).getPhoto().getPhoto_longitude());
-            content.getDetails().get(i).getPhoto().setAddress(address);
-            myDataset.add(content.getDetails().get(i));
-            originData.add(content.getDetails().get(i));
-        }*/
 
         //recycleview사용선언
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);

@@ -59,7 +59,7 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
     private RecyclerView.LayoutManager mLayoutManager;
     private List<Content> myDataset;
     private static final String TAG = "";
-    private String user_id = "";
+    private String user_id = "", user_nick_name;
     private String urlflag = "";
 
     Toolbar toolbar;
@@ -74,14 +74,16 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
         toolbar = (Toolbar) findViewById(R.id.contentListToolbar);
         setSupportActionBar(toolbar);
 
+        //현재 로그인한 user_id 받아오기
+        SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
+        user_id = get_to_eat.getString("user_id","notFound");
+        user_nick_name = get_to_eat.getString("user_nick_name","notFound");
+        Log.i("user_id", user_id);
+
         Intent intent = getIntent();
         user_id = intent.getStringExtra("user_id");
         if(user_id.equals("")){
             Log.i("user_id","list_user_id 못받아옴!!!");
-            //현재 로그인한 user_id 받아오기
-            SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
-            user_id = get_to_eat.getString("user_id","notFound");
-            Log.i("user_id", user_id);
         }else{
             Log.i("user_id","list_user_id : "+user_id);
         }
@@ -157,7 +159,7 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
             }
         });
         TextView tvUserName = (TextView)hView.findViewById(R.id.tvUserName);
-        tvUserName.setText(user_id);
+        tvUserName.setText(user_nick_name);
         TextView tvProfileUpdate = (TextView)hView.findViewById(R.id.tvProfileUpdate);
         tvProfileUpdate.setTypeface(fontAwesomeFont);
         tvProfileUpdate.setOnClickListener(new View.OnClickListener() {

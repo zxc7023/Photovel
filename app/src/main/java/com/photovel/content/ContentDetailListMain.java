@@ -74,7 +74,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
     private List<ContentDetail> myDataset;
     private Content content;
     private int content_id=-1;
-    private String user_id;
+    private String user_id, user_nick_name;
 
     //comment
     private BottomSheetBehavior bottomSheetBehavior;
@@ -102,6 +102,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
 
         SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
         user_id = get_to_eat.getString("user_id","notFound");
+        user_nick_name = get_to_eat.getString("user_nick_name","notFound");
 
         // Adding Toolbar to the activity
         toolbar = (Toolbar) findViewById(R.id.detailListToolbar);
@@ -407,7 +408,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
             }
         });
         TextView tvUserName = (TextView)hView.findViewById(R.id.tvUserName);
-        tvUserName.setText(user_id);
+        tvUserName.setText(user_nick_name);
         TextView tvProfileUpdate = (TextView)hView.findViewById(R.id.tvProfileUpdate);
         tvProfileUpdate.setTypeface(fontAwesomeFont);
         tvProfileUpdate.setOnClickListener(new View.OnClickListener() {
