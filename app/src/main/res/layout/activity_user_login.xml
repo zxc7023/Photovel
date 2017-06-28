@@ -20,7 +20,7 @@
             android:text="Photovel"
             android:textColor="@android:color/white"
             android:textSize="25dp"
-            android:layout_marginBottom="-10dp"/>
+            android:includeFontPadding="false"/>
 
         <TextView
             android:id="@+id/subString"
@@ -29,7 +29,8 @@
             android:layout_weight="1"
             android:gravity="top|center_horizontal"
             android:text="사진으로 만드는 여행"
-            android:textColor="@android:color/white" />
+            android:textColor="@android:color/white"
+            android:includeFontPadding="false"/>
     </LinearLayout>
 
     <LinearLayout

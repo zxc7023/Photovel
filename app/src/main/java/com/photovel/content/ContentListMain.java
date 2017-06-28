@@ -59,7 +59,7 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
     private RecyclerView.LayoutManager mLayoutManager;
     private List<Content> myDataset;
     private static final String TAG = "";
-    private String user_id = "", user_nick_name;
+    private String content_user_id = "", user_id, user_nick_name;
     private String urlflag = "";
 
     Toolbar toolbar;
@@ -81,12 +81,16 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
         Log.i("user_id", user_id);
 
         Intent intent = getIntent();
-        user_id = intent.getStringExtra("user_id");
-        if(user_id.equals("")){
-            Log.i("user_id","list_user_id 못받아옴!!!");
+        content_user_id = intent.getStringExtra("user_id");
+        if(content_user_id.equals("")){
+            Log.i("user_id","content_list_user_id 못받아옴!!!");
         }else{
-            Log.i("user_id","list_user_id : "+user_id);
+            Log.i("user_id","content_list_user_id : "+user_id);
         }
+        SharedPreferences contentInfo = getSharedPreferences("content_user_id", MODE_PRIVATE);
+        SharedPreferences.Editor editor = contentInfo.edit();
+        editor.putString("content_user_id",content_user_id);
+        editor.commit();
 
         urlflag = intent.getStringExtra("urlflag");
         if(urlflag.equals("")){
@@ -103,16 +107,16 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
 
                 String qry = null;
                 if(urlflag.equals("C")){
-                    qry = Value.contentURL+"/user/";
+                    qry = Value.contentURL+"/user/"+content_user_id;
                 }else if(urlflag.equals("M")){
-                    qry = Value.contentURL+"/my/";
+                    qry = Value.contentURL+"/my/"+user_id;
                 }else if(urlflag.equals("N")){
-                    qry = Value.contentURL+"/new/";
+                    qry = Value.contentURL+"/new/"+user_id;
                 }else if(urlflag.equals("R")){
-                    qry = Value.contentURL+"/recommend/";
+                    qry = Value.contentURL+"/recommend/"+user_id;
                 }
 
-                String responseData = JsonConnection.getConnection(qry+user_id, "GET", null);
+                String responseData = JsonConnection.getConnection(qry, "GET", null);
                 myDataset = JSON.parseArray(responseData, Content.class);
             }
         };

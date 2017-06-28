@@ -316,15 +316,13 @@ public class SettingMain extends FontActivity2 implements NavigationView.OnNavig
                                     e.printStackTrace();
                                 }
 
-                                //로그인한 후에 세션을 관리한다. TestActivity에 저장한다.
+                                //user정보값 수정해주기
                                 SharedPreferences loginInfo = getSharedPreferences("loginInfo", MODE_PRIVATE);
                                 SharedPreferences.Editor editor = loginInfo.edit();
-                                editor.remove("user_nick_name");
-                                editor.remove("user_password");
-                                editor.remove("user_phone");
                                 editor.putString("user_nick_name",etUserNickName.getText().toString());
                                 editor.putString("user_password",etUserPassword.getText().toString());
                                 editor.putString("user_phone",etUserPhone.getText().toString());
+                                editor.commit();
 
                                 Toast.makeText(getApplicationContext(),"정보수정 성공",Toast.LENGTH_SHORT).show();
                                 Intent intent = new Intent(getApplicationContext(), SettingMain.class);
@@ -370,7 +368,7 @@ public class SettingMain extends FontActivity2 implements NavigationView.OnNavig
     private Bitmap resizeBitmap(String path) {
         InputStream in = null;
         try {
-            final int IMAGE_MAX_SIZE = 200000; //고정됨!!!!수정금지!!!!
+            final int IMAGE_MAX_SIZE = 100000; //고정됨!!!!수정금지!!!!
             in = new FileInputStream(path);
 
             // Decode image size

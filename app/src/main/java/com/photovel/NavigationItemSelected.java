@@ -28,6 +28,7 @@ public class NavigationItemSelected extends FontActivity{
         Intent intent;
         SharedPreferences get_to_eat = context.getSharedPreferences("loginInfo", MODE_PRIVATE);
         String user_id = get_to_eat.getString("user_id","notFound");
+
         if(id == R.id.nav_home){
             intent = new Intent(context, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -58,6 +59,7 @@ public class NavigationItemSelected extends FontActivity{
             intent = new Intent(context, ContentListMain.class);
             intent.putExtra("urlflag","R");
             intent.putExtra("user_id","");
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
             finish();
         }else if(id==R.id.nav_log_out){
@@ -116,6 +118,16 @@ public class NavigationItemSelected extends FontActivity{
                 } catch (IOException e) {
                     e.printStackTrace();
                 }finally {
+                    //SharedPreferences user정보삭제
+                    SharedPreferences test = getSharedPreferences("loginInfo", MODE_PRIVATE);
+                    SharedPreferences.Editor editor2 = test.edit();
+                    editor2.remove("Set-Cookie");
+                    editor2.remove("user_id");
+                    editor2.remove("user_nick_name");
+                    editor2.remove("user_password");
+                    editor2.remove("user_phone");
+                    editor2.remove("user_friend_count");
+                    editor2.commit();
                 }
             }
         });

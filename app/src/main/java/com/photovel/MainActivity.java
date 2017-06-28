@@ -92,6 +92,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         searchListAdapter = new SearchListAdapter(this, matrixCursor, true, suggestionsListView);
 
         searchView.setAdapter(searchListAdapter);
+        searchView.bringToFront();
 
         //메인이미지 캐러셀뷰 부분
         carouselView = (CarouselView) findViewById(R.id.carouselView);

@@ -241,6 +241,11 @@ public class ContentListAdapter extends RecyclerView.Adapter<ContentListAdapter.
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+
+                if(urlflag.equals("C")){
+                    SharedPreferences contentInfo = mcontext.getSharedPreferences("content_user_id", mcontext.MODE_PRIVATE);
+                    user_id = contentInfo.getString("content_user_id","notFound");
+                }
                 Intent intent = new Intent(mcontext, ContentListMain.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
                 intent.putExtra("user_id", user_id);
@@ -265,10 +270,14 @@ public class ContentListAdapter extends RecyclerView.Adapter<ContentListAdapter.
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+                if(urlflag.equals("C")){
+                    SharedPreferences contentInfo = mcontext.getSharedPreferences("content_user_id", mcontext.MODE_PRIVATE);
+                    user_id = contentInfo.getString("content_user_id","notFound");
+                }
                 Intent intent = new Intent(mcontext, ContentListMain.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
                 intent.putExtra("user_id", user_id);
-                intent.putExtra("urlflag", "B");
+                intent.putExtra("urlflag", urlflag);
                 mcontext.startActivity(intent);
                 Toast.makeText(mcontext,"북마크 완료!",Toast.LENGTH_SHORT).show();
             }
