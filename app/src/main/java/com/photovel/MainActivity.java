@@ -191,6 +191,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
 
         Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
 
+        //메뉴 navigationView
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         View hView =  navigationView.getHeaderView(0);
         TextView btnContentInsert = (TextView)hView.findViewById(R.id.btnContentInsert);
@@ -204,7 +205,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
             }
         });
         TextView tvUserName = (TextView)hView.findViewById(R.id.tvUserName);
-        tvUserName.setText(user_id);   //로그인 상태 userID받아오면됨.
+        tvUserName.setText(user_id);
         TextView tvProfileUpdate = (TextView)hView.findViewById(R.id.tvProfileUpdate);
         tvProfileUpdate.setTypeface(fontAwesomeFont);
         tvProfileUpdate.setOnClickListener(new View.OnClickListener() {

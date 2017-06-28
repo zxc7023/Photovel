@@ -14,6 +14,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -51,7 +52,7 @@ public class BookMarkMain extends FontActivity2 implements NavigationView.OnNavi
 
     //추천, 신규 게시글
     private RecyclerView recyclerView;
-    private MainNewAdapter mNewAdapter;
+    private BookMarkAdapter mBookMarkAdapter;
     private RecyclerView.LayoutManager mNewLayoutManager;
     private List<Content> myNewDataset;
     private TextView tvbookmark;
@@ -91,20 +92,14 @@ public class BookMarkMain extends FontActivity2 implements NavigationView.OnNavi
             myNewDataset.get(i).setBitmap(newBitmaps.get(i));
         }
 
-        /*//recyclerview데코레이션
-        int spanCount = 3; // 3 columns
-        int spacing = 50; // 50px
-        boolean includeEdge = true;*/
-
-        //신규 스토리 recycleview사용선언
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setNestedScrollingEnabled(false);
-        mNewLayoutManager = new LinearLayoutManager(this);
+        mNewLayoutManager = new GridLayoutManager(this, 2);
         recyclerView.setLayoutManager(mNewLayoutManager);
-        recyclerView.addItemDecoration(new GridSpacingItemDecoration(2, dpToPx(10), true));
-        mNewAdapter = new MainNewAdapter(myNewDataset, BookMarkMain.this);
-        recyclerView.setAdapter(mNewAdapter);
+        recyclerView.addItemDecoration(new GridSpacingItemDecoration(2, dpToPx(5), true));
+        mBookMarkAdapter = new BookMarkAdapter(myNewDataset, BookMarkMain.this);
+        recyclerView.setAdapter(mBookMarkAdapter);
 
         // Adding Toolbar to the activity
         toolbar = (Toolbar) findViewById(R.id.toolbar);

@@ -103,7 +103,6 @@ public class UserLogin extends FontActivity2 {
                     Toast.makeText(mContext, "아이디와 비밀번호를 입력해주세요.", Toast.LENGTH_SHORT).show();
                 } else {
                     JSONObject job = new JSONObject();
-                    //final String url = "http://192.168.12.44:8888/photovel/common/user/email";
                     String url =Value.userLoginURL;
                     try {
                         job.put("user_id", user_id);
@@ -134,8 +133,6 @@ public class UserLogin extends FontActivity2 {
                 startActivity(intent);
             }
         });
-
-
     }
 
     public void login(final String json, final String url){
@@ -191,6 +188,9 @@ public class UserLogin extends FontActivity2 {
                                 editor2.remove("Set-Cookie");
                                 editor2.remove("user_id");
                                 editor2.remove("user_nick_name");
+                                editor2.remove("user_password");
+                                editor2.remove("user_phone");
+                                editor2.remove("user_friend_count");
                                 editor2.commit();
                             }
 
@@ -215,6 +215,9 @@ public class UserLogin extends FontActivity2 {
                             editor.putString("Set-Cookie", cookieValues); //First라는 key값으로 infoFirst 데이터를 저장한다.
                             editor.putString("user_id",user_id);
                             editor.putString("user_nick_name",temp.getUser_nick_name());
+                            editor.putString("user_password",temp.getUser_password());
+                            editor.putString("user_phone",temp.getUser_phone2());
+                            editor.putInt("user_friend_count",temp.getUser_friend_count());
 
                             editor.commit(); //완료한다.
 
