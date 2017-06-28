@@ -1,16 +1,23 @@
 package com.photovel.setting;
 
+import android.content.ClipData;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.ExifInterface;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
@@ -54,6 +61,7 @@ import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import com.google.maps.android.ui.IconGenerator;
+import com.mikhaellopez.circularimageview.CircularImageView;
 import com.photovel.FontActivity;
 import com.photovel.FontActivity2;
 import com.photovel.MainActivity;
@@ -67,6 +75,8 @@ import com.photovel.content.ContentUpdateMain;
 import com.photovel.content.GetCurrentAddress;
 import com.photovel.content.MultiDrawable;
 import com.photovel.content.MySupportMapFragment;
+import com.photovel.content.PhotoGeoDegree;
+import com.photovel.content.PhotoRealPathUtil;
 import com.photovel.http.JsonConnection;
 import com.photovel.http.Value;
 import com.vo.Comment;
@@ -77,17 +87,25 @@ import com.vo.Photo;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 public class SettingMain extends FontActivity2 implements NavigationView.OnNavigationItemSelectedListener{
     Toolbar toolbar;
-    private String user_id;
-    private int content_id=0;
+    private String user_id, user_nick_name, user_password, user_phone, path;
+    private int user_friend_count;
     private TextView tvpen1, tvpen2, tvpen3, tvUserID, tvUserFriendCount;
+    private LinearLayout userProfileUpdate;
     private EditText etUserNickName, etUserPassword, etUserPhone;
     private Button btnSettingUpdate, btnUserFriendGo;
+    private CircularImageView userProfile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,19 +118,24 @@ public class SettingMain extends FontActivity2 implements NavigationView.OnNavig
 
         SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
         user_id = get_to_eat.getString("user_id","notFound");
+        user_nick_name = get_to_eat.getString("user_nick_name","notFound");
+        user_password = get_to_eat.getString("user_password","notFound");
+        user_phone = get_to_eat.getString("user_phone","notFound");
+        user_friend_count = get_to_eat.getInt("user_friend_count",0);
 
         tvpen1 = (TextView)findViewById(R.id.tvpen1);
         tvpen2 = (TextView)findViewById(R.id.tvpen2);
         tvpen3 = (TextView)findViewById(R.id.tvpen3);
-
+        userProfileUpdate = (LinearLayout)findViewById(R.id.userProfileUpdate);
         tvUserID = (TextView)findViewById(R.id.tvUserID);
         tvUserFriendCount = (TextView)findViewById(R.id.tvUserFriendCount);
         etUserNickName = (EditText)findViewById(R.id.etUserNickName);
         etUserPassword = (EditText)findViewById(R.id.etUserPassword);
         etUserPhone = (EditText)findViewById(R.id.etUserPhone);
-
         btnSettingUpdate = (Button)findViewById(R.id.btnSettingUpdate);
         btnUserFriendGo = (Button)findViewById(R.id.btnUserFriendGo);
+
+        userProfile = (CircularImageView)findViewById(R.id.userProfile);
 
         //imageView를 font로 바꿔주기
         Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
@@ -120,9 +143,11 @@ public class SettingMain extends FontActivity2 implements NavigationView.OnNavig
         tvpen2.setTypeface(fontAwesomeFont);
         tvpen3.setTypeface(fontAwesomeFont);
 
-
         tvUserID.setText(user_id);
-
+        etUserNickName.setText(user_nick_name);
+        etUserPassword.setText(user_password);
+        etUserPhone.setText(user_phone);
+        tvUserFriendCount.setText(String.valueOf(user_friend_count));
 
         //toolbar
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -143,126 +168,148 @@ public class SettingMain extends FontActivity2 implements NavigationView.OnNavig
                 getApplicationContext().startActivity(intent);
             }
         });
+        TextView tvUserName = (TextView)hView.findViewById(R.id.tvUserName);
+        tvUserName.setText(user_nick_name);
         TextView tvProfileUpdate = (TextView)hView.findViewById(R.id.tvProfileUpdate);
         tvProfileUpdate.setTypeface(fontAwesomeFont);
         tvProfileUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(),"프로필변경클릭",Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getApplicationContext(), SettingMain.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                getApplicationContext().startActivity(intent);
             }
         });
         navigationView.setNavigationItemSelectedListener(this);
-    }
 
-    //디테일 설정 메뉴클릭시
-    public void ContentMenuClick(View v){
-        Context wrapper = new ContextThemeWrapper(this, R.style.MenuStyle);
-        PopupMenu popup = new PopupMenu(wrapper, v);
-        MenuInflater inflater = popup.getMenuInflater();
-        inflater.inflate(R.menu.content_setting_menu, popup.getMenu());
-        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+        userProfileUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.action_update:
-                        Intent intent = new Intent(SettingMain.this, ContentUpdateMain.class);
-                        intent.putExtra("content_id", content_id);
-                        SettingMain.this.startActivity(intent);
-                        Toast.makeText(getApplicationContext(), "수정", Toast.LENGTH_SHORT).show();
-                        break;
-                    case R.id.action_delete:
-                        AlertDialog.Builder dalert_confirm = new AlertDialog.Builder(SettingMain.this);
-                        dalert_confirm.setMessage("정말 글을 삭제 하시겠습니까?").setCancelable(false).setPositiveButton("확인",
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        Thread deleteContent = new Thread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                JsonConnection.getConnection(Value.contentURL+"/"+content_id, "DELETE", null);
-                                            }
-                                        });
-                                        deleteContent.start();
-                                        try {
-                                            deleteContent.join();
-                                        } catch (InterruptedException e) {
-                                            e.printStackTrace();
-                                        }
-                                        Toast.makeText(getApplicationContext(),"삭제성공",Toast.LENGTH_SHORT).show();
-                                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
-                                        startActivity(intent);
-                                        finish();
-                                    }
-                                }).setNegativeButton("취소",
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        return;
-                                    }
-                                });
-                        AlertDialog dalert = dalert_confirm.create();
-                        dalert.show();
-                        break;
-                    case R.id.action_report:
-                        AlertDialog.Builder walert_confirm = new AlertDialog.Builder(SettingMain.this);
-                        walert_confirm.setMessage("정말 글을 신고 하시겠습니까?").setCancelable(false).setPositiveButton("확인",
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        Thread th = new Thread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                JsonConnection.getConnection(Value.contentURL+"/"+content_id+"/warning", "POST", null);
-                                            }
-                                        });
-                                        th.start();
-                                        try {
-                                            th.join();
-                                        } catch (InterruptedException e) {
-                                            e.printStackTrace();
-                                        }
-                                        Toast.makeText(getApplicationContext(),"신고성공",Toast.LENGTH_SHORT).show();
-                                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
-                                        startActivity(intent);
-                                        finish();
-                                    }
-                                }).setNegativeButton("취소",
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        return;
-                                    }
-                                });
-                        AlertDialog walert = walert_confirm.create();
-                        walert.show();
-                        break;
-                }
-                return false;
+            public void onClick(View view) {
+                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);
             }
         });
-        popup.show();
     }
 
-    //프로파일 클릭시
-    public void ProFileMenuClick(View v){
-        Context wrapper = new ContextThemeWrapper(this, R.style.MenuStyle);
-        PopupMenu popup = new PopupMenu(wrapper, v);
-        MenuInflater inflater = popup.getMenuInflater();
-        inflater.inflate(R.menu.user_menu, popup.getMenu());
-        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()){
-                    case R.id.show_profile:
-                        Toast.makeText(getApplicationContext(),"프로필보기",Toast.LENGTH_SHORT).show();
-                        break;
+    //requestCode == 1 -> 갤러리에서 사진불러오기
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && resultCode == RESULT_OK) {
+            if (requestCode == 1) {
+                Uri uri = data.getData();   //갤러리에서 선택한 dataUri 받아오기
+                path = PhotoRealPathUtil.getRealPath(this, uri);
+                Bitmap bitmap = resizeBitmap(path);
+                ExifInterface exif = null;
+                try {
+                    exif = new ExifInterface(path);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-                return false;
+                int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
+                Bitmap bitmap2 = rotateBitmap(bitmap, orientation);
+
+                userProfile.setImageBitmap(bitmap2);
             }
-        });
-        popup.show();
+        }
+    }
+
+    //사진 용량 줄이기
+    private Bitmap resizeBitmap(String path) {
+        InputStream in = null;
+        try {
+            final int IMAGE_MAX_SIZE = 200000; //고정됨!!!!수정금지!!!!
+            in = new FileInputStream(path);
+
+            // Decode image size
+            BitmapFactory.Options o = new BitmapFactory.Options();
+            o.inJustDecodeBounds = true;
+            BitmapFactory.decodeStream(in, null, o);
+            in.close();
+
+            int scale = 1;
+            while ((o.outWidth * o.outHeight) * (1 / Math.pow(scale, 2)) > IMAGE_MAX_SIZE) {
+                scale++;
+            }
+
+            Bitmap b = null;
+            in = new FileInputStream(path);
+            if (scale > 1) {
+                scale--;
+                // scale to max possible inSampleSize that still yields an image
+                // larger than target
+                o = new BitmapFactory.Options();
+                o.inSampleSize = scale;
+                b = BitmapFactory.decodeStream(in, null, o);
+
+                // resize to desired dimensions
+                int height = b.getHeight();
+                int width = b.getWidth();
+
+                double y = Math.sqrt(IMAGE_MAX_SIZE / (((double) width) / height));
+                double x = (y / height) * width;
+
+                Bitmap scaledBitmap = Bitmap.createScaledBitmap(b, (int) x,
+                        (int) y, true);
+                b.recycle();
+                b = scaledBitmap;
+
+                System.gc();
+            } else {
+                b = BitmapFactory.decodeStream(in);
+            }
+            in.close();
+
+            return b;
+        } catch (IOException e) {
+            Log.e("TAG", e.getMessage(), e);
+            return null;
+        }
+
+    }
+
+    //사진 회전
+    public static Bitmap rotateBitmap(Bitmap bitmap, int orientation) {
+        Matrix matrix = new Matrix();
+        switch (orientation) {
+            case ExifInterface.ORIENTATION_NORMAL:
+                return bitmap;
+            case ExifInterface.ORIENTATION_FLIP_HORIZONTAL:
+                matrix.setScale(-1, 1);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_180:
+                matrix.setRotate(180);
+                break;
+            case ExifInterface.ORIENTATION_FLIP_VERTICAL:
+                matrix.setRotate(180);
+                matrix.postScale(-1, 1);
+                break;
+            case ExifInterface.ORIENTATION_TRANSPOSE:
+                matrix.setRotate(90);
+                matrix.postScale(-1, 1);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_90:
+                matrix.setRotate(90);
+                break;
+            case ExifInterface.ORIENTATION_TRANSVERSE:
+                matrix.setRotate(-90);
+                matrix.postScale(-1, 1);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_270:
+                matrix.setRotate(-90);
+                break;
+            default:
+                return bitmap;
+        }
+        try {
+            Bitmap bmRotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+            bitmap.recycle();
+            return bmRotated;
+        } catch (OutOfMemoryError e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override

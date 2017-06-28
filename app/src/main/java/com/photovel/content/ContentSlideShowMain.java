@@ -14,6 +14,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.NestedScrollView;
@@ -70,7 +71,7 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
 
     private RelativeLayout RldetailData;
     private LinearLayout RLdetailDate, LLmenu, btnLike, btnComment;
-    private TextView icglobe, icleft, icright, tvleft, tvright, iccal, icmarker, icpow, icthumb, iccomment, icshare, btnDetailMenu;
+    private TextView icglobe, icleft, icright, tvleft, tvright, iccal, icmarker, icbookmark, icthumb, iccomment, icshare, btnDetailMenu;
     private TextView tvContentInsertDate, tvContentSubject, tvContentLocation, tvUsername, tvUsername2, tvDuring, tvdetailcount, tvdetailstate, tvContent;
     private TextView tvLikeCount, tvCommentCount, tvShareCount;
     private ImageView ivTopPhoto;
@@ -119,6 +120,9 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
             Log.i("content_id","slide_content_id : "+content_id);
         }
 
+        SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
+        user_id = get_to_eat.getString("user_id","notFound");
+
         // Adding Toolbar to the activity
         toolbar = (Toolbar) findViewById(R.id.slideToolbar);
         setSupportActionBar(toolbar);
@@ -130,7 +134,7 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         tvright = (TextView)findViewById(R.id.tvright);
         iccal = (TextView)findViewById(R.id.iccal);
         icmarker = (TextView)findViewById(R.id.icmarker);
-        icpow = (TextView)findViewById(R.id.icpow);
+        icbookmark = (TextView)findViewById(R.id.icbookmark);
         icthumb = (TextView)findViewById(R.id.icthumb);
         iccomment = (TextView)findViewById(R.id.iccomment);
         icshare = (TextView)findViewById(R.id.icshare);
@@ -162,7 +166,7 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         icright.setTypeface(fontAwesomeFont);
         iccal.setTypeface(fontAwesomeFont);
         icmarker.setTypeface(fontAwesomeFont);
-        icpow.setTypeface(fontAwesomeFont);
+        icbookmark.setTypeface(fontAwesomeFont);
         icthumb.setTypeface(fontAwesomeFont);
         iccomment.setTypeface(fontAwesomeFont);
         icshare.setTypeface(fontAwesomeFont);
@@ -186,7 +190,7 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
             @Override
             public void run() {
                 super.run();
-                String responseData = JsonConnection.getConnection(Value.contentURL+"/"+content_id, "GET", null);
+                String responseData = JsonConnection.getConnection(Value.contentURL+"/"+content_id+"/"+user_id, "GET", null);
                 content = JSON.parseObject(responseData, Content.class);
                 myDataset = content.getDetails();
                 myCommentDataset = content.getComments();
@@ -207,8 +211,6 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         }
 
         //디테일 메뉴 보이기 전에 글쓴이 == 내계정 확인
-        SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
-        user_id = get_to_eat.getString("user_id","notFound");
         if(!content.getUser().getUser_id().equals(user_id)){
             LLmenu.setVisibility(View.GONE);
         }
@@ -224,6 +226,17 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         tvLikeCount.setText(String.valueOf(content.getGood_count()));
         tvCommentCount.setText(String.valueOf(content.getComment_count()));
         tvShareCount.setText(String.valueOf(content.getContent_share_count()));
+
+        //bookmark유무
+        if(content.getBookmark_status() == 1){
+            icbookmark.setText(R.string.fa_bookmark);
+            icbookmark.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.textBlue));
+        }
+
+        //좋아요 유무
+        if(content.getGood_status() == 1){
+            icthumb.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.textBlue));
+        }
 
         //메인 사진 저장
         ivTopPhoto.setImageBitmap(content.getBitmap());
@@ -698,9 +711,6 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         }else if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
             super.onBackPressed();
         }
     }

@@ -309,9 +309,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_weight="0.9"
-                    android:gravity="left">
+                    android:gravity="left|center"
+                    android:orientation="horizontal">
                     <TextView
-                        android:id="@+id/icpow"
+                        android:id="@+id/icbookmark"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:text="@string/fa_bookmark_o"
@@ -320,6 +321,14 @@
                         android:gravity="center_vertical"
                         android:layout_gravity="center"
                         android:layout_marginLeft="10dp"
+                        android:layout_marginRight="@dimen/between_tv_margin"
+                        android:includeFontPadding="false"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="북마크"
+                        android:textColor="@color/bgDarkGrey"
+                        android:textSize="@dimen/content_text_size"
                         android:includeFontPadding="false"/>
                 </LinearLayout>
                 <LinearLayout
