@@ -93,7 +93,6 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
     private SearchView searchView;
     private static final String TAG = "AppPermission";
     Toolbar toolbar;
-    String user_id;
 
     private RelativeLayout RldetailData;
     private LinearLayout RLdetailDate, LLmenu, btnLike, btnComment;
@@ -129,9 +128,6 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_content_cluster_main);
-
-        SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
-        user_id = get_to_eat.getString("user_id","notFound");
 
         //프래그먼트에 지도를 보여주기위해 싱크
         ns = (NestedScrollView)findViewById(R.id.cluster_nestedScrollView);
@@ -324,8 +320,6 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
                 final JSONObject comment = new JSONObject();
                 try {
                     JSONObject user = new JSONObject();
-                    SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
-                    final String user_id = get_to_eat.getString("user_id","notFound");
                     user.put("user_id", user_id);
                     comment.put("content_id", content_id);
                     comment.put("comment_content", etComment.getText());
@@ -360,8 +354,6 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
         btnLike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
-                final String user_id = get_to_eat.getString("user_id","notFound");
                 Thread good = new Thread(new Runnable() {
                     @Override
                     public void run() {

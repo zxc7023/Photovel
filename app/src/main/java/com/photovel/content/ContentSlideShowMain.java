@@ -67,7 +67,6 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
     private SearchView searchView;
     private static final String TAG = "ContentSlideShow";
     Toolbar toolbar;
-    String user_id;
 
     private RelativeLayout RldetailData;
     private LinearLayout RLdetailDate, LLmenu, btnLike, btnComment;
@@ -119,9 +118,6 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         }else {
             Log.i("content_id","slide_content_id : "+content_id);
         }
-
-        SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
-        user_id = get_to_eat.getString("user_id","notFound");
 
         // Adding Toolbar to the activity
         toolbar = (Toolbar) findViewById(R.id.slideToolbar);
