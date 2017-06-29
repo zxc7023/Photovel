@@ -40,7 +40,7 @@ import java.util.List;
  * @author Miguel Catalan Bañuls
  */
 
-public class SearchViewMain extends FrameLayout implements Filter.FilterListener {
+public class SearchView extends FrameLayout implements Filter.FilterListener {
 
     private static final String TAG = "ContentSearchView";
     //메뉴 xml의 아이템. searchItem 가져오기
@@ -109,21 +109,21 @@ public class SearchViewMain extends FrameLayout implements Filter.FilterListener
     }
 
     //생성자
-    public SearchViewMain(@NonNull Context context) {
+    public SearchView(@NonNull Context context) {
         super(context);
         this.context = context;
         initiateView();
         getAttrs(null, 0);
     }
 
-    public SearchViewMain(@NonNull Context context, @Nullable AttributeSet attrs) {
+    public SearchView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         this.context = context;
         initiateView();
         getAttrs(attrs, 0);
     }
 
-    public SearchViewMain(@NonNull Context context, @Nullable AttributeSet attrs, @AttrRes int defStyleAttr) {
+    public SearchView(@NonNull Context context, @Nullable AttributeSet attrs, @AttrRes int defStyleAttr) {
         super(context, attrs);
         this.context = context;
         //뷰 객체화
@@ -159,7 +159,7 @@ public class SearchViewMain extends FrameLayout implements Filter.FilterListener
     }
 
     private void getAttrs(AttributeSet attrs, int defStyleAttr) {
-        TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.SearchViewMain, defStyleAttr, 0);
+        TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.SearchView, defStyleAttr, 0);
 
         initStyle(typedArray);
     }
@@ -206,40 +206,40 @@ public class SearchViewMain extends FrameLayout implements Filter.FilterListener
     private void initStyle(TypedArray attrs){
         //R.styleable 은 res/attr.xml에서 정의한 것을 자바에서 구현
         if(attrs != null){
-            if(attrs.hasValue(R.styleable.SearchViewMain_searchBackground)){
-                setBackground(attrs.getDrawable(R.styleable.SearchViewMain_searchBackground));
+            if(attrs.hasValue(R.styleable.SearchView_searchBackground)){
+                setBackground(attrs.getDrawable(R.styleable.SearchView_searchBackground));
             }
 
-            if(attrs.hasValue(R.styleable.SearchViewMain_searchSuggestionBackground)){
-                setSuggestionBackground(attrs.getDrawable(R.styleable.SearchViewMain_searchSuggestionBackground));
+            if(attrs.hasValue(R.styleable.SearchView_searchSuggestionBackground)){
+                setSuggestionBackground(attrs.getDrawable(R.styleable.SearchView_searchSuggestionBackground));
             }
 
-            if(attrs.hasValue(R.styleable.SearchViewMain_searchCloseIcon)){
-                setCloseIcon(attrs.getDrawable(R.styleable.SearchViewMain_searchCloseIcon));
+            if(attrs.hasValue(R.styleable.SearchView_searchCloseIcon)){
+                setCloseIcon(attrs.getDrawable(R.styleable.SearchView_searchCloseIcon));
             }
 
-            if(attrs.hasValue(R.styleable.SearchViewMain_searchBackIcon)){
-                setBackIcon(attrs.getDrawable(R.styleable.SearchViewMain_searchBackIcon));
+            if(attrs.hasValue(R.styleable.SearchView_searchBackIcon)){
+                setBackIcon(attrs.getDrawable(R.styleable.SearchView_searchBackIcon));
             }
 
            /* if(attrs.hasValue(R.styleable.ContentSearchView_searchSuggestionIcon)){
                 setSuggstionIcon(attrs.getDrawable(R.styleable.ContentSearchView_searchSuggestionIcon));
             }*/
 
-            if(attrs.hasValue(R.styleable.SearchViewMain_android_textColor)){
-                setTextColor(attrs.getColor(R.styleable.SearchViewMain_android_textColor, 0));
+            if(attrs.hasValue(R.styleable.SearchView_android_textColor)){
+                setTextColor(attrs.getColor(R.styleable.SearchView_android_textColor, 0));
             }
 
-            if(attrs.hasValue(R.styleable.SearchViewMain_android_hint)){
-                setHint(attrs.getString(R.styleable.SearchViewMain_android_hint));
+            if(attrs.hasValue(R.styleable.SearchView_android_hint)){
+                setHint(attrs.getString(R.styleable.SearchView_android_hint));
             }
 
-            if(attrs.hasValue(R.styleable.SearchViewMain_android_textColorHint)){
-                setHintTextColor(attrs.getColor(R.styleable.SearchViewMain_android_textColorHint, 0));
+            if(attrs.hasValue(R.styleable.SearchView_android_textColorHint)){
+                setHintTextColor(attrs.getColor(R.styleable.SearchView_android_textColorHint, 0));
             }
 
-            if(attrs.hasValue(R.styleable.SearchViewMain_android_inputType)){
-                setInputType(attrs.getInt(R.styleable.SearchViewMain_android_inputType, EditorInfo.TYPE_NULL));
+            if(attrs.hasValue(R.styleable.SearchView_android_inputType)){
+                setInputType(attrs.getInt(R.styleable.SearchView_android_inputType, EditorInfo.TYPE_NULL));
             }
 
 
@@ -325,7 +325,7 @@ public void setBackground(Drawable background) {
                 usersQuey = s;
                 //
                 startFilter(s);
-                SearchViewMain.this.onTextChanged(s);
+                SearchView.this.onTextChanged(s);
             }
 
             @Override
@@ -484,7 +484,7 @@ public void setBackground(Drawable background) {
         if (searchListAdapter != null && searchListAdapter instanceof Filterable) {
 //            ((Filterable) searchListAdapter).getFilter().filter(s, ContentSearchView.this);
             //이전에 실행되지 않은 필터 요청을 지우고 나중에 실행될 새로운 필터 요청
-            (searchListAdapter).getFilter().filter(s, SearchViewMain.this);
+            (searchListAdapter).getFilter().filter(s, SearchView.this);
         }
     }
 

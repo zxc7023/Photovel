@@ -58,7 +58,7 @@ public class FriendListMain extends FontActivity2 implements NavigationView.OnNa
     private TextView tvbookmark;
 
     private Boolean isFabOpen = false;
-    private FloatingActionButton fab, fab1, fab2, fab3;
+    private FloatingActionButton fab_more, fab_search_id, fab_search_phone;
     private Animation fab_open, fab_close, rotate_forward, rotate_backward;
 
     @Override
@@ -73,41 +73,36 @@ public class FriendListMain extends FontActivity2 implements NavigationView.OnNa
         user_profile = get_to_eat.getString("user_profile","notFound");
 
         //FloatingActionButton정의 및 기능
-        fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab1 = (FloatingActionButton) findViewById(R.id.fab1);
-        fab2 = (FloatingActionButton) findViewById(R.id.fab2);
+        fab_more = (FloatingActionButton) findViewById(R.id.fab_more);
+        fab_search_id = (FloatingActionButton) findViewById(R.id.fab_search_id);
+        fab_search_phone = (FloatingActionButton) findViewById(R.id.fab_search_phone);
         fab_open = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_open);
         fab_close = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_close);
         rotate_forward = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate_forward);
         rotate_backward = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate_backward);
-        /*fab.setOnClickListener(this);
-        fab1.setOnClickListener(this);
-        fab2.setOnClickListener(this);*/
-        fab2.setOnClickListener(new View.OnClickListener() {
+        fab_search_phone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Toast.makeText(getBaseContext(), "아직 개발중입니다.", Toast.LENGTH_LONG).show();
             }
         });
-        fab1.setOnClickListener(new View.OnClickListener() {
+        fab_search_id.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Toast.makeText(getBaseContext(), "아직 개발중입니다.", Toast.LENGTH_LONG).show();
             }
         });
-        fab.setOnClickListener(new View.OnClickListener() {
+        fab_more.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 int id = v.getId();
                 switch (id) {
-                    case R.id.fab:
+                    case R.id.fab_more:
                         animateFAB();
                         break;
-                    case R.id.fab1:
-                        Log.i("ddd", "Fab 1");
+                    case R.id.fab_search_id:
                         break;
-                    case R.id.fab2:
-                        Log.i("ddd", "Fab 2");
+                    case R.id.fab_search_phone:
                         break;
                 }
             }
@@ -224,25 +219,19 @@ public class FriendListMain extends FontActivity2 implements NavigationView.OnNa
     //FloatingActionButton 회전하기
     public void animateFAB() {
         if (isFabOpen) {
-            fab.startAnimation(rotate_backward);
-            fab1.startAnimation(fab_close);
-            fab2.startAnimation(fab_close);
-            fab3.startAnimation(fab_close);
-            fab1.setClickable(false);
-            fab2.setClickable(false);
-            fab3.setClickable(false);
+            fab_more.startAnimation(rotate_backward);
+            fab_search_id.startAnimation(fab_close);
+            fab_search_phone.startAnimation(fab_close);
+            fab_search_id.setClickable(false);
+            fab_search_phone.setClickable(false);
             isFabOpen = false;
-            Log.i("ddd", "close");
         } else {
-            fab.startAnimation(rotate_forward);
-            fab1.startAnimation(fab_open);
-            fab2.startAnimation(fab_open);
-            fab3.startAnimation(fab_open);
-            fab1.setClickable(true);
-            fab2.setClickable(true);
-            fab3.setClickable(true);
+            fab_more.startAnimation(rotate_forward);
+            fab_search_id.startAnimation(fab_open);
+            fab_search_phone.startAnimation(fab_open);
+            fab_search_id.setClickable(true);
+            fab_search_phone.setClickable(true);
             isFabOpen = true;
-            Log.i("ddd", "open");
         }
     }
 
