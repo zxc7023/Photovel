@@ -115,7 +115,7 @@
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab2"
+        android:id="@+id/fab_search_phone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="140dp"
@@ -125,9 +125,9 @@
         app:backgroundTint="@color/nonpressed"
         app:elevation="6dp"
         app:pressedTranslationZ="12dp"
-        android:src="@drawable/ic_profile_circle" />
+        android:src="@drawable/btn_number_off" />
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab1"
+        android:id="@+id/fab_search_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="80dp"
@@ -137,9 +137,9 @@
         app:elevation="6dp"
         app:backgroundTint="@color/nonpressed"
         app:pressedTranslationZ="12dp"
-        android:src="@drawable/btn_plus" />
+        android:src="@drawable/btn_id_off" />
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
+        android:id="@+id/fab_more"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"

@@ -71,7 +71,7 @@
                     android:background="?attr/colorPrimary"
                     app:layout_collapseMode="pin"
                     app:layout_scrollFlags="scroll|exitUntilCollapsed"/>
-                <com.photovel.search.SearchViewMain
+                <com.photovel.search.SearchView
                     android:id="@+id/search_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

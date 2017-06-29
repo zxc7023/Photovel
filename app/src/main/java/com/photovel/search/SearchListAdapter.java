@@ -1,10 +1,13 @@
 package com.photovel.search;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
+import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +19,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.photovel.R;
+import com.photovel.content.ContentDetailListMain;
+import com.photovel.user.UserBitmapEncoding;
 
 //import android.support.v4.widget.CursorAdapter;
 
@@ -32,12 +37,11 @@ public class SearchListAdapter extends CursorAdapter implements Filterable {
     private byte[] photoBytes;
     private ViewGroup parent;
 
-    public RelativeLayout RlmainTop;
-    public ImageView main_ivphoto;
+    public RelativeLayout RlmainTop, RLBookmark;
+    public ImageView main_ivphoto, userProfile;
     public TextView contentSubject, userNickname;
     public TextView main_icthumb, main_iccomment, main_icshare;
     public TextView thumbCount, commentCount, shareCount;
-    public LinearLayout llthumb, llcomment, llshare;
 
     public SearchListAdapter(Context context, Cursor c, boolean autoRequery) {
         super(context, c, autoRequery);
@@ -71,36 +75,60 @@ public class SearchListAdapter extends CursorAdapter implements Filterable {
 
     //커서가 가리키는 데이터에 뷰를 묶는다
     @Override
-    public void bindView(View view, Context context, Cursor cursor) {
+    public void bindView(View view, final Context context, final Cursor cursor) {
         RlmainTop = (RelativeLayout)view.findViewById(R.id.RlmainTop);
-        //이미 존재하는 뷰 객체의 main_ivphoto에 커서가 가리키는 정보의 이미지 저장
-        main_ivphoto = (ImageView)view.findViewById(R.id.main_ivphoto);
-
-        //photoBytes = cursor.getBlob(cursor.getColumnIndex("content_subject"));
-        //photoBytes = cursor.getBlob(cursor.getColumnIndex("main_ivphoto"));
-        if(photoBytes != null){
-            Bitmap mainIvPhoto = BitmapFactory.decodeByteArray(photoBytes, 0, photoBytes.length);
-            main_ivphoto.setImageBitmap(mainIvPhoto);
-        }
-
-        contentSubject = (TextView)view.findViewById(R.id.contentSubject);
-        contentSubject.setText(cursor.getString(cursor.getColumnIndex("content_subject")));
-        userNickname = (TextView)view.findViewById(R.id.userNickname);
+        RLBookmark = (RelativeLayout)view.findViewById(R.id.RLBookmark);
+        main_ivphoto = (ImageView)view.findViewById(R.id.main_ivphoto);//이미 존재하는 뷰 객체의 main_ivphoto에 커서가 가리키는 정보의 이미지 저장
         main_icthumb = (TextView)view.findViewById(R.id.main_icthumb);
         main_iccomment = (TextView)view.findViewById(R.id.main_iccomment);
         main_icshare = (TextView)view.findViewById(R.id.main_icshare);
+        contentSubject = (TextView)view.findViewById(R.id.contentSubject);
+        userNickname = (TextView)view.findViewById(R.id.userNickname);
+        userProfile = (ImageView)view.findViewById(R.id.userProfile);
         thumbCount = (TextView)view.findViewById(R.id.thumbCount);
         commentCount = (TextView)view.findViewById(R.id.commentCount);
         shareCount = (TextView)view.findViewById(R.id.shareCount);
-        llthumb = (LinearLayout)view.findViewById(R.id.llthumb);//좋아요 레이아웃
-        llcomment = (LinearLayout)view.findViewById(R.id.llcomment);//코멘트 레이아웃
-        llshare = (LinearLayout)view.findViewById(R.id.llshare);//공유 레이아웃
 
         Typeface fontAwesomeFont = Typeface.createFromAsset(context.getAssets(), "fontawesome-webfont.ttf");
         main_icthumb.setTypeface(fontAwesomeFont);
         main_iccomment.setTypeface(fontAwesomeFont);
         main_icshare.setTypeface(fontAwesomeFont);
 
+        //photoBytes = cursor.getBlob(cursor.getColumnIndex("content_subject"));
+        //photoBytes = cursor.getBlob(cursor.getColumnIndex("main_ivphoto"));
+        /*if(photoBytes != null){
+            Bitmap mainIvPhoto = BitmapFactory.decodeByteArray(photoBytes, 0, photoBytes.length);
+            main_ivphoto.setImageBitmap(mainIvPhoto);
+        }*/
+        UserBitmapEncoding ub = new UserBitmapEncoding();
+        Bitmap content_bitmap = ub.StringToBitMap(cursor.getString(cursor.getColumnIndex("content_bitmap")));
+        Bitmap user_bitmap = ub.StringToBitMap(cursor.getString(cursor.getColumnIndex("user_bitmap")));
+
+        main_ivphoto.setImageBitmap(content_bitmap);
+        userNickname.setText(cursor.getString(cursor.getColumnIndex("user_nick_name")));
+        userProfile.setImageBitmap(user_bitmap);
+        contentSubject.setText(cursor.getString(cursor.getColumnIndex("content_subject")));
+        thumbCount.setText(cursor.getString(cursor.getColumnIndex("good_count")));
+        commentCount.setText(cursor.getString(cursor.getColumnIndex("comment_count")));
+        shareCount.setText(cursor.getString(cursor.getColumnIndex("content_share_count")));
+        if(cursor.getString(cursor.getColumnIndex("good_status")).equals("1")){
+            main_icthumb.setTextColor(ContextCompat.getColor(context, R.color.textBlue));
+        }
+        if(cursor.getString(cursor.getColumnIndex("bookmark_status")).equals("1")){
+            RLBookmark.setVisibility(View.VISIBLE);
+            RLBookmark.bringToFront();
+        }
+
+        //사진클릭
+        RlmainTop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i("click","메인이 클릭되었당!");
+                Intent intent = new Intent(context, ContentDetailListMain.class);
+                intent.putExtra("content_id", cursor.getString(cursor.getColumnIndex("content_id")));
+                context.startActivity(intent);
+            }
+        });
     }
 
     @Override
