@@ -60,7 +60,7 @@ public class MainNewAdapter extends RecyclerView.Adapter<MainNewAdapter.ViewHold
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public RelativeLayout RlmainTop, RLBookmark;
-        public ImageView main_ivphoto;
+        public ImageView main_ivphoto, userProfile;
         public TextView contentSubject, userNickname;
         public TextView main_icthumb, main_iccomment, main_icshare;
         public TextView thumbCount, commentCount, shareCount, tvbookmark;
@@ -83,6 +83,7 @@ public class MainNewAdapter extends RecyclerView.Adapter<MainNewAdapter.ViewHold
             llthumb = (LinearLayout)view.findViewById(R.id.llthumb);
             llcomment = (LinearLayout)view.findViewById(R.id.llcomment);
             llshare = (LinearLayout)view.findViewById(R.id.llshare);
+            userProfile = (ImageView)view.findViewById(R.id.userProfile);
 
         }
     }
@@ -122,6 +123,7 @@ public class MainNewAdapter extends RecyclerView.Adapter<MainNewAdapter.ViewHold
         }
         holder.contentSubject.setText(subject);
         holder.userNickname.setText(mDataset.get(position).getUser().getUser_nick_name());
+        holder.userProfile.setImageBitmap(mDataset.get(position).getUser().getBitmap());
         holder.thumbCount.setText(String.valueOf(mDataset.get(position).getGood_count()));
         holder.commentCount.setText(String.valueOf(mDataset.get(position).getComment_count()));
         holder.shareCount.setText(String.valueOf(mDataset.get(position).getContent_share_count()));

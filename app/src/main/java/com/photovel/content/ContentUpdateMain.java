@@ -151,11 +151,8 @@ public class ContentUpdateMain extends FontActivity {
         }
 
         //ContentDetail bitmap 받아오기
-        List<Bitmap> detailBitmaps = JsonConnection.getBitmap(myDataset, Value.contentPhotoURL);
-        for(int i = 0; i < myDataset.size(); i++){
-            myDataset.get(i).getPhoto().setBitmap(detailBitmaps.get(i));
-            originData.get(i).getPhoto().setBitmap(detailBitmaps.get(i));
-        }
+        JsonConnection.setBitmap(myDataset, Value.contentPhotoURL);
+        JsonConnection.setBitmap(originData, Value.contentPhotoURL);
 
         //content정보 추가하기
         contentSubject.setText(content.getContent_subject());

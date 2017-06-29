@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.MatrixCursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
@@ -112,10 +113,8 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         }
 
         //메인이미지 bitmap 받아오기
-        List<Bitmap> mainImageBitmaps = JsonConnection.getBitmap(images, Value.mainImagePhotoURL);
-        for(int i = 0; i < images.size(); i++){
-            images.get(i).setBitmap(mainImageBitmaps.get(i));
-        }
+        JsonConnection.setBitmap(images, Value.mainImagePhotoURL);
+
 
         carouselView.setPageCount(images.size());
         carouselView.setImageListener(imageListener);
@@ -136,11 +135,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
             e.printStackTrace();
         }
         //추천 스토리 bitmap 받아오기
-        List<Bitmap> recommendBitmaps = JsonConnection.getBitmap(myRecommendDataset, Value.contentPhotoURL);
-        for(int i = 0; i < myRecommendDataset.size(); i++){
-            myRecommendDataset.get(i).setBitmap(recommendBitmaps.get(i));
-        }
-
+        JsonConnection.setBitmap(myRecommendDataset, Value.contentPhotoURL);
 
         //추천 스토리 recycleview사용선언
         RVrecommend = (RecyclerView) findViewById(R.id.RVrecommend);
@@ -167,9 +162,12 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
             e.printStackTrace();
         }
         //신규 스토리 bitmap 받아오기
-        List<Bitmap> newBitmaps = JsonConnection.getBitmap(myNewDataset, Value.contentPhotoURL);
+        JsonConnection.setBitmap(myNewDataset, Value.contentPhotoURL);
         for(int i = 0; i < myNewDataset.size(); i++){
-            myNewDataset.get(i).setBitmap(newBitmaps.get(i));
+            if(myNewDataset.get(i).getUser().getUser_profile_photo() == null){
+                Bitmap profile = BitmapFactory.decodeResource(getResources(),R.drawable.ic_profile_circle);
+                myNewDataset.get(i).getUser().setBitmap(profile);
+            }
         }
 
         //신규 스토리 recycleview사용선언
@@ -208,6 +206,9 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         });
         TextView tvUserName = (TextView)hView.findViewById(R.id.tvUserName);
         tvUserName.setText(user_nick_name);
+        //shared 이미지 저장하는 거 찾기
+        /*ImageView userProfile = (ImageView)hView.findViewById(R.id.userProfile);
+        userProfile.setImageBitmap(u);*/
         TextView tvProfileUpdate = (TextView)hView.findViewById(R.id.tvProfileUpdate);
         tvProfileUpdate.setTypeface(fontAwesomeFont);
         tvProfileUpdate.setOnClickListener(new View.OnClickListener() {

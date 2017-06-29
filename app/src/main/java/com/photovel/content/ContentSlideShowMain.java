@@ -74,7 +74,7 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
     private TextView icglobe, icleft, icright, tvleft, tvright, iccal, icmarker, icbookmark, icthumb, iccomment, icshare, btnDetailMenu;
     private TextView tvContentInsertDate, tvContentSubject, tvContentLocation, tvUsername, tvUsername2, tvDuring, tvdetailcount, tvdetailstate, tvContent;
     private TextView tvLikeCount, tvCommentCount, tvShareCount;
-    private ImageView ivTopPhoto;
+    private ImageView ivTopPhoto, userProfile;
     private LinearLayout btnLookLeft, btnLookRight;
     private FloatingActionButton btnTop;
     //private Button btnLike, btnComment, btnShare;
@@ -141,6 +141,7 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         icshare = (TextView)findViewById(R.id.icshare);
         btnDetailMenu = (TextView) findViewById(R.id.btnDetailMenu);
         ivTopPhoto = (ImageView) findViewById(R.id.ivTopPhoto);
+        userProfile = (ImageView) findViewById(R.id.userProfile);
 
         tvContentInsertDate = (TextView) findViewById(R.id.tvContentInsertDate);    //컨텐트입력날짜
         tvContentSubject = (TextView) findViewById(R.id.tvContentSubject);           //컨텐트 제목
@@ -206,9 +207,10 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         //content의 bitmap 받아오기
         List<Content> tmpContent = new ArrayList<>();
         tmpContent.add(content);
-        List<Bitmap> contentBitmaps = JsonConnection.getBitmap(tmpContent, Value.contentPhotoURL);
-        for(int i = 0; i < contentBitmaps.size(); i++){
-            tmpContent.get(i).setBitmap(contentBitmaps.get(i));
+        JsonConnection.setBitmap(tmpContent, Value.contentPhotoURL);
+        if(content.getUser().getUser_profile_photo() == null){
+            Bitmap profile = BitmapFactory.decodeResource(getResources(),R.drawable.ic_profile_circle);
+            content.getUser().setBitmap(profile);
         }
 
         //디테일 메뉴 보이기 전에 글쓴이 == 내계정 확인
@@ -241,6 +243,7 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
 
         //메인 사진 저장
         ivTopPhoto.setImageBitmap(content.getBitmap());
+        userProfile.setImageBitmap(content.getUser().getBitmap());
 
         //메인 위치 저장
         GetCurrentAddress getAddress = new GetCurrentAddress();

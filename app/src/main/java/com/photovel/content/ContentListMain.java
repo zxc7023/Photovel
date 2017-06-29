@@ -127,9 +127,12 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
             e.printStackTrace();
         }
         //스토리 bitmap 받아오기
-        List<Bitmap> newBitmaps = JsonConnection.getBitmap(myDataset, Value.contentPhotoURL);
+        JsonConnection.setBitmap(myDataset, Value.contentPhotoURL);
         for(int i = 0; i < myDataset.size(); i++){
-            myDataset.get(i).setBitmap(newBitmaps.get(i));
+            if(myDataset.get(i).getUser().getUser_profile_photo() == null){
+                Bitmap profile = BitmapFactory.decodeResource(getResources(),R.drawable.ic_profile_circle);
+                myDataset.get(i).getUser().setBitmap(profile);
+            }
         }
 
         //recycleview사용선언

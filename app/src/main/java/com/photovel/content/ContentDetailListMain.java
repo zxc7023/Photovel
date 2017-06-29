@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -69,7 +70,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
     private TextView tvContentInsertDate, tvContentSubject, tvContentLocation, tvUsername, tvUsername2, tvDuring, tvdetailcount, tvdetailstate, tvContent;
     private TextView tvLikeCount, tvCommentCount, tvShareCount;
     private LinearLayout btnLookLeft, btnLookRight;
-    private ImageView ivTopPhoto;
+    private ImageView ivTopPhoto, userProfile, userProfile1;
     private FloatingActionButton btnTop;
     private List<ContentDetail> myDataset;
     private Content content;
@@ -121,6 +122,8 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         tvright = (TextView)findViewById(R.id.tvright);
         btnDetailMenu = (TextView) findViewById(R.id.btnDetailMenu);
         ivTopPhoto = (ImageView) findViewById(R.id.ivTopPhoto);
+        userProfile = (ImageView) findViewById(R.id.userProfile);
+        userProfile1 = (ImageView) findViewById(R.id.userProfile1);
 
         tvContentInsertDate = (TextView) findViewById(R.id.tvContentInsertDate);    //컨텐트입력날짜
         tvContentSubject = (TextView) findViewById(R.id.tvContentSubject);           //컨텐트 제목
@@ -203,16 +206,17 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         //content의 bitmap 받아오기
         List<Content> tmpContent = new ArrayList<>();
         tmpContent.add(content);
-        List<Bitmap> contentBitmaps = JsonConnection.getBitmap(tmpContent, Value.contentPhotoURL);
-        for(int i = 0; i < contentBitmaps.size(); i++){
-            tmpContent.get(i).setBitmap(contentBitmaps.get(i));
+        JsonConnection.setBitmap(tmpContent, Value.contentPhotoURL);
+        if(content.getUser().getUser_profile_photo() == null){
+            Bitmap profile = BitmapFactory.decodeResource(getResources(),R.drawable.ic_profile_circle);
+            content.getUser().setBitmap(profile);
         }
 
         //사진 스토리 bitmap 받아오기
-        List<Bitmap> detailBitmaps = JsonConnection.getBitmap(myDataset, Value.contentPhotoURL);
-        for(int i = 0; i < myDataset.size(); i++){
-            myDataset.get(i).getPhoto().setBitmap(detailBitmaps.get(i));
-        }
+        JsonConnection.setBitmap(myDataset, Value.contentPhotoURL);
+
+        //코멘트 bitmap 받아오기
+        JsonConnection.setBitmap(myCommentDataset, Value.contentPhotoURL);
 
         //디테일 메뉴 보이기 전에 글쓴이 == 내계정 확인
         if(!user_id.equals(content.getUser().getUser_id())){
@@ -244,6 +248,8 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
 
         //메인 사진 저장
         ivTopPhoto.setImageBitmap(content.getBitmap());
+        userProfile.setImageBitmap(content.getUser().getBitmap());
+        userProfile1.setImageBitmap(content.getUser().getBitmap());
 
         //메인 위치 저장
         GetCurrentAddress getAddress = new GetCurrentAddress();

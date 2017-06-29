@@ -5,6 +5,8 @@ import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import org.json.JSONObject;
+
+import com.vo.Comment;
 import com.vo.Content;
 import com.vo.ContentDetail;
 import com.vo.MainImage;
@@ -86,9 +88,8 @@ public class JsonConnection {
         return responseData;
     }
 
-    public static List<Bitmap> getBitmap(final List imgs, final String url){
-        final List<Bitmap> bitmaps = new ArrayList<Bitmap>();
-        Thread thread2 = new Thread(){
+    public static void setBitmap(final List imgs, final String url){
+        Thread setBitmap = new Thread(){
             @Override
             public void run() {
                 super.run();
@@ -99,7 +100,7 @@ public class JsonConnection {
                         for (int i = 0; i < imgs.size(); i++) {
                             Bitmap bitmap = BitmapFactory.decodeStream((InputStream)
                                     new URL(url + "/" + ((MainImage) imgs.get(i)).getImage_file_name()).getContent());
-                            bitmaps.add(bitmap);
+                            ((MainImage) imgs.get(i)).setBitmap(bitmap);
                             Log.i(TAG, "4. getBitmap (MainImage)bitmap= " + bitmap);
                         }
 
@@ -108,8 +109,17 @@ public class JsonConnection {
                         for (int i = 0; i < imgs.size(); i++) {
                             Bitmap bitmap = BitmapFactory.decodeStream((InputStream)
                                     new URL(url+"/"+((Content)imgs.get(i)).getContent_id()+"/"+((Content)imgs.get(i)).getPhoto_file_name()).getContent());
-                            bitmaps.add(bitmap);
+                            ((Content)imgs.get(i)).setBitmap(bitmap);
                             Log.i(TAG, "4. getBitmap (Content)bitmap= " + bitmap);
+                        }
+                        //글쓴이 profile 가져오기
+                        for (int i = 0; i < imgs.size(); i++) {
+                            if(((Content)imgs.get(i)).getUser().getUser_profile_photo() != null) {
+                                Bitmap bitmap = BitmapFactory.decodeStream((InputStream)
+                                        new URL(url + "/profile/"+((Content)imgs.get(i)).getUser().getUser_profile_photo()).getContent());
+                                ((Content)imgs.get(i)).getUser().setBitmap(bitmap);
+                                Log.i(TAG, "4. getBitmap (profile)bitmap= " + bitmap);
+                            }
                         }
 
                     //ContentDetail 타입일 때
@@ -117,12 +127,20 @@ public class JsonConnection {
                         for (int i = 0; i < imgs.size(); i++) {
                             Bitmap bitmap = BitmapFactory.decodeStream((InputStream)
                                     new URL(url+"/"+((ContentDetail)imgs.get(i)).getContent_id()+"/"+((ContentDetail)imgs.get(i)).getPhoto().getPhoto_file_name()).getContent());
-                            bitmaps.add(bitmap);
+                            ((ContentDetail)imgs.get(i)).getPhoto().setBitmap(bitmap);
+                            ((ContentDetail)imgs.get(i)).getPhoto().setRank(String.valueOf(i+1));
                             Log.i(TAG, "4. getBitmap (ContentDetail)bitmap= " + bitmap);
                         }
-
+                    //Comment 타입일 때
+                    } else if (imgs.get(0) instanceof Comment) {
+                        for (int i = 0; i < imgs.size(); i++) {
+                            Bitmap bitmap = BitmapFactory.decodeStream((InputStream)
+                                    new URL(url + "/profile/"+((Comment)imgs.get(i)).getUser().getUser_profile_photo()).getContent());
+                            ((Comment)imgs.get(i)).getUser().setBitmap(bitmap);
+                            Log.i(TAG, "4. getBitmap (Comment)bitmap= " + bitmap);
+                        }
                     }else{
-                        Log.i(TAG, "MainImage, Content, ContentDetail Type이 아닙니다");
+                        Log.i(TAG, "MainImage, Content, ContentDetail, Comment Type이 아닙니다");
                     }
 
 
@@ -131,12 +149,11 @@ public class JsonConnection {
                 }
             }
         };
-        thread2.start();
+        setBitmap.start();
         try {
-            thread2.join();
+            setBitmap.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return bitmaps;
     }
 }

@@ -100,7 +100,7 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
     private TextView icglobe, icleft, icright, tvleft, tvright, iccal, icmarker, icbookmark, icthumb, iccomment, icshare, btnDetailMenu;
     private TextView tvContentInsertDate, tvContentSubject, tvContentLocation, tvUsername, tvUsername2, tvDuring, tvdetailcount, tvdetailstate, tvContent;
     private TextView tvLikeCount, tvCommentCount, tvShareCount;
-    private ImageView ivTopPhoto;
+    private ImageView ivTopPhoto, userProfile;
     private FloatingActionButton btnTop;
     private LinearLayout btnLookLeft, btnLookRight;
     private List<ContentDetail> myDataset;
@@ -172,6 +172,7 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
         icshare = (TextView)findViewById(R.id.icshare);
         btnDetailMenu = (TextView) findViewById(R.id.btnDetailMenu);
         ivTopPhoto = (ImageView) findViewById(R.id.ivTopPhoto);
+        userProfile = (ImageView) findViewById(R.id.userProfile);
 
         tvContentInsertDate = (TextView) findViewById(R.id.tvContentInsertDate);    //컨텐트입력날짜
         tvContentSubject = (TextView) findViewById(R.id.tvContentSubject);           //컨텐트 제목
@@ -237,16 +238,13 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
         //content의 bitmap 받아오기
         List<Content> tmpContent = new ArrayList<>();
         tmpContent.add(content);
-        List<Bitmap> contentBitmaps = JsonConnection.getBitmap(tmpContent, Value.contentPhotoURL);
-        for(int i = 0; i < contentBitmaps.size(); i++){
-            tmpContent.get(i).setBitmap(contentBitmaps.get(i));
+        JsonConnection.setBitmap(tmpContent, Value.contentPhotoURL);
+        if(content.getUser().getUser_profile_photo() == null){
+            Bitmap profile = BitmapFactory.decodeResource(getResources(),R.drawable.ic_profile_circle);
+            content.getUser().setBitmap(profile);
         }
         //지도 스토리 bitmap 받아오기
-        List<Bitmap> clusterBitmaps = JsonConnection.getBitmap(myDataset, Value.contentPhotoURL);
-        for(int i = 0; i < myDataset.size(); i++){
-            myDataset.get(i).getPhoto().setBitmap(clusterBitmaps.get(i));
-            myDataset.get(i).getPhoto().setRank(String.valueOf(i));
-        }
+        JsonConnection.setBitmap(myDataset, Value.contentPhotoURL);
 
         //디테일 메뉴 보이기 전에 글쓴이 == 내계정 확인
         if(!content.getUser().getUser_id().equals(user_id)){
@@ -264,6 +262,7 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
         tvLikeCount.setText(String.valueOf(content.getGood_count()));
         tvCommentCount.setText(String.valueOf(content.getComment_count()));
         tvShareCount.setText(String.valueOf(content.getContent_share_count()));
+        userProfile.setImageBitmap(content.getUser().getBitmap());
 
         //bookmark유무
         if(content.getBookmark_status() == 1){

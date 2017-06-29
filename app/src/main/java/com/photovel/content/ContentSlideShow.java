@@ -66,10 +66,7 @@ public class ContentSlideShow extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        List<Bitmap> detailBitmaps = JsonConnection.getBitmap(myDataset, Value.contentPhotoURL);
-        for(int i = 0; i < myDataset.size(); i++){
-            myDataset.get(i).getPhoto().setBitmap(detailBitmaps.get(i));
-        }
+        JsonConnection.setBitmap(myDataset, Value.contentPhotoURL);
 
         //find  view
         mViewFlipper = (ViewFlipper) this.findViewById(R.id.view_flipper);

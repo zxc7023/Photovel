@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
@@ -88,9 +89,12 @@ public class BookMarkMain extends FontActivity2 implements NavigationView.OnNavi
             e.printStackTrace();
         }
         //신규 스토리 bitmap 받아오기
-        List<Bitmap> newBitmaps = JsonConnection.getBitmap(myNewDataset, Value.contentPhotoURL);
+        JsonConnection.setBitmap(myNewDataset, Value.contentPhotoURL);
         for(int i = 0; i < myNewDataset.size(); i++){
-            myNewDataset.get(i).setBitmap(newBitmaps.get(i));
+            if(myNewDataset.get(i).getUser().getUser_profile_photo() == null){
+                Bitmap profile = BitmapFactory.decodeResource(getResources(),R.drawable.ic_profile_circle);
+                myNewDataset.get(i).getUser().setBitmap(profile);
+            }
         }
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);

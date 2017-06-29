@@ -79,7 +79,7 @@ public class ContentListAdapter extends RecyclerView.Adapter<ContentListAdapter.
         public TextView tvContentInsertDate, tvContentSubject, tvContentLocation, tvUsername, tvDuring, tvdetailcount, tvContent;
         public TextView tvLikeCount, tvCommentCount, tvShareCount, btnComment;
         public LinearLayout btnLookLeft, btnLookRight, btnLike, btnBookmark;
-        public ImageView ivTopPhoto;
+        public ImageView ivTopPhoto, userProfile;
 
         public ViewHolder(View view) {
             super(view);
@@ -100,6 +100,7 @@ public class ContentListAdapter extends RecyclerView.Adapter<ContentListAdapter.
             tvright = (TextView)view.findViewById(R.id.tvright);
             btnDetailMenu = (TextView) view.findViewById(R.id.btnDetailMenu);
             ivTopPhoto = (ImageView) view.findViewById(R.id.ivTopPhoto);
+            userProfile = (ImageView) view.findViewById(R.id.userProfile);
 
             tvContentInsertDate = (TextView) view.findViewById(R.id.tvContentInsertDate);    //컨텐트입력날짜
             tvContentSubject = (TextView) view.findViewById(R.id.tvContentSubject);           //컨텐트 제목
@@ -189,6 +190,7 @@ public class ContentListAdapter extends RecyclerView.Adapter<ContentListAdapter.
         holder.tvShareCount.setText(String.valueOf(mDataset.get(position).getContent_share_count()));
 
         holder.ivTopPhoto.setImageBitmap(mDataset.get(position).getBitmap());
+        holder.userProfile.setImageBitmap(mDataset.get(position).getUser().getBitmap());
 
         holder.btnLookLeft.setOnClickListener(new View.OnClickListener() {
             @Override
