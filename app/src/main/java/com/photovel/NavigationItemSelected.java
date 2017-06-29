@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import com.photovel.common.BookMarkMain;
 import com.photovel.content.ContentListMain;
+import com.photovel.friend.FriendListMain;
 import com.photovel.http.Value;
 import com.photovel.setting.SettingMain;
 
@@ -42,7 +43,10 @@ public class NavigationItemSelected extends FontActivity{
             context.startActivity(intent);
             finish();
         }else if(id==R.id.nav_my_friend){
-
+            intent = new Intent(context, FriendListMain.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
+            finish();
         }else if(id==R.id.nav_book_mark){
             intent = new Intent(context, BookMarkMain.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

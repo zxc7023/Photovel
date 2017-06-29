@@ -50,7 +50,7 @@
         <activity android:name=".common.BookMarkMain" android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".friend.FriendListMain" android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".TestActivity"/>
-        <activity android:name=".user.UserLogin"/>
+        <activity android:name=".user.UserLogin" android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".user.UserValidityCheck"/>
         <activity android:name=".user.UserJoin"/>
         <activity android:name=".MainActivity"

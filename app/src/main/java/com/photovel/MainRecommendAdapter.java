@@ -36,6 +36,7 @@ public class MainRecommendAdapter extends RecyclerView.Adapter<MainRecommendAdap
     private Context mcontext;
     private MainRecommendAdapter.ViewHolder holder;
     private int position;
+    private int[] likeFlag;
 
     public int getPosition() {
         return position;
@@ -57,6 +58,7 @@ public class MainRecommendAdapter extends RecyclerView.Adapter<MainRecommendAdap
     public MainRecommendAdapter(List<Content> myDataset, Context mycontext) {
         mDataset = myDataset;
         mcontext = mycontext;
+        likeFlag = new int[getItemCount()];
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -95,7 +97,7 @@ public class MainRecommendAdapter extends RecyclerView.Adapter<MainRecommendAdap
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, final int position) {
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
         //imageView를 font로 바꿔주기
         Typeface fontAwesomeFont = Typeface.createFromAsset(mcontext.getAssets(), "fontawesome-webfont.ttf");
         holder.main_icthumb.setTypeface(fontAwesomeFont);
@@ -109,7 +111,10 @@ public class MainRecommendAdapter extends RecyclerView.Adapter<MainRecommendAdap
         }
         if(mDataset.get(position).getGood_status() == 1){   //좋아요 유무
             holder.main_icthumb.setTextColor(ContextCompat.getColor(mcontext, R.color.textBlue));
-       }
+            likeFlag[position]=1;
+        }else{
+            likeFlag[position]=0;
+        }
 
         holder.main_ivphoto.setImageBitmap(mDataset.get(position).getBitmap());
         //subject 15자 이상이면 ... 붙이기
@@ -152,10 +157,15 @@ public class MainRecommendAdapter extends RecyclerView.Adapter<MainRecommendAdap
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                Intent intent = new Intent(mcontext, MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
-                mcontext.startActivity(intent);
-                Toast.makeText(mcontext,"좋아요 완료!",Toast.LENGTH_SHORT).show();
+                if(likeFlag[position] == 1){
+                    holder.main_icthumb.setTextColor(ContextCompat.getColor(mcontext, R.color.bgDarkGrey));
+                    holder.thumbCount.setText(String.valueOf(Integer.parseInt(holder.thumbCount.getText().toString())-1));
+                    likeFlag[position]=0;
+                }else{
+                    holder.main_icthumb.setTextColor(ContextCompat.getColor(mcontext, R.color.textBlue));
+                    holder.thumbCount.setText(String.valueOf(Integer.parseInt(holder.thumbCount.getText().toString())+1));
+                    likeFlag[position]=1;
+                }
             }
         });
 
