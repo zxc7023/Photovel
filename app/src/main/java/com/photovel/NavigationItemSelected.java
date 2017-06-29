@@ -112,6 +112,12 @@ public class NavigationItemSelected extends FontActivity{
                             String isRemovable = test.getString("Set-Cookie","notFound");
                             if(!isRemovable.equals("notFound")){
                                 SharedPreferences.Editor editor2 = test.edit();
+                                editor2.remove("user_id");
+                                editor2.remove("user_nick_name");
+                                editor2.remove("user_password");
+                                editor2.remove("user_phone");
+                                editor2.remove("user_friend_count");
+                                editor2.remove("user_profile");
                                 editor2.remove("Set-Cookie");
                                 editor2.commit();
                             }
@@ -122,16 +128,6 @@ public class NavigationItemSelected extends FontActivity{
                 } catch (IOException e) {
                     e.printStackTrace();
                 }finally {
-                    //SharedPreferences user정보삭제
-                    SharedPreferences test = getSharedPreferences("loginInfo", MODE_PRIVATE);
-                    SharedPreferences.Editor editor2 = test.edit();
-                    editor2.remove("Set-Cookie");
-                    editor2.remove("user_id");
-                    editor2.remove("user_nick_name");
-                    editor2.remove("user_password");
-                    editor2.remove("user_phone");
-                    editor2.remove("user_friend_count");
-                    editor2.commit();
                 }
             }
         });

@@ -30,6 +30,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.mikhaellopez.circularimageview.CircularImageView;
 import com.photovel.search.SearchViewMain;
 import com.photovel.search.SearchListAdapter;
 import com.photovel.http.JsonConnection;
@@ -37,6 +38,7 @@ import com.photovel.setting.SettingMain;
 import com.alibaba.fastjson.JSON;
 import com.photovel.content.ContentInsertMain;
 import com.photovel.http.Value;
+import com.photovel.user.UserBitmapEncoding;
 import com.synnapps.carouselview.CarouselView;
 import com.synnapps.carouselview.ImageListener;
 import com.vo.Content;
@@ -47,7 +49,7 @@ import java.util.List;
 public class MainActivity extends FontActivity2 implements NavigationView.OnNavigationItemSelectedListener {
     private static final String TAG = "MainActivity";
     Toolbar toolbar;
-    private String user_id, user_nick_name;
+    private String user_id, user_nick_name, user_profile;
 
     //메인 이미지 케러셀뷰
     CarouselView carouselView;
@@ -84,6 +86,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
         user_id = get_to_eat.getString("user_id","notFound");
         user_nick_name = get_to_eat.getString("user_nick_name","notFound");
+        user_profile = get_to_eat.getString("user_profile","notFound");
 
         searchView = (SearchViewMain) findViewById(R.id.search_view);
 
@@ -206,9 +209,11 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         });
         TextView tvUserName = (TextView)hView.findViewById(R.id.tvUserName);
         tvUserName.setText(user_nick_name);
-        //shared 이미지 저장하는 거 찾기
-        /*ImageView userProfile = (ImageView)hView.findViewById(R.id.userProfile);
-        userProfile.setImageBitmap(u);*/
+        CircularImageView userProfile = (CircularImageView)hView.findViewById(R.id.userProfile);
+        if(!user_profile.equals("notFound")){
+            UserBitmapEncoding ub = new UserBitmapEncoding();
+            userProfile.setImageBitmap(ub.StringToBitMap(user_profile));
+        }
         TextView tvProfileUpdate = (TextView)hView.findViewById(R.id.tvProfileUpdate);
         tvProfileUpdate.setTypeface(fontAwesomeFont);
         tvProfileUpdate.setOnClickListener(new View.OnClickListener() {
@@ -220,8 +225,6 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
             }
         });
         navigationView.setNavigationItemSelectedListener(this);
-
-
 
         //검색 제안 목록 등록
         searchView.setSuggestions(myNewDataset, matrixCursor, true);

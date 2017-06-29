@@ -38,6 +38,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
+import com.mikhaellopez.circularimageview.CircularImageView;
 import com.photovel.FontActivity2;
 import com.photovel.MainActivity;
 import com.photovel.MainNewAdapter;
@@ -45,9 +46,11 @@ import com.photovel.MainRecommendAdapter;
 import com.photovel.NavigationItemSelected;
 import com.photovel.R;
 import com.photovel.common.BookMarkMain;
+import com.photovel.friend.FriendListMain;
 import com.photovel.http.JsonConnection;
 import com.photovel.http.Value;
 import com.photovel.setting.SettingMain;
+import com.photovel.user.UserBitmapEncoding;
 import com.vo.Comment;
 import com.vo.Content;
 import com.vo.ContentDetail;
@@ -77,7 +80,8 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
     private List<ContentDetail> myDataset;
     private Content content;
     private int content_id=-1, likeFlag=0, bookmarkFlag=0;
-    private String user_id, user_nick_name;
+    private String user_id, user_nick_name, user_profile;
+    CircularImageView navUserProfile, myProfile;
 
     //comment
     private BottomSheetBehavior bottomSheetBehavior;
@@ -106,6 +110,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
         user_id = get_to_eat.getString("user_id","notFound");
         user_nick_name = get_to_eat.getString("user_nick_name","notFound");
+        user_profile = get_to_eat.getString("user_profile","notFound");
 
         // Adding Toolbar to the activity
         toolbar = (Toolbar) findViewById(R.id.detailListToolbar);
@@ -142,7 +147,6 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         tvShareCount = (TextView) findViewById(R.id.tvShareCount);
         tvdetailcount = (TextView) findViewById(R.id.tvdetailcount);                    //디테일 수
         btnBack = (TextView) findViewById(R.id.btnBack);
-
 
         btnLookLeft = (LinearLayout) findViewById(R.id.btnLookLeft);
         btnLookRight = (LinearLayout) findViewById(R.id.btnLookRight);
@@ -284,9 +288,6 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         etComment = (EditText) findViewById(R.id.etComment);
         llBack = (LinearLayout) findViewById(R.id.llBack);
 
-        //Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
-        btnBack.setTypeface(fontAwesomeFont);
-
         //comment recycleview사용선언
         RVComment = (RecyclerView) findViewById(R.id.RVComment);
         RVComment.setHasFixedSize(true);
@@ -315,6 +316,12 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
             }
         });
+
+        myProfile = (CircularImageView)findViewById(R.id.myProfile);
+        if(!user_profile.equals("notFound")){
+            UserBitmapEncoding ub = new UserBitmapEncoding();
+            myProfile.setImageBitmap(ub.StringToBitMap(user_profile));
+        }
 
         //코멘트 전송
         findViewById(R.id.btnCommentSubmit).setOnClickListener(new View.OnClickListener() {
@@ -427,12 +434,17 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), ContentInsertMain.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); //준기오빠의 낮은 버전을 위해 인텐트할때 넣어주기
                 getApplicationContext().startActivity(intent);
             }
         });
         TextView tvUserName = (TextView)hView.findViewById(R.id.tvUserName);
         tvUserName.setText(user_nick_name);
+        navUserProfile = (CircularImageView)hView.findViewById(R.id.userProfile);
+        if(!user_profile.equals("notFound")){
+            UserBitmapEncoding ub = new UserBitmapEncoding();
+            navUserProfile.setImageBitmap(ub.StringToBitMap(user_profile));
+        }
         TextView tvProfileUpdate = (TextView)hView.findViewById(R.id.tvProfileUpdate);
         tvProfileUpdate.setTypeface(fontAwesomeFont);
         tvProfileUpdate.setOnClickListener(new View.OnClickListener() {
@@ -602,8 +614,22 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()){
-                    case R.id.show_profile:
-                        Toast.makeText(getApplicationContext(),"프로필보기",Toast.LENGTH_SHORT).show();
+                    case R.id.friend_plus:
+                        //////////////////친구추가 db처리해야함
+                        //   /friend/new/{user_id1:.+}/{user_id2:.+}   user_id1->나 user_id2 ->친구신청할아이디
+                        Thread friend_plus = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                JsonConnection.getConnection(Value.photovelURL+"/friend/new/"+user_id+"/"+content.getUser().getUser_id(), "POST", null);
+                            }
+                        });
+                        friend_plus.start();
+                        try {
+                            friend_plus.join();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        Toast.makeText(getApplicationContext(),"친구추가성공",Toast.LENGTH_SHORT).show();
                         break;
                 }
                 return false;

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -26,6 +27,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
+import com.mikhaellopez.circularimageview.CircularImageView;
 import com.photovel.FontActivity2;
 import com.photovel.MainActivity;
 import com.photovel.NavigationItemSelected;
@@ -36,20 +38,23 @@ import com.photovel.content.ContentInsertMain;
 import com.photovel.http.JsonConnection;
 import com.photovel.http.Value;
 import com.photovel.setting.SettingMain;
+import com.photovel.user.UserBitmapEncoding;
 import com.vo.Content;
 import com.vo.User;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class FriendListMain extends FontActivity2 implements NavigationView.OnNavigationItemSelectedListener {
     private static final String TAG = "Image";
     Toolbar toolbar;
-    private String user_id, user_nick_name;
+    private String user_id, user_nick_name, user_profile;
 
     private RecyclerView recyclerView;
+    private FriendNewListAdapter mFriendNewListAdapter;
     private FriendListAdapter mFriendListAdapter;
     private RecyclerView.LayoutManager mNewLayoutManager;
-    private List<User> myFriendDataset;
+    private List<User> myFriendDataset, myNewFriendDataset;
     private TextView tvbookmark;
 
     private Boolean isFabOpen = false;
@@ -65,6 +70,7 @@ public class FriendListMain extends FontActivity2 implements NavigationView.OnNa
         SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
         user_id = get_to_eat.getString("user_id","notFound");
         user_nick_name = get_to_eat.getString("user_nick_name","notFound");
+        user_profile = get_to_eat.getString("user_profile","notFound");
 
         //FloatingActionButton정의 및 기능
         fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -107,8 +113,60 @@ public class FriendListMain extends FontActivity2 implements NavigationView.OnNa
             }
         });
 
-        //////////////////친구리스트받아오는부분들어가야함
+        //친구 신청 목록
+        Thread detailList = new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                String responseData = JsonConnection.getConnection(Value.photovelURL+"/friend/new/"+user_id, "GET", null);
+                myNewFriendDataset = JSON.parseArray(responseData, User.class);
+            }
+        };
+        detailList.start();
+        try {
+            detailList.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        //content의 bitmap 받아오기
+        JsonConnection.setBitmap(myNewFriendDataset, Value.contentPhotoURL);
+        for(int i = 0; i < myNewFriendDataset.size(); i++){
+            if(myNewFriendDataset.get(i).getUser_profile_photo() == null){
+                Bitmap profile = BitmapFactory.decodeResource(getResources(),R.drawable.ic_profile_circle);
+                myNewFriendDataset.get(i).setBitmap(profile);
+            }
+        }
+        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setNestedScrollingEnabled(false);
+        mNewLayoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(mNewLayoutManager);
+        mFriendNewListAdapter = new FriendNewListAdapter(myNewFriendDataset, FriendListMain.this);
+        recyclerView.setAdapter(mFriendNewListAdapter);
 
+        //친구 목록
+        Thread detailList2 = new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                String responseData = JsonConnection.getConnection(Value.photovelURL+"/friend/"+user_id, "GET", null);
+                myFriendDataset = JSON.parseArray(responseData, User.class);
+            }
+        };
+        detailList2.start();
+        try {
+            detailList2.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        //content의 bitmap 받아오기
+        JsonConnection.setBitmap(myFriendDataset, Value.contentPhotoURL);
+        for(int i = 0; i < myFriendDataset.size(); i++){
+            if(myFriendDataset.get(i).getUser_profile_photo() == null){
+                Bitmap profile = BitmapFactory.decodeResource(getResources(),R.drawable.ic_profile_circle);
+                myFriendDataset.get(i).setBitmap(profile);
+            }
+        }
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setNestedScrollingEnabled(false);
@@ -130,7 +188,7 @@ public class FriendListMain extends FontActivity2 implements NavigationView.OnNa
 
         final Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
 
-        //메뉴 navigation
+        //메뉴 navigationView
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         View hView =  navigationView.getHeaderView(0);
         TextView btnContentInsert = (TextView)hView.findViewById(R.id.btnContentInsert);
@@ -139,12 +197,17 @@ public class FriendListMain extends FontActivity2 implements NavigationView.OnNa
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), ContentInsertMain.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); //준기오빠의 낮은 버전을 위해 인텐트할때 넣어주기
                 getApplicationContext().startActivity(intent);
             }
         });
         TextView tvUserName = (TextView)hView.findViewById(R.id.tvUserName);
-        tvUserName.setText(user_nick_name);   //로그인 상태 userID받아오면됨.
+        tvUserName.setText(user_nick_name);
+        CircularImageView userProfile = (CircularImageView)hView.findViewById(R.id.userProfile);
+        if(!user_profile.equals("notFound")){
+            UserBitmapEncoding ub = new UserBitmapEncoding();
+            userProfile.setImageBitmap(ub.StringToBitMap(user_profile));
+        }
         TextView tvProfileUpdate = (TextView)hView.findViewById(R.id.tvProfileUpdate);
         tvProfileUpdate.setTypeface(fontAwesomeFont);
         tvProfileUpdate.setOnClickListener(new View.OnClickListener() {

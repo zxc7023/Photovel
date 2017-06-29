@@ -29,6 +29,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
+import com.mikhaellopez.circularimageview.CircularImageView;
 import com.photovel.FontActivity;
 import com.photovel.FontActivity2;
 import com.photovel.MainActivity;
@@ -37,6 +38,7 @@ import com.photovel.R;
 import com.photovel.http.JsonConnection;
 import com.photovel.http.Value;
 import com.photovel.setting.SettingMain;
+import com.photovel.user.UserBitmapEncoding;
 import com.vo.Content;
 import com.vo.ContentDetail;
 import com.vo.Photo;
@@ -59,7 +61,7 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
     private RecyclerView.LayoutManager mLayoutManager;
     private List<Content> myDataset;
     private static final String TAG = "";
-    private String content_user_id = "", user_id, user_nick_name;
+    private String content_user_id = "", user_id, user_nick_name, user_profile;
     private String urlflag = "";
 
     Toolbar toolbar;
@@ -78,7 +80,7 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
         SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
         user_id = get_to_eat.getString("user_id","notFound");
         user_nick_name = get_to_eat.getString("user_nick_name","notFound");
-        Log.i("user_id", user_id);
+        user_profile = get_to_eat.getString("user_profile","notFound");
 
         Intent intent = getIntent();
         content_user_id = intent.getStringExtra("user_id");
@@ -153,6 +155,7 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
 
         Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
 
+        //메뉴 navigationView
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         View hView =  navigationView.getHeaderView(0);
         TextView btnContentInsert = (TextView)hView.findViewById(R.id.btnContentInsert);
@@ -161,12 +164,17 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), ContentInsertMain.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); //준기오빠의 낮은 버전을 위해 인텐트할때 넣어주기
                 getApplicationContext().startActivity(intent);
             }
         });
         TextView tvUserName = (TextView)hView.findViewById(R.id.tvUserName);
         tvUserName.setText(user_nick_name);
+        CircularImageView userProfile = (CircularImageView)hView.findViewById(R.id.userProfile);
+        if(!user_profile.equals("notFound")){
+            UserBitmapEncoding ub = new UserBitmapEncoding();
+            userProfile.setImageBitmap(ub.StringToBitMap(user_profile));
+        }
         TextView tvProfileUpdate = (TextView)hView.findViewById(R.id.tvProfileUpdate);
         tvProfileUpdate.setTypeface(fontAwesomeFont);
         tvProfileUpdate.setOnClickListener(new View.OnClickListener() {

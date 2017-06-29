@@ -10,6 +10,7 @@ import com.vo.Comment;
 import com.vo.Content;
 import com.vo.ContentDetail;
 import com.vo.MainImage;
+import com.vo.User;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -104,7 +105,7 @@ public class JsonConnection {
                             Log.i(TAG, "4. getBitmap (MainImage)bitmap= " + bitmap);
                         }
 
-                    //Content 타입일 때
+                        //Content 타입일 때
                     }else if(imgs.get(0) instanceof Content){
                         for (int i = 0; i < imgs.size(); i++) {
                             Bitmap bitmap = BitmapFactory.decodeStream((InputStream)
@@ -122,7 +123,7 @@ public class JsonConnection {
                             }
                         }
 
-                    //ContentDetail 타입일 때
+                        //ContentDetail 타입일 때
                     } else if (imgs.get(0) instanceof ContentDetail) {
                         for (int i = 0; i < imgs.size(); i++) {
                             Bitmap bitmap = BitmapFactory.decodeStream((InputStream)
@@ -131,7 +132,7 @@ public class JsonConnection {
                             ((ContentDetail)imgs.get(i)).getPhoto().setRank(String.valueOf(i+1));
                             Log.i(TAG, "4. getBitmap (ContentDetail)bitmap= " + bitmap);
                         }
-                    //Comment 타입일 때
+                        //Comment 타입일 때
                     } else if (imgs.get(0) instanceof Comment) {
                         for (int i = 0; i < imgs.size(); i++) {
                             Bitmap bitmap = BitmapFactory.decodeStream((InputStream)
@@ -139,8 +140,16 @@ public class JsonConnection {
                             ((Comment)imgs.get(i)).getUser().setBitmap(bitmap);
                             Log.i(TAG, "4. getBitmap (Comment)bitmap= " + bitmap);
                         }
+                        //User 타입일 때
+                    } else if (imgs.get(0) instanceof User) {
+                        for (int i = 0; i < imgs.size(); i++) {
+                            Bitmap bitmap = BitmapFactory.decodeStream((InputStream)
+                                    new URL(url + "/profile/"+((User)imgs.get(i)).getUser_profile_photo()).getContent());
+                            ((User)imgs.get(i)).setBitmap(bitmap);
+                            Log.i(TAG, "4. getBitmap (User)bitmap= " + bitmap);
+                        }
                     }else{
-                        Log.i(TAG, "MainImage, Content, ContentDetail, Comment Type이 아닙니다");
+                        Log.i(TAG, "MainImage, Content, ContentDetail, Comment, User Type이 아닙니다");
                     }
 
 

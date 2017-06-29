@@ -82,9 +82,11 @@ import com.photovel.content.MultiDrawable;
 import com.photovel.content.MySupportMapFragment;
 import com.photovel.content.PhotoGeoDegree;
 import com.photovel.content.PhotoRealPathUtil;
+import com.photovel.friend.FriendListMain;
 import com.photovel.http.JsonConnection;
 import com.photovel.http.MultipartConnection;
 import com.photovel.http.Value;
+import com.photovel.user.UserBitmapEncoding;
 import com.vo.Comment;
 import com.vo.Content;
 import com.vo.ContentDetail;
@@ -110,7 +112,7 @@ public class SettingMain extends FontActivity2 implements NavigationView.OnNavig
     private Toolbar toolbar;
     private final int MY_PERMISSION_REQUEST_STORAGE = 100;
     private static final String TAG = "AppPermission";
-    private String user_id, user_nick_name, user_password, user_phone, path;
+    private String user_id, user_nick_name, user_password, user_phone, user_profile, path;
     private int user_friend_count;
     private TextView tvpen1, tvpen2, tvpen3, tvUserID, tvUserFriendCount;
     private LinearLayout userProfileUpdate;
@@ -131,13 +133,12 @@ public class SettingMain extends FontActivity2 implements NavigationView.OnNavig
         toolbar = (Toolbar) findViewById(R.id.settingToolbar);
         setSupportActionBar(toolbar);
 
-        bitmap2 = BitmapFactory.decodeResource(getResources(), R.drawable.ic_profile_circle);
-
         SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
         user_id = get_to_eat.getString("user_id","notFound");
         user_nick_name = get_to_eat.getString("user_nick_name","notFound");
         user_password = get_to_eat.getString("user_password","notFound");
         user_phone = get_to_eat.getString("user_phone","notFound");
+        user_profile = get_to_eat.getString("user_profile","notFound");
         user_friend_count = get_to_eat.getInt("user_friend_count",0);
 
         tvpen1 = (TextView)findViewById(R.id.tvpen1);
@@ -168,6 +169,13 @@ public class SettingMain extends FontActivity2 implements NavigationView.OnNavig
         etUserPassword.setText(user_password);
         etUserPhone.setText(user_phone);
         tvUserFriendCount.setText(String.valueOf(user_friend_count));
+        if(!user_profile.equals("notFound")){
+            UserBitmapEncoding ub = new UserBitmapEncoding();
+            bitmap2 = ub.StringToBitMap(user_profile);
+        }else{
+            bitmap2 = BitmapFactory.decodeResource(getResources(), R.drawable.ic_profile_circle);
+        }
+        userProfile.setImageBitmap(bitmap2);
 
         //permission 객체 받아오기
         Thread permissionList = new Thread(){
@@ -243,12 +251,17 @@ public class SettingMain extends FontActivity2 implements NavigationView.OnNavig
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), ContentInsertMain.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); //준기오빠의 낮은 버전을 위해 인텐트할때 넣어주기
                 getApplicationContext().startActivity(intent);
             }
         });
         TextView tvUserName = (TextView)hView.findViewById(R.id.tvUserName);
         tvUserName.setText(user_nick_name);
+        CircularImageView userProfile = (CircularImageView)hView.findViewById(R.id.userProfile);
+        if(!user_profile.equals("notFound")){
+            UserBitmapEncoding ub = new UserBitmapEncoding();
+            userProfile.setImageBitmap(ub.StringToBitMap(user_profile));
+        }
         TextView tvProfileUpdate = (TextView)hView.findViewById(R.id.tvProfileUpdate);
         tvProfileUpdate.setTypeface(fontAwesomeFont);
         tvProfileUpdate.setOnClickListener(new View.OnClickListener() {
@@ -322,6 +335,9 @@ public class SettingMain extends FontActivity2 implements NavigationView.OnNavig
                                 editor.putString("user_nick_name",etUserNickName.getText().toString());
                                 editor.putString("user_password",etUserPassword.getText().toString());
                                 editor.putString("user_phone",etUserPhone.getText().toString());
+                                UserBitmapEncoding ub = new UserBitmapEncoding();
+                                String user_profile = ub.BitMapToString(bitmap2);
+                                editor.putString("user_profile",user_profile);
                                 editor.commit();
 
                                 Toast.makeText(getApplicationContext(),"정보수정 성공",Toast.LENGTH_SHORT).show();
@@ -338,6 +354,16 @@ public class SettingMain extends FontActivity2 implements NavigationView.OnNavig
                         });
                 AlertDialog alert = alert_confirm.create();
                 alert.show();
+            }
+        });
+
+        btnUserFriendGo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), FriendListMain.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                getApplicationContext().startActivity(intent);
+                finish();
             }
         });
     }

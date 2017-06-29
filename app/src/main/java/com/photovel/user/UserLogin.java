@@ -191,6 +191,7 @@ public class UserLogin extends FontActivity2 {
                                 editor2.remove("user_password");
                                 editor2.remove("user_phone");
                                 editor2.remove("user_friend_count");
+                                editor2.remove("user_profile");
                                 editor2.commit();
                             }
 
@@ -218,6 +219,12 @@ public class UserLogin extends FontActivity2 {
                             editor.putString("user_password",temp.getUser_password());
                             editor.putString("user_phone",temp.getUser_phone2());
                             editor.putInt("user_friend_count",temp.getUser_friend_count());
+
+                            UserBitmapEncoding ub = new UserBitmapEncoding();
+                            if(temp.getBitmap() != null){
+                                String user_profile = ub.BitMapToString(temp.getBitmap());
+                                editor.putString("user_profile",user_profile);
+                            }
 
                             editor.commit(); //완료한다.
 
