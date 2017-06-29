@@ -24,6 +24,7 @@ import android.widget.Toast;
 import com.photovel.FontActivity2;
 
 import com.photovel.TestActivity;
+import com.photovel.http.JsonConnection;
 import com.photovel.http.Value;
 import com.vo.User;
 
@@ -38,6 +39,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -53,7 +55,7 @@ public class UserLogin extends FontActivity2 {
     EditText passwordTextView;
     String user_id;
     String user_password;
-
+    User temp;
 
     String isSucess;
     String cookieValues = "";
@@ -111,6 +113,7 @@ public class UserLogin extends FontActivity2 {
                         e.printStackTrace();
                     }
                     Log.i("myJsonString", job.toString());
+
                     login(job.toString(),url);
                     if(isSucess.equals("")){
                         Toast.makeText(mContext, "로그인실패", Toast.LENGTH_SHORT).show();
@@ -177,7 +180,7 @@ public class UserLogin extends FontActivity2 {
                                 Log.i("ddd","로그인실패");
                                 break;
                             }
-                            User temp = JSON.parseObject(isSucess, User.class);
+                            temp = JSON.parseObject(isSucess, User.class);
                             Log.i("temp","temp : "+temp.toString());
 
                             //로그인이 삭제되건 성공하건 이전의 세션은 삭제해줘야한다.
@@ -209,25 +212,6 @@ public class UserLogin extends FontActivity2 {
                                     }
                                 }
                             }
-
-                            //로그인한 후에 세션을 관리한다. TestActivity에 저장한다.
-                            SharedPreferences loginInfo = getSharedPreferences("loginInfo", MODE_PRIVATE);
-                            SharedPreferences.Editor editor = loginInfo.edit();
-                            editor.putString("Set-Cookie", cookieValues); //First라는 key값으로 infoFirst 데이터를 저장한다.
-                            editor.putString("user_id",user_id);
-                            editor.putString("user_nick_name",temp.getUser_nick_name());
-                            editor.putString("user_password",temp.getUser_password());
-                            editor.putString("user_phone",temp.getUser_phone2());
-                            editor.putInt("user_friend_count",temp.getUser_friend_count());
-
-                            UserBitmapEncoding ub = new UserBitmapEncoding();
-                            if(temp.getBitmap() != null){
-                                String user_profile = ub.BitMapToString(temp.getBitmap());
-                                editor.putString("user_profile",user_profile);
-                            }
-
-                            editor.commit(); //완료한다.
-
                             break;
                     }
                 } catch (MalformedURLException e) {
@@ -238,12 +222,33 @@ public class UserLogin extends FontActivity2 {
                 }
             }
         });
-
         loginThread.start();
         try {
             loginThread.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        //user프로필사진set
+        List<User> user = new ArrayList<>();
+        user.add(temp);
+        JsonConnection.setBitmap(user, Value.contentPhotoURL);
+
+        //로그인한 후에 세션을 관리한다. TestActivity에 저장한다.
+        SharedPreferences loginInfo = getSharedPreferences("loginInfo", MODE_PRIVATE);
+        SharedPreferences.Editor editor = loginInfo.edit();
+        editor.putString("Set-Cookie", cookieValues); //First라는 key값으로 infoFirst 데이터를 저장한다.
+        editor.putString("user_id",user_id);
+        editor.putString("user_nick_name",temp.getUser_nick_name());
+        editor.putString("user_password",temp.getUser_password());
+        editor.putString("user_phone",temp.getUser_phone2());
+        editor.putInt("user_friend_count",temp.getUser_friend_count());
+
+        UserBitmapEncoding ub = new UserBitmapEncoding();
+        if(temp.getBitmap() != null){
+            String user_profile = ub.BitMapToString(temp.getBitmap());
+            editor.putString("user_profile",user_profile);
+        }
+
+        editor.commit(); //완료한다.
     }
 }

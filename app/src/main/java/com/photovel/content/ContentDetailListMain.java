@@ -615,8 +615,13 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()){
                     case R.id.friend_plus:
-                        //////////////////친구추가 db처리해야함
-                        //   /friend/new/{user_id1:.+}/{user_id2:.+}   user_id1->나 user_id2 ->친구신청할아이디
+                        //친구일때
+                        Toast.makeText(getApplicationContext(),"이미 친구입니다",Toast.LENGTH_SHORT).show();
+
+                        //친구신청중일때
+                        Toast.makeText(getApplicationContext(),"이미 친구신청을 하였습니다",Toast.LENGTH_SHORT).show();
+
+                        //친구가아닐때
                         Thread friend_plus = new Thread(new Runnable() {
                             @Override
                             public void run() {
@@ -629,7 +634,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                        Toast.makeText(getApplicationContext(),"친구추가성공",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(),"친구추가성공!",Toast.LENGTH_SHORT).show();
                         break;
                 }
                 return false;
