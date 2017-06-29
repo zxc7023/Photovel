@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="ContentSearchView">
+    <declare-styleable name="SearchViewMain">
         <attr name="searchBackground" format="reference|integer" />
         <attr name="searchCloseIcon" format="reference|integer" />
         <attr name="searchBackIcon" format="reference|integer" />

@@ -18,7 +18,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
@@ -26,13 +25,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.photovel.content.ContentSearchView;
-import com.photovel.content.SearchListAdapter;
+import com.photovel.search.SearchViewMain;
+import com.photovel.search.SearchListAdapter;
 import com.photovel.http.JsonConnection;
 import com.photovel.setting.SettingMain;
 import com.alibaba.fastjson.JSON;
@@ -73,7 +71,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
     private SearchListAdapter searchListAdapter;
 
     //굳이 클래스로 객체 만들 필요 없이 xml에 태그로 정의하여 호출 가능
-    ContentSearchView searchView;
+    SearchViewMain searchView;
     ListView suggestionsListView;
 
 
@@ -86,7 +84,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         user_id = get_to_eat.getString("user_id","notFound");
         user_nick_name = get_to_eat.getString("user_nick_name","notFound");
 
-        searchView = (ContentSearchView) findViewById(R.id.search_view);
+        searchView = (SearchViewMain) findViewById(R.id.search_view);
 
         suggestionsListView = (ListView) findViewById(R.id.suggestion_list);
         searchListAdapter = new SearchListAdapter(this, matrixCursor, true, suggestionsListView);
@@ -183,20 +181,9 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         mNewAdapter = new MainNewAdapter(myNewDataset, MainActivity.this);
         RVnew.setAdapter(mNewAdapter);
 
-
         // Adding Toolbar to the activity
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        // Adding FloatingActionButton to the activity
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -239,7 +226,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         searchView.setSuggestions(myNewDataset, matrixCursor, true);
 
         //리스너 등록
-        searchView.setOnQueryTextListener(new ContentSearchView.OnQueryTextListener() {
+        searchView.setOnQueryTextListener(new SearchViewMain.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 //Do some magic
@@ -278,7 +265,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
             }
         });
 
-        searchView.setOnSearchViewListener(new ContentSearchView.SearchViewListener() {
+        searchView.setOnSearchViewListener(new SearchViewMain.SearchViewListener() {
             @Override
             public void onSearchViewShown() {
                 //Do some magic

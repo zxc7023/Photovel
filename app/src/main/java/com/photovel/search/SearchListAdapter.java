@@ -1,9 +1,10 @@
-package com.photovel.content;
+package com.photovel.search;
 
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,8 +38,6 @@ public class SearchListAdapter extends CursorAdapter implements Filterable {
     public TextView main_icthumb, main_iccomment, main_icshare;
     public TextView thumbCount, commentCount, shareCount;
     public LinearLayout llthumb, llcomment, llshare;
-
-
 
     public SearchListAdapter(Context context, Cursor c, boolean autoRequery) {
         super(context, c, autoRequery);
@@ -93,20 +92,16 @@ public class SearchListAdapter extends CursorAdapter implements Filterable {
         thumbCount = (TextView)view.findViewById(R.id.thumbCount);
         commentCount = (TextView)view.findViewById(R.id.commentCount);
         shareCount = (TextView)view.findViewById(R.id.shareCount);
+        llthumb = (LinearLayout)view.findViewById(R.id.llthumb);//좋아요 레이아웃
+        llcomment = (LinearLayout)view.findViewById(R.id.llcomment);//코멘트 레이아웃
+        llshare = (LinearLayout)view.findViewById(R.id.llshare);//공유 레이아웃
 
-        //좋아요 레이아웃
-        llthumb = (LinearLayout)view.findViewById(R.id.llthumb);
-        //코멘트 레이아웃
-        llcomment = (LinearLayout)view.findViewById(R.id.llcomment);
-        //공유 레이아웃
-        llshare = (LinearLayout)view.findViewById(R.id.llshare);
+        Typeface fontAwesomeFont = Typeface.createFromAsset(context.getAssets(), "fontawesome-webfont.ttf");
+        main_icthumb.setTypeface(fontAwesomeFont);
+        main_iccomment.setTypeface(fontAwesomeFont);
+        main_icshare.setTypeface(fontAwesomeFont);
 
     }
-
-
-
-
-
 
     @Override
     public void changeCursor(Cursor cursor) {

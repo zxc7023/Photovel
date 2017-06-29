@@ -96,7 +96,7 @@ public class MainNewAdapter extends RecyclerView.Adapter<MainNewAdapter.ViewHold
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, final int position) {
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
         //imageView를 font로 바꿔주기
         Typeface fontAwesomeFont = Typeface.createFromAsset(mcontext.getAssets(), "fontawesome-webfont.ttf");
         holder.main_icthumb.setTypeface(fontAwesomeFont);
@@ -155,10 +155,17 @@ public class MainNewAdapter extends RecyclerView.Adapter<MainNewAdapter.ViewHold
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                Intent intent = new Intent(mcontext, MainActivity.class);
+
+                //////////////////////////////화면만 수정하기->맞나확인
+                if(mDataset.get(position).getGood_status() == 1){   //좋아요 유무
+                    holder.main_icthumb.setTextColor(ContextCompat.getColor(mcontext, R.color.bgDarkGrey));
+                }else{
+                    holder.main_icthumb.setTextColor(ContextCompat.getColor(mcontext, R.color.textBlue));
+                }
+                /*Intent intent = new Intent(mcontext, MainActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
                 mcontext.startActivity(intent);
-                Toast.makeText(mcontext,"좋아요 완료!",Toast.LENGTH_SHORT).show();
+                Toast.makeText(mcontext,"좋아요 완료!",Toast.LENGTH_SHORT).show();*/
             }
         });
 

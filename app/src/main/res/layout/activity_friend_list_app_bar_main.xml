@@ -46,36 +46,66 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/most_left_tv_margin"
-                android:layout_marginTop="@dimen/most_rignt_tv_margin">
-                <TextView
-                    android:id="@+id/tvbookmark"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:text="@string/fa_bookmark"
-                    android:textSize="@dimen/icon_size"
-                    android:includeFontPadding="false"
-                    android:gravity="center"/>
+                android:layout_marginTop="@dimen/most_rignt_tv_margin"
+                android:orientation="vertical">
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginLeft="@dimen/between_tv_margin"
                     android:textColor="@color/textBlack"
                     android:textStyle="bold"
                     android:textSize="@dimen/content_text_size"
-                    android:text="북마크 스토리"
+                    android:text="친구 목록"
                     android:includeFontPadding="false"
                     android:gravity="center_vertical"/>
-            </LinearLayout>
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <android.support.v7.widget.RecyclerView
-                    xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:id="@+id/recycler_view"
+                <View
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
-            </RelativeLayout>
+                    android:layout_height="1dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerInParent="true"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginRight="@dimen/most_rignt_tv_margin"
+                    android:layout_marginTop="5dp"
+                    android:background="@color/bgGrey2" />
+            </LinearLayout>
+            <android.support.v7.widget.RecyclerView
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
-
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="140dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginRight="@dimen/fab_margin"
+        android:visibility="invisible"
+        app:backgroundTint="@color/nonpressed"
+        app:elevation="6dp"
+        app:pressedTranslationZ="12dp"
+        android:src="@drawable/ic_profile_circle" />
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="80dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginRight="@dimen/fab_margin"
+        android:visibility="invisible"
+        app:elevation="6dp"
+        app:backgroundTint="@color/nonpressed"
+        app:pressedTranslationZ="12dp"
+        android:src="@drawable/btn_plus" />
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        app:elevation="6dp"
+        app:backgroundTint="@color/nonpressed"
+        app:pressedTranslationZ="12dp"
+        android:layout_margin="@dimen/fab_margin"
+        android:src="@drawable/btn_plus" />
 </android.support.design.widget.CoordinatorLayout>
