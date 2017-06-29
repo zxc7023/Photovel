@@ -48,6 +48,8 @@
         <activity android:name=".user.UserValidityCheck"/>
         <activity android:name=".user.UserJoin"/>
         <activity android:name=".content.CommentMain"/>
+
+        <activity android:name=".content.SlideShowTest"/>
     </application>
 
 </manifest>

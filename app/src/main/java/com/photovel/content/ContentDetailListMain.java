@@ -260,6 +260,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
                 break;
             case R.id.btnLookRight:
                 Intent intent2=new Intent(this, ContentSlideShowMain.class);
+                //Intent intent2=new Intent(this, SlideShowTest.class);
                 intent2.putExtra("content_id",content_id);
                 this.startActivity(intent2);
                 finish();

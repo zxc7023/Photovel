@@ -22,6 +22,7 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -39,6 +40,7 @@ import com.photovel.FontActivity2;
 import com.photovel.MainActivity;
 import com.photovel.R;
 import com.photovel.http.Value;
+import com.photovel.utils.AnimationUtil.SlideShowAnimationUtil;
 import com.vo.Content;
 import com.vo.ContentDetail;
 import com.vo.Photo;
@@ -61,7 +63,7 @@ import java.util.TimerTask;
 
 public class ContentSlideShowMain extends FontActivity2 implements NavigationView.OnNavigationItemSelectedListener {
     private SearchView searchView;
-    private static final String TAG = "AppPermission";
+    private static final String TAG = "ContentSlideShowMain";
     Toolbar toolbar;
 
 ////////////////슬라이드쇼용 필드//////////////////
@@ -75,6 +77,12 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
     private int maxOffset;
     private int currOffset;
     int index;
+    int imageViewWidth;
+
+    private LayoutInflater layoutInflater;
+    private ContentSlideShowAdapter contentSlideShowAdapter;
+    private SlideShowAnimationUtil slideShowAnimationUtil;
+
 /////////////////////////////////////////////////
 
     private RelativeLayout RldetailData;
@@ -254,6 +262,8 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
     }
 
     private void init(){
+        NestedScrollView scrollView = (NestedScrollView) findViewById (R.id.nestedScrollView);
+        scrollView.setFillViewport (true);
         //find  view
         vpSlideShow = (ViewPager) this.findViewById(R.id.VP_slide_show);
 /*        play = (Button) findViewById(R.id.play);
@@ -264,21 +274,32 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         //SeekBar 찾아오기
         slideSeekBar = (SeekBar) findViewById(R.id.slide_seek_bar);
 
+        contentSlideShowAdapter = new ContentSlideShowAdapter(images, getApplicationContext());
+
+        //슬라이드쇼 어댑터 등록
+        if(vpSlideShow != null) {
+            Log.i(TAG, "vpSlideShow 있음");
+            for (Bitmap bitmap : images) {
+                Log.i(TAG, "vpSlideShow에 나올 bitmap= " + bitmap.getRowBytes());
+            }
+            vpSlideShow.setAdapter(contentSlideShowAdapter);
+        }
+
+//        imageViewWidth = contentSlideShowAdapter.getFakeMaxWidth();
+        Log.i(TAG, "imageViewWidth= " + imageViewWidth);
+
+        slideSeekBar.setMax(imageViewWidth);
         //현재 페이지 표시할 TextView
 //        tvCurrPage = (TextView)findViewById(R.id.tv_curr_page);
         MAX_PAGES = images.size();
-        Log.i(TAG, "MAX_PAGES= " + images.size());
+        Log.i(TAG, "MAX_PAGES= " + MAX_PAGES);
 
         /*final long frameInterval = 1000;
         final long maxTime = 30000;
         final int totalTime = (int) (maxTime / frameInterval);
         final int secPerFrame = totalTime / contentData.getDetails().size();*/
 
-        //슬라이드쇼 어댑터 등록
-        if(vpSlideShow != null){
-            Log.i(TAG, "vpSlideShow 있음");
-            vpSlideShow.setAdapter(new ContentSlideShowAdapter(images, getApplicationContext()));
-        }
+
 
         //이미지 ArrayList에 추가
         //setViewPagerImage();
@@ -296,7 +317,7 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
                 Log.i(TAG, "update의 currpage= "+ currPage);
                 vpSlideShow.setCurrentItem(currPage++, true);
                 Log.i(TAG, "update의 vpSlideShow= "+ vpSlideShow.getCurrentItem());
-
+//                slideSeekBar.setProgress();
             }
         };
 
@@ -312,15 +333,53 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
             }
         }, 3000, 3000);
 
+        /*slideShowAnimationUtil = new SlideShowAnimationUtil();
 
+        slideShowAnimationUtil.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        vpSlideShow.setAnimation(slideShowAnimationUtil);*/
+
+
+        vpSlideShow.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                Log.i(TAG, "onPageScrollStateChanged의 state= " + state);
+            }
+        });
 
         slideSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if(vpSlideShow.isFakeDragging()){
                     //seekbar 클릭시 뷰페이저의 전체 너비 가져온다
-                    //전체 너비를 100등분(100%로 표현)해서 현재 progress(위치)와 곱하면 현재 위치
-                    int offset = (int) ((maxOffset/100.0) * progress);
+                    //마치 여러 사진이 붙어서 드래그로 이동할 수 있는 것처럼 보여주기 위한 설정
+                    int offset = (int) (maxOffset/100.0) * progress;
                     int dragBy = -1 * (offset - currOffset);
                     //fakeDragBy를 사용하려면 먼저 반드시 beginFakeDrag 사용해야 함
                     vpSlideShow.fakeDragBy(dragBy);
@@ -330,18 +389,26 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                maxOffset = vpSlideShow.getWidth();
+                //seekbar 드래그 시작할 때 이미지들이 묶일 전체 가로 너비를 설정
+                maxOffset = imageViewWidth;
+                //maxOffset = vpSlideShow.getWidth();
+                Log.i(TAG, "onStartTrackingTouch의 maxOffset= " + maxOffset);
                 vpSlideShow.beginFakeDrag();
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 vpSlideShow.endFakeDrag();
+
                 currOffset = 0;
+//                Log.i(TAG, "onStartTrackingTouch의 currOffset= " + currOffset);
                 seekBar.setProgress(0);
             }
         });
     }
+
+
+
 
     //onClick
     public void goLook(View v){

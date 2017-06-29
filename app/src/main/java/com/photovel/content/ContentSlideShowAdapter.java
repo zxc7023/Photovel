@@ -21,8 +21,11 @@ import java.util.ArrayList;
 public class ContentSlideShowAdapter extends PagerAdapter {
     private static final String TAG = "ContentSlideShowAdapter";
     private ArrayList<Bitmap> images;
+//    private Bitmap[] imagesArray;
     private LayoutInflater layoutInflater;
     private Context context;
+
+    private int fakeMaxwidth = 0;
 
     //각 슬라이드 이미지용 이미지 뷰 객체
 
@@ -31,6 +34,8 @@ public class ContentSlideShowAdapter extends PagerAdapter {
         this.context = context;
         //레이아웃 인플레이터 생성
         layoutInflater = LayoutInflater.from(context);
+        //이미지 리스트를 배열로
+//        imagesArray = images.toArray(new Bitmap[images.size()]);
     }
 
 
@@ -51,22 +56,50 @@ public class ContentSlideShowAdapter extends PagerAdapter {
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
         //각 슬라이드 이미지용 뷰 객체 인플레이트
+
         View slideImageLayout = layoutInflater.inflate(R.layout.slide_images_layout, container, false);
         //assert slideImageLayout != null;
+        //ImageView를 감싸고 있던 FrameLayout을 지우니 사진이 나온다
         final ImageView imageView = (ImageView) slideImageLayout.findViewById(R.id.slide_images_view);
         if(imageView != null){
             imageView.setImageBitmap(images.get(position));
             Log.i(TAG, "instantiateItem의 bitmap= " + images.get(position).toString());
             //뷰 그룹에 자식 뷰 추가
             container.addView(imageView);
+
         }
 
         return slideImageLayout;
     }
 
+
+   /* public int getSlideImagePosition(int currPosition){
+        int upTo = currPosition + 1;
+
+        int imagePosition = 0;
+        for(int i=0; i<upTo; i++){
+            imagePosition += imagesArray[i].getWidth();
+        }
+        return imagePosition;
+    }
+
+    public int getSlideImgRange(int currPosition){
+        int maxSlideRange = imagesArray[currPosition].getWidth();
+        return maxSlideRange;
+    }
+
+
+    public int getFakeMaxWidth(){
+        for(Bitmap bitmap : images){
+            fakeMaxwidth += bitmap.getWidth();
+        }
+        return fakeMaxwidth;
+    }*/
+
+    //새로운 뷰를 뷰 페이저에 넣기 위해 이전 뷰 객체 제거
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
-        super.destroyItem(container, position, object);
+        container.removeView((View)object);
     }
 
     @Override
