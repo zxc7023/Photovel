@@ -39,6 +39,8 @@ import android.widget.Toast;
 import com.alibaba.fastjson.JSON;
 import com.photovel.FontActivity2;
 import com.photovel.MainActivity;
+import com.photovel.MainNewAdapter;
+import com.photovel.MainRecommendAdapter;
 import com.photovel.NavigationItemSelected;
 import com.photovel.R;
 import com.photovel.common.BookMarkMain;
@@ -67,13 +69,13 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
     private LinearLayout RLdetailDate, LLmenu, btnMoreUserContent, btnLike, btnComment, btnBookmark;
     private TextView icglobe, icleft, icright, tvleft, tvright, iccal, icmarker, icbookmark, icthumb, iccomment, icshare, btnDetailMenu;
     private TextView tvContentInsertDate, tvContentSubject, tvContentLocation, tvUsername, tvUsername2, tvDuring, tvdetailcount, tvdetailstate, tvContent;
-    private TextView tvLikeCount, tvCommentCount, tvShareCount;
+    private TextView tvLikeCount, tvlike, tvbookmark, tvCommentCount, tvShareCount;
     private LinearLayout btnLookLeft, btnLookRight;
     private ImageView ivTopPhoto;
     private FloatingActionButton btnTop;
     private List<ContentDetail> myDataset;
     private Content content;
-    private int content_id=-1;
+    private int content_id=-1, likeFlag=0, bookmarkFlag=0;
     private String user_id, user_nick_name;
 
     //comment
@@ -131,6 +133,8 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         tvdetailstate = (TextView) findViewById(R.id.tvdetailstate);                  //보고있는 화면 상태(사진/동영상/지도)
         tvContent = (TextView) findViewById(R.id.tvContent);                            //컨텐트 내용
         tvLikeCount = (TextView) findViewById(R.id.tvLikeCount);
+        tvlike = (TextView) findViewById(R.id.tvlike);
+        tvbookmark = (TextView) findViewById(R.id.tvbookmark);
         tvCommentCount = (TextView) findViewById(R.id.tvCommentCount);
         tvShareCount = (TextView) findViewById(R.id.tvShareCount);
         tvdetailcount = (TextView) findViewById(R.id.tvdetailcount);                    //디테일 수
@@ -235,11 +239,15 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         if(content.getBookmark_status() == 1){
             icbookmark.setText(R.string.fa_bookmark);
             icbookmark.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.textBlue));
+            tvbookmark.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.textBlue));
+            bookmarkFlag=1;
         }
 
         //좋아요 유무
         if(content.getGood_status() == 1){
             icthumb.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.textBlue));
+            tvlike.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.textBlue));
+            likeFlag=1;
         }
 
         //메인 사진 저장
@@ -355,11 +363,17 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                Intent intent = new Intent(getApplicationContext(), ContentDetailListMain.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
-                intent.putExtra("content_id", content_id);
-                startActivity(intent);
-                Toast.makeText(getApplicationContext(),"좋아요 완료!",Toast.LENGTH_SHORT).show();
+                if(likeFlag == 1){
+                    icthumb.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.bgDarkGrey));
+                    tvlike.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.bgDarkGrey));
+                    tvLikeCount.setText(String.valueOf(Integer.parseInt(tvLikeCount.getText().toString())-1));
+                    likeFlag=0;
+                }else{
+                    icthumb.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.textBlue));
+                    tvlike.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.textBlue));
+                    tvLikeCount.setText(String.valueOf(Integer.parseInt(tvLikeCount.getText().toString())+1));
+                    likeFlag=1;
+                }
             }
         });
 
@@ -379,12 +393,16 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                Intent intent = new Intent(getApplicationContext(), ContentDetailListMain.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
-                intent.putExtra("content_id", content_id);
-                startActivity(intent);
-                Toast.makeText(getApplicationContext(),"북마크 완료!",Toast.LENGTH_SHORT).show();
-                finish();
+                if(bookmarkFlag == 1){
+                    icbookmark.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.bgDarkGrey));
+                    tvbookmark.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.bgDarkGrey));
+                    bookmarkFlag=0;
+                }else{
+                    icbookmark.setText(R.string.fa_bookmark);
+                    icbookmark.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.textBlue));
+                    tvbookmark.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.textBlue));
+                    bookmarkFlag=1;
+                }
             }
         });
 
@@ -631,6 +649,9 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         }else if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
             super.onBackPressed();
         }
     }
