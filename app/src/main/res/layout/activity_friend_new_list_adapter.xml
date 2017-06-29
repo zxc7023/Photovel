@@ -49,22 +49,21 @@
             android:orientation="horizontal"
             android:gravity="right">
             <TextView
-                android:visibility="invisible"
-                android:id="@+id/btnFriendBlock"
-                android:layout_width="60dp"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:text="차단"
-                android:textSize="@dimen/content_text_size"
-                android:textColor="@color/bgWhite"
-                android:background="@drawable/xml_border4"
-                android:layout_marginRight="@dimen/between_tv_margin"/>
-            <TextView
                 android:id="@+id/btnFriendDelete"
                 android:layout_width="60dp"
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:text="삭제"
+                android:textSize="@dimen/content_text_size"
+                android:textColor="@color/bgWhite"
+                android:background="@drawable/xml_border4"
+                android:layout_marginRight="@dimen/between_tv_margin"/>
+            <TextView
+                android:id="@+id/btnFriendAccept"
+                android:layout_width="60dp"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="추가"
                 android:textSize="@dimen/content_text_size"
                 android:textColor="@color/bgWhite"
                 android:background="@drawable/xml_border3"/>

@@ -21,6 +21,7 @@ import com.mikhaellopez.circularimageview.CircularImageView;
 import com.photovel.R;
 import com.photovel.common.BookMarkMain;
 import com.photovel.content.ContentDetailListMain;
+import com.photovel.content.ContentListMain;
 import com.photovel.http.JsonConnection;
 import com.photovel.http.Value;
 import com.vo.Content;
@@ -33,6 +34,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Vi
     private Context mcontext;
     private FriendListAdapter.ViewHolder holder;
     private int position;
+    private String user_id;
 
     public int getPosition() {
         return position;
@@ -59,6 +61,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Vi
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public CircularImageView userProfile;
         public TextView tvUserNickName, btnFriendDelete, btnFriendBlock;
+        public LinearLayout lluser;
 
         public ViewHolder(View view) {
             super(view);
@@ -66,6 +69,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Vi
             tvUserNickName = (TextView)view.findViewById(R.id.tvUserNickName);
             btnFriendDelete = (TextView)view.findViewById(R.id.btnFriendDelete);
             btnFriendBlock = (TextView)view.findViewById(R.id.btnFriendBlock);
+            lluser = (LinearLayout)view.findViewById(R.id.lluser);
         }
     }
 
@@ -79,6 +83,43 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Vi
 
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
+        SharedPreferences get_to_eat = mcontext.getSharedPreferences("loginInfo", mcontext.MODE_PRIVATE);
+        user_id = get_to_eat.getString("user_id","notFound");
+        holder.userProfile.setImageBitmap(mDataset.get(position).getBitmap());
+        holder.tvUserNickName.setText(mDataset.get(position).getUser_nick_name());
+        holder.lluser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent dintent = new Intent(mcontext, ContentListMain.class);
+                dintent.putExtra("user_id", mDataset.get(position).getUser_id());
+                dintent.putExtra("urlflag","");
+                mcontext.startActivity(dintent);
+            }
+        });
+
+        holder.btnFriendDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //친구 삭제
+                Thread accept = new Thread(){
+                    @Override
+                    public void run() {
+                        super.run();
+                        JsonConnection.getConnection(Value.photovelURL+"/friend/delete/"+user_id+"/"+mDataset.get(position).getUser_id(), "POST", null);
+                        Intent intent = new Intent(mcontext, FriendListMain.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
+                        mcontext.startActivity(intent);
+                        Toast.makeText(mcontext, "친구삭제완료", Toast.LENGTH_SHORT).show();
+                    }
+                };
+                accept.start();
+                try {
+                    accept.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
 
     }
     @Override

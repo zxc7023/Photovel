@@ -50,7 +50,7 @@ public class FriendListMain extends FontActivity2 implements NavigationView.OnNa
     Toolbar toolbar;
     private String user_id, user_nick_name, user_profile;
 
-    private RecyclerView recyclerView;
+    private RecyclerView recyclerNewView, recyclerView;
     private FriendNewListAdapter mFriendNewListAdapter;
     private FriendListAdapter mFriendListAdapter;
     private RecyclerView.LayoutManager mNewLayoutManager;
@@ -136,13 +136,13 @@ public class FriendListMain extends FontActivity2 implements NavigationView.OnNa
                 myNewFriendDataset.get(i).setBitmap(profile);
             }
         }
-        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setNestedScrollingEnabled(false);
+        recyclerNewView = (RecyclerView) findViewById(R.id.recycler_new_view);
+        recyclerNewView.setHasFixedSize(true);
+        recyclerNewView.setNestedScrollingEnabled(false);
         mNewLayoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(mNewLayoutManager);
+        recyclerNewView.setLayoutManager(mNewLayoutManager);
         mFriendNewListAdapter = new FriendNewListAdapter(myNewFriendDataset, FriendListMain.this);
-        recyclerView.setAdapter(mFriendNewListAdapter);
+        recyclerNewView.setAdapter(mFriendNewListAdapter);
 
         //친구 목록
         Thread detailList2 = new Thread(){
