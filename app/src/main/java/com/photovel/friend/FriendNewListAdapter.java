@@ -53,7 +53,7 @@ public class FriendNewListAdapter extends RecyclerView.Adapter<FriendNewListAdap
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public CircularImageView userProfile;
-        public TextView tvUserNickName, btnFriendDelete, btnFriendAccept;
+        public TextView tvUserNickName, btnFriendAccept;
         public LinearLayout lluser;
 
         public ViewHolder(View view) {
@@ -61,7 +61,6 @@ public class FriendNewListAdapter extends RecyclerView.Adapter<FriendNewListAdap
             userProfile = (CircularImageView)view.findViewById(R.id.userProfile);
             tvUserNickName = (TextView)view.findViewById(R.id.tvUserNickName);
             btnFriendAccept = (TextView)view.findViewById(R.id.btnFriendAccept);
-            btnFriendDelete = (TextView)view.findViewById(R.id.btnFriendDelete);
             lluser = (LinearLayout)view.findViewById(R.id.lluser);
         }
     }
@@ -110,29 +109,6 @@ public class FriendNewListAdapter extends RecyclerView.Adapter<FriendNewListAdap
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
                 mcontext.startActivity(intent);
                 Toast.makeText(mcontext, "친구수락완료", Toast.LENGTH_SHORT).show();
-            }
-        });
-        holder.btnFriendDelete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //친구 삭제
-                Thread delete = new Thread(){
-                    @Override
-                    public void run() {
-                        super.run();
-                        JsonConnection.getConnection(Value.photovelURL+"/friend/block/"+user_id+"/"+mDataset.get(position).getUser_id(), "POST", null);
-                    }
-                };
-                delete.start();
-                try {
-                    delete.join();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                Intent intent = new Intent(mcontext, FriendListMain.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
-                mcontext.startActivity(intent);
-                Toast.makeText(mcontext, "친구요청삭제완료", Toast.LENGTH_SHORT).show();
             }
         });
 
