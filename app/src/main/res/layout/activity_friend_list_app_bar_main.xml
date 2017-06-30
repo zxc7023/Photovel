@@ -122,11 +122,11 @@
         android:layout_gravity="bottom|end"
         android:layout_marginRight="@dimen/fab_margin"
         android:visibility="invisible"
-        app:backgroundTint="@color/nonpressed"
         app:elevation="6dp"
+        app:backgroundTint="@color/nonpressed"
         app:pressedTranslationZ="12dp"
         android:src="@drawable/btn_number_off"
-        android:scaleType="centerCrop"/>
+        android:scaleType="center"/>
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_search_id"
         android:layout_width="wrap_content"
@@ -139,7 +139,7 @@
         app:backgroundTint="@color/nonpressed"
         app:pressedTranslationZ="12dp"
         android:src="@drawable/btn_id_off"
-        android:scaleType="centerCrop"/>
+        android:scaleType="center"/>
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_more"
         android:layout_width="wrap_content"
