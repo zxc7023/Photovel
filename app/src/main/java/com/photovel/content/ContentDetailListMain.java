@@ -634,10 +634,10 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
 
                         if(friend_state == 0){ //친구가아닐때
                             Toast.makeText(getApplicationContext(),"친구추가성공!",Toast.LENGTH_SHORT).show();
-                        }else if(friend_state == 1){ //친구일때
-                            Toast.makeText(getApplicationContext(),"이미 친구입니다",Toast.LENGTH_SHORT).show();
-                        }else if(friend_state == 2){ //내가 이미 친구신청을 했을때
+                        }else if(friend_state == 1){ //내가 이미 친구신청을 했을때
                             Toast.makeText(getApplicationContext(),"이미 친구신청을 하였습니다",Toast.LENGTH_SHORT).show();
+                        }else if(friend_state == 2){ //친구일때
+                            Toast.makeText(getApplicationContext(),"이미 친구입니다",Toast.LENGTH_SHORT).show();
                         }else if(friend_state == 3){ //상대방이 이미 친구신청을 했을때
                             Toast.makeText(getApplicationContext(),content.getUser().getUser_id()+"님이 이미 친구신청을 하였습니다",Toast.LENGTH_SHORT).show();
                         }
