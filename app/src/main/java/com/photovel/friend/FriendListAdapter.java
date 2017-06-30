@@ -101,23 +101,23 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Vi
             @Override
             public void onClick(View v) {
                 //친구 삭제
-                Thread accept = new Thread(){
+                Thread delete = new Thread(){
                     @Override
                     public void run() {
                         super.run();
                         JsonConnection.getConnection(Value.photovelURL+"/friend/delete/"+user_id+"/"+mDataset.get(position).getUser_id(), "POST", null);
-                        Intent intent = new Intent(mcontext, FriendListMain.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
-                        mcontext.startActivity(intent);
-                        Toast.makeText(mcontext, "친구삭제완료", Toast.LENGTH_SHORT).show();
                     }
                 };
-                accept.start();
+                delete.start();
                 try {
-                    accept.join();
+                    delete.join();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+                Intent intent = new Intent(mcontext, FriendListMain.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
+                mcontext.startActivity(intent);
+                Toast.makeText(mcontext, "친구삭제완료", Toast.LENGTH_SHORT).show();
             }
         });
 

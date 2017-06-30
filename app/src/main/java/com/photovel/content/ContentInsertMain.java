@@ -36,12 +36,14 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.mikhaellopez.circularimageview.CircularImageView;
 import com.photovel.MainActivity;
 import com.photovel.MainNewAdapter;
 import com.photovel.R;
 import com.photovel.FontActivity;
 import com.photovel.http.MultipartConnection;
 import com.photovel.http.Value;
+import com.photovel.user.UserBitmapEncoding;
 import com.vo.Content;
 import com.vo.ContentDetail;
 import com.vo.Photo;
@@ -71,7 +73,7 @@ import java.util.Locale;
 
 public class ContentInsertMain extends FontActivity {
     private Button btnSort, btnPhotoSave;
-    private TextView btnBack;
+    private TextView btnBack, tvUsername;
     private FloatingActionButton  btnAddPhots, btnTop;
     private String path;
     private ExifInterface exif;
@@ -93,6 +95,8 @@ public class ContentInsertMain extends FontActivity {
 
     //준기가 추가하는 부분
     Context mContext;
+    private String user_id, user_nick_name, user_profile;
+    private CircularImageView userProfile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,6 +108,19 @@ public class ContentInsertMain extends FontActivity {
         /*CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setExpandedTitleTextAppearance(R.style.ExpandedAppBar);
         collapsingToolbar.setCollapsedTitleTextAppearance(R.style.CollapsedAppBar);*/
+
+        SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
+        user_id = get_to_eat.getString("user_id","notFound");
+        user_nick_name = get_to_eat.getString("user_nick_name","notFound");
+        user_profile = get_to_eat.getString("user_profile","notFound");
+
+        tvUsername = (TextView)findViewById(R.id.tvUsername);
+        userProfile = (CircularImageView)findViewById(R.id.userProfile);
+        tvUsername.setText(user_nick_name);
+        if(!user_profile.equals("notFound")){
+            UserBitmapEncoding ub = new UserBitmapEncoding();
+            userProfile.setImageBitmap(ub.StringToBitMap(user_profile));
+        }
 
         contentSubject = (EditText) findViewById(R.id.contentSubject);
         contentText = (EditText) findViewById(R.id.contentText);

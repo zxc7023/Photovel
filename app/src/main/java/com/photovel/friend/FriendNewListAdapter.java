@@ -116,16 +116,16 @@ public class FriendNewListAdapter extends RecyclerView.Adapter<FriendNewListAdap
             @Override
             public void onClick(View v) {
                 //친구 삭제
-                Thread accept = new Thread(){
+                Thread delete = new Thread(){
                     @Override
                     public void run() {
                         super.run();
                         JsonConnection.getConnection(Value.photovelURL+"/friend/block/"+user_id+"/"+mDataset.get(position).getUser_id(), "POST", null);
                     }
                 };
-                accept.start();
+                delete.start();
                 try {
-                    accept.join();
+                    delete.join();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
