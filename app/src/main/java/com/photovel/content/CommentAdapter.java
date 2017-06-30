@@ -123,16 +123,17 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         //디테일 메뉴 보이기 전에 글쓴이 == 내계정 확인
         SharedPreferences get_to_eat = mcontext.getSharedPreferences("loginInfo", mcontext.MODE_PRIVATE);
         user_id = get_to_eat.getString("user_id","notFound");
-        if(!mDataset.get(getPosition()).getUser().getUser_id().equals(user_id)){
-            holder.LLmenu.setVisibility(View.GONE);
+        ca = new CommentAdapter();
+        ca.setHolder(holder);
+        ca.setPosition(position);
+
+        if(!mDataset.get(ca.getPosition()).getUser().getUser_id().equals(user_id)){
+            holder.LLmenu.setVisibility(View.INVISIBLE);
         }
 
         holder.LLmenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ca = new CommentAdapter();
-                ca.setHolder(holder);
-                ca.setPosition(position);
                 CommentMenu(view);
             }
         });

@@ -254,7 +254,7 @@ public class ContentInsertGoogleMap extends AppCompatActivity
         //ConnectionCallbacks
         //After calling connect(), this method will be invoked asynchronously when the connect request has successfully completed.
         Log.d("lifeCycle", "onConnected");
-        Toast.makeText(getApplication(), "onConnected", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getApplication(), "onConnected", Toast.LENGTH_SHORT).show();
 
 
         //API를 참조하시오 (마우스 포인터를 메소드에 가져가보세요)
@@ -419,7 +419,7 @@ public class ContentInsertGoogleMap extends AppCompatActivity
      * 권한을 받고나서만 접근가능
      */
     protected synchronized void buildGoogleApiClient() {
-        Toast.makeText(getApplication(), "buildGoogleApiClient", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getApplication(), "buildGoogleApiClient", Toast.LENGTH_SHORT).show();
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
@@ -510,7 +510,7 @@ public class ContentInsertGoogleMap extends AppCompatActivity
         //Called when the location has changed.
         Log.d("lifeCycle", "onLocationChanged");
         if (isSearched) {
-            Toast.makeText(getApplication(), "onLocationChanged", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplication(), "onLocationChanged", Toast.LENGTH_SHORT).show();
             //getCurrentAddres 메소드는 위경도에 해당하는 주소값을 반환 받을 수 있다.
             String markerTitle = getCurrentAddress(location);
             String markerSnippet = "위도:" + String.valueOf(location.getLatitude()) + " 경도:" + String.valueOf(location.getLongitude());
@@ -532,15 +532,15 @@ public class ContentInsertGoogleMap extends AppCompatActivity
                     1);
         } catch (IOException ioException) {
             //네트워크 문제
-            Toast.makeText(this, "지오코더 서비스 사용불가", Toast.LENGTH_LONG).show();
+            //Toast.makeText(this, "지오코더 서비스 사용불가", Toast.LENGTH_LONG).show();
             return "지오코더 서비스 사용불가";
         } catch (IllegalArgumentException illegalArgumentException) {
-            Toast.makeText(this, "잘못된 GPS 좌표", Toast.LENGTH_LONG).show();
+            //Toast.makeText(this, "잘못된 GPS 좌표", Toast.LENGTH_LONG).show();
             return "잘못된 GPS 좌표";
 
         }
         if (addresses == null || addresses.size() == 0) {
-            Toast.makeText(this, "주소 미확인", Toast.LENGTH_LONG).show();
+            //Toast.makeText(this, "주소 미확인", Toast.LENGTH_LONG).show();
             return "주소 미확인";
 
         } else {
