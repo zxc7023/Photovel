@@ -3,7 +3,9 @@ package com.photovel.utils.AnimationUtil;
 import android.content.Context;
 import android.support.annotation.AnimRes;
 import android.support.annotation.InterpolatorRes;
+import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.Interpolator;
 import android.view.animation.Transformation;
@@ -12,7 +14,7 @@ import android.view.animation.Transformation;
  * Created by daybreak on 2017-06-29.
  */
 
-public class SlideShowAnimationUtil extends Animation {
+public class SlideShowAnimationUtil extends Animation implements ViewPager.PageTransformer {
     private long startOffset;
     private long durationMillis;
     private long startTimeMillis;
@@ -163,5 +165,15 @@ public class SlideShowAnimationUtil extends Animation {
     @Override
     protected void finalize() throws Throwable {
         super.finalize();
+    }
+
+    @Override
+    public void transformPage(View page, float position) {
+        int pageWidth = page.getWidth();
+
+        //화면이 왼쪽에 감춰져 있는 경우
+        if(position < -1){
+
+        }
     }
 }
