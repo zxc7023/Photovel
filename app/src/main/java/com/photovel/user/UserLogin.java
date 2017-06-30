@@ -115,7 +115,7 @@ public class UserLogin extends FontActivity2 {
                     Log.i("myJsonString", job.toString());
 
                     login(job.toString(),url);
-                    if(isSucess.equals("")){
+                    if("".equals(isSucess)){
                         Toast.makeText(mContext, "로그인실패", Toast.LENGTH_SHORT).show();
                     }else{
                         Toast.makeText(mContext, "로그인성공", Toast.LENGTH_SHORT).show();

@@ -94,6 +94,8 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
     private TextView btnBack;
     private EditText etComment;
 
+    private int friend_state;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -615,26 +617,31 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()){
                     case R.id.friend_plus:
-                        //친구일때
-                        Toast.makeText(getApplicationContext(),"이미 친구입니다",Toast.LENGTH_SHORT).show();
-
-                        //친구신청중일때
-                        Toast.makeText(getApplicationContext(),"이미 친구신청을 하였습니다",Toast.LENGTH_SHORT).show();
-
-                        //친구가아닐때
-                        Thread friend_plus = new Thread(new Runnable() {
+                        //친구상태 확인하기
+                        friend_state = -1;
+                        Thread tfriend_state = new Thread(new Runnable() {
                             @Override
                             public void run() {
-                                JsonConnection.getConnection(Value.photovelURL+"/friend/new/"+user_id+"/"+content.getUser().getUser_id(), "POST", null);
+                                friend_state = Integer.parseInt(JsonConnection.getConnection(Value.photovelURL+"/friend/new/"+user_id+"/"+content.getUser().getUser_id(), "POST", null));
                             }
                         });
-                        friend_plus.start();
+                        tfriend_state.start();
                         try {
-                            friend_plus.join();
+                            tfriend_state.join();
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                        Toast.makeText(getApplicationContext(),"친구추가성공!",Toast.LENGTH_SHORT).show();
+                        Log.i("ddd","friend_state"+friend_state);
+
+                        if(friend_state == 0){ //친구가아닐때
+                            Toast.makeText(getApplicationContext(),"친구추가성공!",Toast.LENGTH_SHORT).show();
+                        }else if(friend_state == 1){ //친구일때
+                            Toast.makeText(getApplicationContext(),"이미 친구입니다",Toast.LENGTH_SHORT).show();
+                        }else if(friend_state == 2){ //내가 이미 친구신청을 했을때
+                            Toast.makeText(getApplicationContext(),"이미 친구신청을 하였습니다",Toast.LENGTH_SHORT).show();
+                        }else if(friend_state == 3){ //상대방이 이미 친구신청을 했을때
+                            Toast.makeText(getApplicationContext(),content.getUser().getUser_id()+"님이 이미 친구신청을 하였습니다",Toast.LENGTH_SHORT).show();
+                        }
                         break;
                 }
                 return false;

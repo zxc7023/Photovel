@@ -98,11 +98,11 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
     Toolbar toolbar;
 
     private RelativeLayout RldetailData;
-    private LinearLayout RLdetailDate, LLmenu, btnLike, btnComment, btnBookmark;
+    private LinearLayout RLdetailDate, LLmenu, btnLike, btnComment, btnBookmark, btnMoreUserContent;
     private TextView icglobe, icleft, icright, tvleft, tvright, iccal, icmarker, icbookmark, icthumb, iccomment, icshare, btnDetailMenu;
     private TextView tvContentInsertDate, tvContentSubject, tvContentLocation, tvUsername, tvUsername2, tvDuring, tvdetailcount, tvdetailstate, tvContent;
     private TextView tvLikeCount, tvlike, tvbookmark, tvCommentCount, tvShareCount;
-    private ImageView ivTopPhoto, userProfile;
+    private ImageView ivTopPhoto, userProfile, userProfile1;
     private FloatingActionButton btnTop;
     private LinearLayout btnLookLeft, btnLookRight;
     private List<ContentDetail> myDataset;
@@ -176,12 +176,13 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
         btnDetailMenu = (TextView) findViewById(R.id.btnDetailMenu);
         ivTopPhoto = (ImageView) findViewById(R.id.ivTopPhoto);
         userProfile = (ImageView) findViewById(R.id.userProfile);
+        userProfile1 = (ImageView) findViewById(R.id.userProfile1);
 
         tvContentInsertDate = (TextView) findViewById(R.id.tvContentInsertDate);    //컨텐트입력날짜
         tvContentSubject = (TextView) findViewById(R.id.tvContentSubject);           //컨텐트 제목
         tvContentLocation = (TextView) findViewById(R.id.tvContentLocation);        //컨텐트 위치(마지막)
         tvUsername = (TextView) findViewById(R.id.tvUsername);                        //유저 네임
-        //tvUsername2 = (TextView) findViewById(R.id.tvUsername2);                        //유저 네임
+        tvUsername2 = (TextView) findViewById(R.id.tvUsername2);                        //유저 네임
         tvDuring = (TextView) findViewById(R.id.tvDuring);                             //컨텐트 날짜첫날 ~ 날짜 끝날(2016.04.20 ~ 2016.06.20)
         tvdetailstate = (TextView) findViewById(R.id.tvdetailstate);                   //디테일 수
         tvContent = (TextView) findViewById(R.id.tvContent);                            //보고있는 화면 상태(사진/동영상/지도)
@@ -197,6 +198,7 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
         btnLike = (LinearLayout) findViewById(R.id.btnLike);
         btnComment = (LinearLayout) findViewById(R.id.btnComment);
         btnBookmark = (LinearLayout) findViewById(R.id.btnBookmark);
+        btnMoreUserContent = (LinearLayout) findViewById(R.id.btnMoreUserContent);
 
         //imageView를 font로 바꿔주기
         Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
@@ -262,13 +264,15 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
         tvContentInsertDate.setText(new SimpleDateFormat("yyyy.MM.dd").format(content.getContent_written_date()));
         tvContentSubject.setText(content.getContent_subject());
         tvUsername.setText(content.getUser().getUser_nick_name());
-        //tvUsername2.setText(content.getUser().getUser_nick_name());
+        tvUsername2.setText(content.getUser().getUser_nick_name());
         tvContent.setText(content.getContent());
         tvdetailcount.setText(String.valueOf(content.getDetails().size()));
         tvLikeCount.setText(String.valueOf(content.getGood_count()));
         tvCommentCount.setText(String.valueOf(content.getComment_count()));
         tvShareCount.setText(String.valueOf(content.getContent_share_count()));
         userProfile.setImageBitmap(content.getUser().getBitmap());
+        userProfile1.setImageBitmap(content.getUser().getBitmap());
+
 
         //bookmark유무
         if(content.getBookmark_status() == 1){
@@ -474,6 +478,18 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
         });
         navigationView.setNavigationItemSelectedListener(this);
 
+        //user_content 더보기 버튼
+        btnMoreUserContent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent dintent = new Intent(getApplicationContext(), ContentListMain.class);
+                user_id = content.getUser().getUser_id();
+                dintent.putExtra("user_id",user_id);
+                dintent.putExtra("urlflag","");
+                getApplicationContext().startActivity(dintent);
+                finish();
+            }
+        });
         //사진으로보기 버튼
         btnLookLeft.setOnClickListener(new View.OnClickListener() {
             @Override
