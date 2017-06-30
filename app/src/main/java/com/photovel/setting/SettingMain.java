@@ -262,8 +262,7 @@ public class SettingMain extends FontActivity2 implements NavigationView.OnNavig
             UserBitmapEncoding ub = new UserBitmapEncoding();
             userProfile.setImageBitmap(ub.StringToBitMap(user_profile));
         }
-        TextView tvProfileUpdate = (TextView)hView.findViewById(R.id.tvProfileUpdate);
-        tvProfileUpdate.setTypeface(fontAwesomeFont);
+        LinearLayout tvProfileUpdate = (LinearLayout)hView.findViewById(R.id.tvProfileUpdate);
         tvProfileUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

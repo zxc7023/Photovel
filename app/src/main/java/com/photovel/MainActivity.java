@@ -24,6 +24,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -212,8 +213,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
             UserBitmapEncoding ub = new UserBitmapEncoding();
             userProfile.setImageBitmap(ub.StringToBitMap(user_profile));
         }
-        TextView tvProfileUpdate = (TextView)hView.findViewById(R.id.tvProfileUpdate);
-        tvProfileUpdate.setTypeface(fontAwesomeFont);
+        LinearLayout tvProfileUpdate = (LinearLayout)hView.findViewById(R.id.tvProfileUpdate);
         tvProfileUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

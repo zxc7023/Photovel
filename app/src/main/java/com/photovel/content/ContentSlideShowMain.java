@@ -430,8 +430,7 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
             UserBitmapEncoding ub = new UserBitmapEncoding();
             navUserProfile.setImageBitmap(ub.StringToBitMap(user_profile));
         }
-        TextView tvProfileUpdate = (TextView)hView.findViewById(R.id.tvProfileUpdate);
-        tvProfileUpdate.setTypeface(fontAwesomeFont);
+        LinearLayout tvProfileUpdate = (LinearLayout)hView.findViewById(R.id.tvProfileUpdate);
         tvProfileUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
