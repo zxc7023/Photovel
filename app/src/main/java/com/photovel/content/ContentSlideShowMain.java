@@ -72,11 +72,11 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
     Toolbar toolbar;
 
     private RelativeLayout RldetailData;
-    private LinearLayout RLdetailDate, LLmenu, btnLike, btnComment, btnBookmark;
+    private LinearLayout RLdetailDate, LLmenu, btnLike, btnComment, btnBookmark, btnMoreUserContent;
     private TextView icglobe, icleft, icright, tvleft, tvright, iccal, icmarker, icbookmark, icthumb, iccomment, icshare, btnDetailMenu;
     private TextView tvContentInsertDate, tvContentSubject, tvContentLocation, tvUsername, tvUsername2, tvDuring, tvdetailcount, tvdetailstate, tvContent;
     private TextView tvLikeCount, tvlike, tvbookmark, tvCommentCount, tvShareCount;
-    private ImageView ivTopPhoto, userProfile;
+    private ImageView ivTopPhoto, userProfile, userProfile1;
     private LinearLayout btnLookLeft, btnLookRight;
     private FloatingActionButton btnTop;
     private List<ContentDetail> myDataset;
@@ -142,6 +142,7 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         btnDetailMenu = (TextView) findViewById(R.id.btnDetailMenu);
         ivTopPhoto = (ImageView) findViewById(R.id.ivTopPhoto);
         userProfile = (ImageView) findViewById(R.id.userProfile);
+        userProfile1 = (ImageView) findViewById(R.id.userProfile1);
 
         tvContentInsertDate = (TextView) findViewById(R.id.tvContentInsertDate);    //컨텐트입력날짜
         tvContentSubject = (TextView) findViewById(R.id.tvContentSubject);           //컨텐트 제목
@@ -163,6 +164,7 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         btnLike = (LinearLayout) findViewById(R.id.btnLike);
         btnComment = (LinearLayout) findViewById(R.id.btnComment);
         btnBookmark = (LinearLayout) findViewById(R.id.btnBookmark);
+        btnMoreUserContent = (LinearLayout) findViewById(R.id.btnMoreUserContent);
 
         //imageView를 font로 바꿔주기
         Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
@@ -251,6 +253,7 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         //메인 사진 저장
         ivTopPhoto.setImageBitmap(content.getBitmap());
         userProfile.setImageBitmap(content.getUser().getBitmap());
+        userProfile1.setImageBitmap(content.getUser().getBitmap());
 
         //메인 위치 저장
         GetCurrentAddress getAddress = new GetCurrentAddress();
@@ -438,6 +441,19 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
             }
         });
         navigationView.setNavigationItemSelectedListener(this);
+
+        //user_content 더보기 버튼
+        btnMoreUserContent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent dintent = new Intent(getApplicationContext(), ContentListMain.class);
+                user_id = content.getUser().getUser_id();
+                dintent.putExtra("user_id",user_id);
+                dintent.putExtra("urlflag","");
+                getApplicationContext().startActivity(dintent);
+                finish();
+            }
+        });
 
         //사진으로보기 버튼
         btnLookLeft.setOnClickListener(new View.OnClickListener() {
