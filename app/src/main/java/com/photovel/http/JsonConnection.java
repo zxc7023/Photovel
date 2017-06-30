@@ -143,8 +143,14 @@ public class JsonConnection {
                         //User 타입일 때
                     } else if (imgs.get(0) instanceof User) {
                         for (int i = 0; i < imgs.size(); i++) {
-                            Bitmap bitmap = BitmapFactory.decodeStream((InputStream)
-                                    new URL(url + "/profile/"+((User)imgs.get(i)).getUser_profile_photo()).getContent());
+                            Bitmap bitmap = null;
+                            if(((User)imgs.get(i)).getUser_profile_photo().contains("http")){
+                                bitmap = BitmapFactory.decodeStream((InputStream)
+                                        new URL(((User)imgs.get(i)).getUser_profile_photo()).getContent());
+                            }else{
+                                bitmap = BitmapFactory.decodeStream((InputStream)
+                                        new URL(url + "/profile/"+((User)imgs.get(i)).getUser_profile_photo()).getContent());
+                            }
                             ((User)imgs.get(i)).setBitmap(bitmap);
                             Log.i(TAG, "4. getBitmap (User)bitmap= " + bitmap);
                         }

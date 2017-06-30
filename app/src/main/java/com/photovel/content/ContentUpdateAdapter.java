@@ -185,7 +185,9 @@ public class ContentUpdateAdapter extends RecyclerView.Adapter<ContentUpdateAdap
 
         //위치
         //Log.i("ddd address",mDataset.get(position).getPhoto().getAddress()+"");
-        holder.tvLocation.setText(mDataset.get(position).getPhoto().getAddress());
+        GetCurrentAddress getAddress = new GetCurrentAddress();
+        String address = getAddress.getAddress(mDataset.get(i).getPhoto().getPhoto_latitude(), mDataset.get(i).getPhoto().getPhoto_longitude()); //주소로 바꿔주기
+        holder.tvLocation.setText(address);
         holder.tvLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
