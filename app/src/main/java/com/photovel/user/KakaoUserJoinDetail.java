@@ -1,10 +1,8 @@
 package com.photovel.user;
 
-import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.util.Log;
@@ -21,7 +19,6 @@ import android.widget.Toast;
 import com.photovel.BackPressCloseHandler;
 import com.photovel.FontActivity2;
 import com.photovel.R;
-import com.photovel.http.Value;
 import com.vo.User;
 
 import org.json.JSONException;
@@ -35,9 +32,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
-import java.util.List;
-
-import static java.lang.Class.forName;
 
 /**
  * Created by Junki on 2017-06-19.
@@ -46,7 +40,11 @@ import static java.lang.Class.forName;
 /**
  * 회원가입전에 이메일형식체크,비밀번호 일치여부, 아이디 중복확인을 합니다.
  */
-public class UserJoin extends FontActivity2 {
+public class KakaoUserJoinDetail extends FontActivity2 {
+
+    //로그를 확인하기위하여 작성한 TAG와 Sequence
+    String TAG = "KakaoSignUpTest";
+    int sequence =0;
 
     String nickName, phoneNumber;
     String isSucess;
@@ -57,17 +55,14 @@ public class UserJoin extends FontActivity2 {
     Context mContext;
     BackPressCloseHandler backPressCloseHandler;
 
-    @Override
-    public void onBackPressed() {
-        backPressCloseHandler.onBackPressed();
-    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.i(TAG+""+sequence,"onCreate()");
         mContext = this;
         setContentView(R.layout.activity_user_join);
-
         backPressCloseHandler = new BackPressCloseHandler(this, new Intent(getApplicationContext(), UserLogin.class));
         //아이콘
         final TextView nickNameIcon = (TextView) findViewById(R.id.nickNameIcon);
@@ -105,7 +100,7 @@ public class UserJoin extends FontActivity2 {
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
-                Toast.makeText(UserJoin.this, "현재 클릭된 id는" + checkedId, Toast.LENGTH_SHORT).show();
+                Toast.makeText(KakaoUserJoinDetail.this, "현재 클릭된 id는" + checkedId, Toast.LENGTH_SHORT).show();
                 checkRadioId = checkedId;
             }
         });
@@ -129,40 +124,44 @@ public class UserJoin extends FontActivity2 {
                 phoneNumber = phoneText.getText().toString();
 
                 if ("".equals(nickName) || "".equals(phoneNumber)) {
-                    Toast.makeText(UserJoin.this, "정보를 다 입력해주세요.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(KakaoUserJoinDetail.this, "정보를 다 입력해주세요.", Toast.LENGTH_SHORT).show();
                     return;
                 } else {
-                    Intent intent = getIntent();
-                    User user;
+                    User user = new User();
+                    user.setUser_nick_name(nickName);
+                    user.setUser_phone2(phoneNumber);
+                    user.setUser_gender(gender);
+                    user.setUser_phone1(country_code);
+                    /*
                     JSONObject job = new JSONObject();
-                    user = (User) intent.getSerializableExtra("user");
                     try {
-                        job.put("user_id", user.getUser_id());
-                        job.put("user_password", user.getUser_password());
                         job.put("user_nick_name", nickName);
                         job.put("user_phone2", phoneNumber);
                         job.put("user_gender", gender);
                         job.put("user_phone1", country_code);
                     } catch (JSONException e) {
                         e.printStackTrace();
-                    }
-                    Log.i("myConsole", job.toString());
-
-                    String url = Value.userJoinURL;
+                    }*/
+                    Intent intent = new Intent();
+                    intent.putExtra("user",user);
+                    Log.i(TAG+""+sequence+"Json to send",user.toString());
+                    setResult(777,intent);
+                    finish();
+               /*     String url = Value.userJoinURL;
                     join(job.toString(), url);
                     if (isSucess.equals("1")) {
                         Log.i("isSucess", "로그인페이지로 이동");
-                        Intent intent1 = new Intent(getApplicationContext(), UserLogin.class);
+                        Intent intent1 = new Intent(getApplicationContext(), KakaoSignupActivity.class);
                         intent1.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                         startActivity(intent1);
                         finish();
-                    }
+                    }*/
                 }
             }
         });
     }
 
-    public void join(final String json, final String url) {
+   /* public void join(final String json, final String url) {
         Log.i("myConsole_idChek", "methodStart");
         Log.i("jsonTest", json.toString());
         Thread joinThread = new Thread(new Runnable() {
@@ -222,5 +221,5 @@ public class UserJoin extends FontActivity2 {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-    }
+    }*/
 }

@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.kakao.usermgmt.UserManagement;
+import com.kakao.usermgmt.callback.LogoutResponseCallback;
 import com.photovel.common.BookMarkMain;
 import com.photovel.content.ContentListMain;
 import com.photovel.http.Value;
@@ -63,6 +65,7 @@ public class NavigationItemSelected extends FontActivity{
         }else if(id==R.id.nav_log_out){
             Toast.makeText(context, "로그아웃", Toast.LENGTH_SHORT).show();
             logout(Value.userLogoutURL, context);
+            kakaoLogout(context);
             intent = new Intent(context, SessionMangement.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
@@ -77,6 +80,17 @@ public class NavigationItemSelected extends FontActivity{
         }else if(id==R.id.nav_howto){
 
         }
+    }
+
+    private void kakaoLogout(final Context context) {
+        UserManagement.requestLogout(new LogoutResponseCallback() {
+            @Override
+            public void onCompleteLogout() {
+                Intent intent = new Intent(context,SessionMangement.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
+        });
     }
 
     public void logout(final String userLogoutURL, final Context context){

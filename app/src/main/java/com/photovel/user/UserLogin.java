@@ -9,6 +9,10 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 
 import com.alibaba.fastjson.JSON;
+import com.kakao.auth.ISessionCallback;
+import com.kakao.auth.Session;
+import com.kakao.util.exception.KakaoException;
+import com.kakao.util.helper.log.Logger;
 import com.photovel.MainActivity;
 import com.photovel.R;
 
@@ -38,6 +42,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -47,7 +52,8 @@ import java.util.Set;
  */
 
 public class UserLogin extends FontActivity2 {
-
+    String TAG = "UserLoginTest";
+    int sequence = 0;
     Context mContext;
     EditText emailText;
     EditText passwordTextView;
@@ -58,16 +64,23 @@ public class UserLogin extends FontActivity2 {
     String isSucess;
     String cookieValues = "";
 
+    private SessionCallback callback;
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_user_login);
         mContext = this;
+
+        callback = new SessionCallback();
+        Session.getCurrentSession().addCallback(callback);
+        Session.getCurrentSession().checkAndImplicitOpen();
+
+        setContentView(R.layout.activity_user_login);
 
         //FacebookLogin 배경색을 java로 동적으로 함
         LinearLayout facebookLayout = (LinearLayout) findViewById(R.id.FacebookLoginLayout);
-        GradientDrawable bgShape = (GradientDrawable)facebookLayout.getBackground();
-        int facebookColor = ContextCompat.getColor(this,R.color.facebookColor);
+        GradientDrawable bgShape = (GradientDrawable) facebookLayout.getBackground();
+        int facebookColor = ContextCompat.getColor(this, R.color.facebookColor);
         bgShape.setColor(facebookColor);
 
 /*        //KAKAO 배경색을 java로 동적으로 함
@@ -77,10 +90,9 @@ public class UserLogin extends FontActivity2 {
         bgShape2.setColor(kakaoColor);
         TextView kakaoView = (TextView)findViewById(R.id.fa_commenting);
         */
-        TextView emailIconView = (TextView)findViewById(R.id.emailIcon);
-        TextView passIconView = (TextView)findViewById(R.id.passwordIcon);
-        TextView facebookView = (TextView)findViewById(R.id.fa_facebook_official);
-
+        TextView emailIconView = (TextView) findViewById(R.id.emailIcon);
+        TextView passIconView = (TextView) findViewById(R.id.passwordIcon);
+        TextView facebookView = (TextView) findViewById(R.id.fa_facebook_official);
 
 
         emailText = (EditText) findViewById(R.id.emailText);
@@ -100,11 +112,11 @@ public class UserLogin extends FontActivity2 {
                 user_id = emailText.getText().toString();
                 user_password = passwordTextView.getText().toString();
 
-                if (("").equals(user_id) || ("").equals(user_password) ) {
+                if (("").equals(user_id) || ("").equals(user_password)) {
                     Toast.makeText(mContext, "아이디와 비밀번호를 입력해주세요.", Toast.LENGTH_SHORT).show();
                 } else {
                     JSONObject job = new JSONObject();
-                    String url =Value.userLoginURL;
+                    String url = Value.userLoginURL;
                     try {
                         job.put("user_id", user_id);
                         job.put("user_password", user_password);
@@ -112,10 +124,10 @@ public class UserLogin extends FontActivity2 {
                         e.printStackTrace();
                     }
                     Log.i("myJsonString", job.toString());
-                    login(job.toString(),url);
-                    if(isSucess.equals("")){
+                    login(job.toString(), url);
+                    if (isSucess.equals("")) {
                         Toast.makeText(mContext, "로그인실패", Toast.LENGTH_SHORT).show();
-                    }else{
+                    } else {
                         Toast.makeText(mContext, "로그인성공", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                         startActivity(intent);
@@ -130,21 +142,27 @@ public class UserLogin extends FontActivity2 {
         joinTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(),UserValidityCheck.class);
+                Intent intent = new Intent(getApplicationContext(), UserValidityCheck.class);
                 startActivity(intent);
             }
         });
     }
 
-    public void login(final String json, final String url){
+    /**
+     * 일반로그인 버튼을 눌렀을때 해당하는 이벤트
+     *
+     * @param json
+     * @param url
+     */
+    public void login(final String json, final String url) {
         Thread loginThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                Log.i("please",json+"\n"+url);
+                Log.i("please", json + "\n" + url);
                 HttpURLConnection conn = null;
                 InputStream is = null;
                 URL connectURL = null;
-                OutputStream dos= null;
+                OutputStream dos = null;
                 ByteArrayOutputStream baos;
 
 
@@ -162,29 +180,29 @@ public class UserLogin extends FontActivity2 {
 
                     int responseCode = conn.getResponseCode();
                     Log.i("myResponseCode", responseCode + "");
-                    switch (responseCode){
-                        case HttpURLConnection.HTTP_OK :
-                            is=conn.getInputStream();
+                    switch (responseCode) {
+                        case HttpURLConnection.HTTP_OK:
+                            is = conn.getInputStream();
                             baos = new ByteArrayOutputStream();
                             byte[] byteBuffer = new byte[1024];
                             byte[] byteData = null;
-                            int nLength =0;
-                            while((nLength = is.read(byteBuffer,0,byteBuffer.length))!=-1){
-                                baos.write(byteBuffer,0,nLength);
+                            int nLength = 0;
+                            while ((nLength = is.read(byteBuffer, 0, byteBuffer.length)) != -1) {
+                                baos.write(byteBuffer, 0, nLength);
                             }
-                            byteData=baos.toByteArray();
+                            byteData = baos.toByteArray();
                             isSucess = new String(byteData);
-                            if(isSucess.equals("")){
-                                Log.i("ddd","로그인실패");
+                            if (isSucess.equals("")) {
+                                Log.i("ddd", "로그인실패");
                                 break;
                             }
                             User temp = JSON.parseObject(isSucess, User.class);
-                            Log.i("temp","temp : "+temp.toString());
+                            Log.i("temp", "temp : " + temp.toString());
 
                             //로그인이 삭제되건 성공하건 이전의 세션은 삭제해줘야한다.
                             SharedPreferences test = getSharedPreferences("loginInfo", MODE_PRIVATE);
-                            String isRemovable = test.getString("Set-Cookie","notFound");
-                            if(!isRemovable.equals("notFound")){
+                            String isRemovable = test.getString("Set-Cookie", "notFound");
+                            if (!isRemovable.equals("notFound")) {
                                 SharedPreferences.Editor editor2 = test.edit();
                                 editor2.remove("Set-Cookie");
                                 editor2.remove("user_id");
@@ -196,16 +214,16 @@ public class UserLogin extends FontActivity2 {
                             }
 
 
-                            Map<String,List<String>> responseHeaders = conn.getHeaderFields();
+                            Map<String, List<String>> responseHeaders = conn.getHeaderFields();
                             Set<String> keys = responseHeaders.keySet();
-                            Log.i("HttpNetwork","응답헤더목록");
-                            for(String key: keys){
-                                List<String>values = responseHeaders.get(key);
-                                Log.i("HttpNetwork",key+"="+values.toString());
-                                if("Set-Cookie".equals(key)){
-                                    for(String value:values){
-                                        cookieValues +=value;
-                                        cookieValues+=":";
+                            Log.i("HttpNetwork", "응답헤더목록");
+                            for (String key : keys) {
+                                List<String> values = responseHeaders.get(key);
+                                Log.i("HttpNetwork", key + "=" + values.toString());
+                                if ("Set-Cookie".equals(key)) {
+                                    for (String value : values) {
+                                        cookieValues += value;
+                                        cookieValues += ":";
                                     }
                                 }
                             }
@@ -214,11 +232,11 @@ public class UserLogin extends FontActivity2 {
                             SharedPreferences loginInfo = getSharedPreferences("loginInfo", MODE_PRIVATE);
                             SharedPreferences.Editor editor = loginInfo.edit();
                             editor.putString("Set-Cookie", cookieValues); //First라는 key값으로 infoFirst 데이터를 저장한다.
-                            editor.putString("user_id",user_id);
-                            editor.putString("user_nick_name",temp.getUser_nick_name());
-                            editor.putString("user_password",temp.getUser_password());
-                            editor.putString("user_phone",temp.getUser_phone2());
-                            editor.putInt("user_friend_count",temp.getUser_friend_count());
+                            editor.putString("user_id", user_id);
+                            editor.putString("user_nick_name", temp.getUser_nick_name());
+                            editor.putString("user_password", temp.getUser_password());
+                            editor.putString("user_phone", temp.getUser_phone2());
+                            editor.putInt("user_friend_count", temp.getUser_friend_count());
 
                             editor.commit(); //완료한다.
 
@@ -228,7 +246,7 @@ public class UserLogin extends FontActivity2 {
                     e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
-                }finally {
+                } finally {
                 }
             }
         });
@@ -240,4 +258,46 @@ public class UserLogin extends FontActivity2 {
             e.printStackTrace();
         }
     }
+
+
+    private class SessionCallback implements ISessionCallback {
+
+        @Override
+        public void onSessionOpened() {
+            Log.i(TAG + "" + sequence++, "onSessionOpened");
+            redirectSignupActivity();
+        }
+
+        @Override
+        public void onSessionOpenFailed(KakaoException exception) {
+            Log.i(TAG + "" + sequence++, "onSessionOpenFailed");
+            if (exception != null) {
+                Log.i("onSessionOpenFailed", exception.toString());
+            }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (Session.getCurrentSession().handleActivityResult(requestCode, resultCode, data)) {
+            return;
+        }
+
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Session.getCurrentSession().removeCallback(callback);
+    }
+
+    protected void redirectSignupActivity() {
+        Log.i(TAG + "" + sequence++, "redirectSignupActivity");
+        Intent intent = new Intent(this, KakaoSignupActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivity(intent);
+        finish();
+    }
+
 }
