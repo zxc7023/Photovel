@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -78,6 +79,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         public TextView tvComment, btnCommentMenu, tvUsername, tvCommentDate, btnCommentSubmit, tvUsername_update, tvCommentDate_update;
         public LinearLayout LLmenu, llselect, llupdate;
         public EditText etComment;
+        public ImageView userProfile;
 
         public ViewHolder(View view) {
             super(view);
@@ -92,6 +94,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
             tvCommentDate_update = (TextView)view.findViewById(R.id.tvCommentDate_update);
             btnCommentSubmit = (TextView)view.findViewById(R.id.btnCommentSubmit);
             etComment = (EditText) view.findViewById(R.id.etComment);
+            userProfile = (ImageView) view.findViewById(R.id.userProfile);
         }
     }
 
@@ -115,20 +118,22 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         holder.tvCommentDate_update.setText(new SimpleDateFormat("yyyy.MM.dd").format(mDataset.get(position).getComment_date()));
         holder.tvComment.setText(mDataset.get(position).getComment_content());
         holder.etComment.setText(mDataset.get(position).getComment_content());
+        holder.userProfile.setImageBitmap(mDataset.get(position).getUser().getBitmap());
 
         //디테일 메뉴 보이기 전에 글쓴이 == 내계정 확인
         SharedPreferences get_to_eat = mcontext.getSharedPreferences("loginInfo", mcontext.MODE_PRIVATE);
         user_id = get_to_eat.getString("user_id","notFound");
-        if(!mDataset.get(getPosition()).getUser().getUser_id().equals(user_id)){
-            holder.LLmenu.setVisibility(View.GONE);
+        ca = new CommentAdapter();
+        ca.setHolder(holder);
+        ca.setPosition(position);
+
+        if(!mDataset.get(ca.getPosition()).getUser().getUser_id().equals(user_id)){
+            holder.LLmenu.setVisibility(View.INVISIBLE);
         }
 
         holder.LLmenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ca = new CommentAdapter();
-                ca.setHolder(holder);
-                ca.setPosition(position);
                 CommentMenu(view);
             }
         });

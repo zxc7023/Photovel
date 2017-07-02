@@ -10,6 +10,7 @@ import com.kakao.usermgmt.UserManagement;
 import com.kakao.usermgmt.callback.LogoutResponseCallback;
 import com.photovel.common.BookMarkMain;
 import com.photovel.content.ContentListMain;
+import com.photovel.friend.FriendListMain;
 import com.photovel.http.Value;
 import com.photovel.setting.SettingMain;
 
@@ -30,6 +31,7 @@ public class NavigationItemSelected extends FontActivity{
         Intent intent;
         SharedPreferences get_to_eat = context.getSharedPreferences("loginInfo", MODE_PRIVATE);
         String user_id = get_to_eat.getString("user_id","notFound");
+
         if(id == R.id.nav_home){
             intent = new Intent(context, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -43,7 +45,10 @@ public class NavigationItemSelected extends FontActivity{
             context.startActivity(intent);
             finish();
         }else if(id==R.id.nav_my_friend){
-
+            intent = new Intent(context, FriendListMain.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
+            finish();
         }else if(id==R.id.nav_book_mark){
             intent = new Intent(context, BookMarkMain.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -60,6 +65,7 @@ public class NavigationItemSelected extends FontActivity{
             intent = new Intent(context, ContentListMain.class);
             intent.putExtra("urlflag","R");
             intent.putExtra("user_id","");
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
             finish();
         }else if(id==R.id.nav_log_out){
@@ -120,6 +126,12 @@ public class NavigationItemSelected extends FontActivity{
                             String isRemovable = test.getString("Set-Cookie","notFound");
                             if(!isRemovable.equals("notFound")){
                                 SharedPreferences.Editor editor2 = test.edit();
+                                editor2.remove("user_id");
+                                editor2.remove("user_nick_name");
+                                editor2.remove("user_password");
+                                editor2.remove("user_phone");
+                                editor2.remove("user_friend_count");
+                                editor2.remove("user_profile");
                                 editor2.remove("Set-Cookie");
                                 editor2.commit();
                             }

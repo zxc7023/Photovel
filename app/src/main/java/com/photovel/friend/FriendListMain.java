@@ -1,4 +1,4 @@
-package com.photovel.common;
+package com.photovel.friend;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -7,24 +7,22 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.util.TypedValue;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,38 +31,41 @@ import com.alibaba.fastjson.JSON;
 import com.mikhaellopez.circularimageview.CircularImageView;
 import com.photovel.FontActivity2;
 import com.photovel.MainActivity;
-import com.photovel.MainNewAdapter;
-import com.photovel.MainRecommendAdapter;
 import com.photovel.NavigationItemSelected;
 import com.photovel.R;
+import com.photovel.common.BookMarkAdapter;
+import com.photovel.common.GridSpacingItemDecoration;
 import com.photovel.content.ContentInsertMain;
 import com.photovel.http.JsonConnection;
 import com.photovel.http.Value;
 import com.photovel.setting.SettingMain;
 import com.photovel.user.UserBitmapEncoding;
-import com.synnapps.carouselview.CarouselView;
-import com.synnapps.carouselview.ImageListener;
 import com.vo.Content;
-import com.vo.MainImage;
+import com.vo.User;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class BookMarkMain extends FontActivity2 implements NavigationView.OnNavigationItemSelectedListener {
+public class FriendListMain extends FontActivity2 implements NavigationView.OnNavigationItemSelectedListener {
     private static final String TAG = "Image";
     Toolbar toolbar;
     private String user_id, user_nick_name, user_profile;
 
-    //추천, 신규 게시글
-    private RecyclerView recyclerView;
-    private BookMarkAdapter mBookMarkAdapter;
+    private RecyclerView recyclerNewView, recyclerView;
+    private FriendNewListAdapter mFriendNewListAdapter;
+    private FriendListAdapter mFriendListAdapter;
     private RecyclerView.LayoutManager mNewLayoutManager;
-    private List<Content> myNewDataset;
+    private List<User> myFriendDataset, myNewFriendDataset;
     private TextView tvbookmark;
+
+    private Boolean isFabOpen = false;
+    private FloatingActionButton fab_more, fab_search_id, fab_search_phone;
+    private Animation fab_open, fab_close, rotate_forward, rotate_backward;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_book_mark_main);
+        setContentView(R.layout.activity_friend_list_main);
 
         //로그인중인 user_id받아오기
         SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
@@ -72,43 +73,103 @@ public class BookMarkMain extends FontActivity2 implements NavigationView.OnNavi
         user_nick_name = get_to_eat.getString("user_nick_name","notFound");
         user_profile = get_to_eat.getString("user_profile","notFound");
 
-        tvbookmark = (TextView)findViewById(R.id.tvbookmark);
+        //FloatingActionButton정의 및 기능
+        fab_more = (FloatingActionButton) findViewById(R.id.fab_more);
+        fab_search_id = (FloatingActionButton) findViewById(R.id.fab_search_id);
+        fab_search_phone = (FloatingActionButton) findViewById(R.id.fab_search_phone);
+        fab_open = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_open);
+        fab_close = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_close);
+        rotate_forward = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate_forward);
+        rotate_backward = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate_backward);
+        fab_search_phone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getBaseContext(), "아직 개발중입니다.", Toast.LENGTH_LONG).show();
+            }
+        });
+        fab_search_id.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getBaseContext(), "아직 개발중입니다.", Toast.LENGTH_LONG).show();
+            }
+        });
+        fab_more.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int id = v.getId();
+                switch (id) {
+                    case R.id.fab_more:
+                        animateFAB();
+                        break;
+                    case R.id.fab_search_id:
+                        break;
+                    case R.id.fab_search_phone:
+                        break;
+                }
+            }
+        });
 
-        Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
-        tvbookmark.setTypeface(fontAwesomeFont);
-
-        //북마크 스토리 객체 받아오기
-        Thread getBookmark = new Thread(){
+        //친구 신청 목록
+        Thread detailList = new Thread(){
             @Override
             public void run() {
                 super.run();
-                String responseData = JsonConnection.getConnection(Value.photovelURL+"/bookmark/"+user_id, "GET", null);
-                myNewDataset = JSON.parseArray(responseData, Content.class);
+                String responseData = JsonConnection.getConnection(Value.photovelURL+"/friend/new/"+user_id, "GET", null);
+                myNewFriendDataset = JSON.parseArray(responseData, User.class);
             }
         };
-        getBookmark.start();
+        detailList.start();
         try {
-            getBookmark.join();  //모든처리 thread처리 기다리기
+            detailList.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        //신규 스토리 bitmap 받아오기
-        JsonConnection.setBitmap(myNewDataset, Value.contentPhotoURL);
-        for(int i = 0; i < myNewDataset.size(); i++){
-            if(myNewDataset.get(i).getUser().getUser_profile_photo() == null){
+        //content의 bitmap 받아오기
+        JsonConnection.setBitmap(myNewFriendDataset, Value.contentPhotoURL);
+        for(int i = 0; i < myNewFriendDataset.size(); i++){
+            if(myNewFriendDataset.get(i).getUser_profile_photo() == null){
                 Bitmap profile = BitmapFactory.decodeResource(getResources(),R.drawable.ic_profile_circle);
-                myNewDataset.get(i).getUser().setBitmap(profile);
+                myNewFriendDataset.get(i).setBitmap(profile);
             }
         }
+        recyclerNewView = (RecyclerView) findViewById(R.id.recycler_new_view);
+        recyclerNewView.setHasFixedSize(true);
+        recyclerNewView.setNestedScrollingEnabled(false);
+        mNewLayoutManager = new LinearLayoutManager(this);
+        recyclerNewView.setLayoutManager(mNewLayoutManager);
+        mFriendNewListAdapter = new FriendNewListAdapter(myNewFriendDataset, FriendListMain.this);
+        recyclerNewView.setAdapter(mFriendNewListAdapter);
 
+        //친구 목록
+        Thread detailList2 = new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                String responseData = JsonConnection.getConnection(Value.photovelURL+"/friend/"+user_id, "GET", null);
+                myFriendDataset = JSON.parseArray(responseData, User.class);
+            }
+        };
+        detailList2.start();
+        try {
+            detailList2.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        //content의 bitmap 받아오기
+        JsonConnection.setBitmap(myFriendDataset, Value.contentPhotoURL);
+        for(int i = 0; i < myFriendDataset.size(); i++){
+            if(myFriendDataset.get(i).getUser_profile_photo() == null){
+                Bitmap profile = BitmapFactory.decodeResource(getResources(),R.drawable.ic_profile_circle);
+                myFriendDataset.get(i).setBitmap(profile);
+            }
+        }
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setNestedScrollingEnabled(false);
-        mNewLayoutManager = new GridLayoutManager(this, 2);
+        mNewLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(mNewLayoutManager);
-        recyclerView.addItemDecoration(new GridSpacingItemDecoration(2, dpToPx(5), true));
-        mBookMarkAdapter = new BookMarkAdapter(myNewDataset, BookMarkMain.this);
-        recyclerView.setAdapter(mBookMarkAdapter);
+        mFriendListAdapter = new FriendListAdapter(myFriendDataset, FriendListMain.this);
+        recyclerView.setAdapter(mFriendListAdapter);
 
         // Adding Toolbar to the activity
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -120,6 +181,8 @@ public class BookMarkMain extends FontActivity2 implements NavigationView.OnNavi
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
+
+        final Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
 
         //메뉴 navigationView
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
@@ -153,10 +216,23 @@ public class BookMarkMain extends FontActivity2 implements NavigationView.OnNavi
         navigationView.setNavigationItemSelectedListener(this);
     }
 
-    //decoration에서필요한거
-    private int dpToPx(int dp) {
-        Resources r = getResources();
-        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics()));
+    //FloatingActionButton 회전하기
+    public void animateFAB() {
+        if (isFabOpen) {
+            fab_more.startAnimation(rotate_backward);
+            fab_search_id.startAnimation(fab_close);
+            fab_search_phone.startAnimation(fab_close);
+            fab_search_id.setClickable(false);
+            fab_search_phone.setClickable(false);
+            isFabOpen = false;
+        } else {
+            fab_more.startAnimation(rotate_forward);
+            fab_search_id.startAnimation(fab_open);
+            fab_search_phone.startAnimation(fab_open);
+            fab_search_id.setClickable(true);
+            fab_search_phone.setClickable(true);
+            isFabOpen = true;
+        }
     }
 
     @Override

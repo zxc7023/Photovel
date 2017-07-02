@@ -5,6 +5,7 @@ import android.annotation.TargetApi;
 import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -33,11 +34,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
+import com.mikhaellopez.circularimageview.CircularImageView;
 import com.photovel.R;
 import com.photovel.FontActivity;
 import com.photovel.http.JsonConnection;
 import com.photovel.http.MultipartConnection;
 import com.photovel.http.Value;
+import com.photovel.user.UserBitmapEncoding;
 import com.vo.Content;
 import com.vo.ContentDetail;
 import com.vo.Photo;
@@ -58,8 +61,7 @@ import java.util.List;
 
 public class ContentUpdateMain extends FontActivity {
     private Button btnSort, btnPhotoSave;
-    private TextView btnBack;
-    private TextView tvTitle;
+    private TextView btnBack, tvTitle, tvUsername;
     private FloatingActionButton  btnAddPhots, btnTop;
     private String path;
     private ExifInterface exif;
@@ -78,12 +80,19 @@ public class ContentUpdateMain extends FontActivity {
     private int content_id=-1;
 
     private Content content;
+    private String user_id, user_nick_name, user_profile;
+    private CircularImageView userProfile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_content_insert_main);
         checkPermission();
+
+        SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
+        user_id = get_to_eat.getString("user_id","notFound");
+        user_nick_name = get_to_eat.getString("user_nick_name","notFound");
+        user_profile = get_to_eat.getString("user_profile","notFound");
 
         Intent intent = getIntent();
         content_id = intent.getIntExtra("content_id",-1);
@@ -95,6 +104,13 @@ public class ContentUpdateMain extends FontActivity {
 
         tvTitle = (TextView)findViewById(R.id.tvTitle);
         tvTitle.setText("여행 편집");
+        tvUsername = (TextView)findViewById(R.id.tvUsername);
+        userProfile = (CircularImageView)findViewById(R.id.userProfile);
+        tvUsername.setText(user_nick_name);
+        if(!user_profile.equals("notFound")){
+            UserBitmapEncoding ub = new UserBitmapEncoding();
+            userProfile.setImageBitmap(ub.StringToBitMap(user_profile));
+        }
 
         CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setExpandedTitleTextAppearance(R.style.ExpandedAppBar);
@@ -138,7 +154,7 @@ public class ContentUpdateMain extends FontActivity {
             @Override
             public void run() {
                 super.run();
-                String responseData = JsonConnection.getConnection(Value.contentURL+"/"+content_id, "GET", null);
+                String responseData = JsonConnection.getConnection(Value.contentURL+"/"+content_id+"/"+user_id, "GET", null);
                 content = JSON.parseObject(responseData, Content.class);
                 myDataset = content.getDetails();
             }
@@ -151,29 +167,12 @@ public class ContentUpdateMain extends FontActivity {
         }
 
         //ContentDetail bitmap 받아오기
-        List<Bitmap> detailBitmaps = JsonConnection.getBitmap(myDataset, Value.contentPhotoURL);
-        for(int i = 0; i < myDataset.size(); i++){
-            myDataset.get(i).getPhoto().setBitmap(detailBitmaps.get(i));
-            originData.get(i).getPhoto().setBitmap(detailBitmaps.get(i));
-        }
+        JsonConnection.setBitmap(myDataset, Value.contentPhotoURL);
+        JsonConnection.setBitmap(originData, Value.contentPhotoURL);
 
         //content정보 추가하기
         contentSubject.setText(content.getContent_subject());
         contentText.setText(content.getContent());
-        /*myDataset = new ArrayList<>();
-        originData = new ArrayList<>();
-        for(int i=0; i<content.getDetails().size(); i++){
-            Photo ph = new Photo();
-            ph.setPhoto_latitude(content.getDetails().get(i).getPhoto().getPhoto_latitude());
-            ph.setPhoto_longitude(content.getDetails().get(i).getPhoto().getPhoto_longitude());
-
-            GetCurrentAddress getAddress = new GetCurrentAddress();
-            String address = getAddress.getAddress(content.getDetails().get(i).getPhoto().getPhoto_latitude(),
-                    content.getDetails().get(i).getPhoto().getPhoto_longitude());
-            content.getDetails().get(i).getPhoto().setAddress(address);
-            myDataset.add(content.getDetails().get(i));
-            originData.add(content.getDetails().get(i));
-        }*/
 
         //recycleview사용선언
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);

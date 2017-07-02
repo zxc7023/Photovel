@@ -28,6 +28,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainNewAdapter extends RecyclerView.Adapter<MainNewAdapter.ViewHolder>{
@@ -35,6 +36,7 @@ public class MainNewAdapter extends RecyclerView.Adapter<MainNewAdapter.ViewHold
     private Context mcontext;
     private MainNewAdapter.ViewHolder holder;
     private int position;
+    private int[] likeFlag;
 
     public int getPosition() {
         return position;
@@ -56,11 +58,12 @@ public class MainNewAdapter extends RecyclerView.Adapter<MainNewAdapter.ViewHold
     public MainNewAdapter(List<Content> myDataset, Context mycontext) {
         mDataset = myDataset;
         mcontext = mycontext;
+        likeFlag = new int[getItemCount()];
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public RelativeLayout RlmainTop, RLBookmark;
-        public ImageView main_ivphoto;
+        public ImageView main_ivphoto, userProfile;
         public TextView contentSubject, userNickname;
         public TextView main_icthumb, main_iccomment, main_icshare;
         public TextView thumbCount, commentCount, shareCount, tvbookmark;
@@ -83,6 +86,7 @@ public class MainNewAdapter extends RecyclerView.Adapter<MainNewAdapter.ViewHold
             llthumb = (LinearLayout)view.findViewById(R.id.llthumb);
             llcomment = (LinearLayout)view.findViewById(R.id.llcomment);
             llshare = (LinearLayout)view.findViewById(R.id.llshare);
+            userProfile = (ImageView)view.findViewById(R.id.userProfile);
 
         }
     }
@@ -96,7 +100,7 @@ public class MainNewAdapter extends RecyclerView.Adapter<MainNewAdapter.ViewHold
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, final int position) {
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
         //imageView를 font로 바꿔주기
         Typeface fontAwesomeFont = Typeface.createFromAsset(mcontext.getAssets(), "fontawesome-webfont.ttf");
         holder.main_icthumb.setTypeface(fontAwesomeFont);
@@ -108,8 +112,12 @@ public class MainNewAdapter extends RecyclerView.Adapter<MainNewAdapter.ViewHold
             holder.RLBookmark.setVisibility(View.VISIBLE);
             holder.RLBookmark.bringToFront();
         }
+
         if(mDataset.get(position).getGood_status() == 1){   //좋아요 유무
             holder.main_icthumb.setTextColor(ContextCompat.getColor(mcontext, R.color.textBlue));
+            likeFlag[position]=1;
+        }else{
+            likeFlag[position]=0;
         }
 
         holder.main_ivphoto.setImageBitmap(mDataset.get(position).getBitmap());
@@ -122,6 +130,7 @@ public class MainNewAdapter extends RecyclerView.Adapter<MainNewAdapter.ViewHold
         }
         holder.contentSubject.setText(subject);
         holder.userNickname.setText(mDataset.get(position).getUser().getUser_nick_name());
+        holder.userProfile.setImageBitmap(mDataset.get(position).getUser().getBitmap());
         holder.thumbCount.setText(String.valueOf(mDataset.get(position).getGood_count()));
         holder.commentCount.setText(String.valueOf(mDataset.get(position).getComment_count()));
         holder.shareCount.setText(String.valueOf(mDataset.get(position).getContent_share_count()));
@@ -155,10 +164,15 @@ public class MainNewAdapter extends RecyclerView.Adapter<MainNewAdapter.ViewHold
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                Intent intent = new Intent(mcontext, MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
-                mcontext.startActivity(intent);
-                Toast.makeText(mcontext,"좋아요 완료!",Toast.LENGTH_SHORT).show();
+                if(likeFlag[position] == 1){
+                    holder.main_icthumb.setTextColor(ContextCompat.getColor(mcontext, R.color.bgDarkGrey));
+                    holder.thumbCount.setText(String.valueOf(Integer.parseInt(holder.thumbCount.getText().toString())-1));
+                    likeFlag[position]=0;
+                }else{
+                    holder.main_icthumb.setTextColor(ContextCompat.getColor(mcontext, R.color.textBlue));
+                    holder.thumbCount.setText(String.valueOf(Integer.parseInt(holder.thumbCount.getText().toString())+1));
+                    likeFlag[position]=1;
+                }
             }
         });
 

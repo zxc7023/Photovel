@@ -28,6 +28,7 @@ import android.widget.Toast;
 import com.photovel.FontActivity2;
 
 import com.photovel.TestActivity;
+import com.photovel.http.JsonConnection;
 import com.photovel.http.Value;
 import com.vo.User;
 
@@ -52,14 +53,16 @@ import java.util.Set;
  */
 
 public class UserLogin extends FontActivity2 {
+    //LOG값을 순서대로 찍어보기위해서 사용
     String TAG = "UserLoginTest";
     int sequence = 0;
+
     Context mContext;
     EditText emailText;
     EditText passwordTextView;
     String user_id;
     String user_password;
-
+    User temp;
 
     String isSucess;
     String cookieValues = "";
@@ -125,7 +128,7 @@ public class UserLogin extends FontActivity2 {
                     }
                     Log.i("myJsonString", job.toString());
                     login(job.toString(), url);
-                    if (isSucess.equals("")) {
+                    if ("".equals(isSucess)) {
                         Toast.makeText(mContext, "로그인실패", Toast.LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(mContext, "로그인성공", Toast.LENGTH_SHORT).show();
@@ -158,7 +161,7 @@ public class UserLogin extends FontActivity2 {
         Thread loginThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                Log.i("please", json + "\n" + url);
+                Log.i(TAG+sequence++ +"parameter check", "json :" +json + "\n" + "url :"+url);
                 HttpURLConnection conn = null;
                 InputStream is = null;
                 URL connectURL = null;
@@ -179,7 +182,7 @@ public class UserLogin extends FontActivity2 {
 
 
                     int responseCode = conn.getResponseCode();
-                    Log.i("myResponseCode", responseCode + "");
+                    Log.i(TAG+sequence + "responseCode", responseCode + "");
                     switch (responseCode) {
                         case HttpURLConnection.HTTP_OK:
                             is = conn.getInputStream();
@@ -193,23 +196,25 @@ public class UserLogin extends FontActivity2 {
                             byteData = baos.toByteArray();
                             isSucess = new String(byteData);
                             if (isSucess.equals("")) {
-                                Log.i("ddd", "로그인실패");
+                                Log.i(TAG+sequence++ +"check return value", "로그인실패");
                                 break;
                             }
-                            User temp = JSON.parseObject(isSucess, User.class);
-                            Log.i("temp", "temp : " + temp.toString());
+
+                            temp = JSON.parseObject(isSucess, User.class);
+                            Log.i(TAG+sequence++ +"transform returnValue(JSON String) to Object ", temp.toString());
 
                             //로그인이 삭제되건 성공하건 이전의 세션은 삭제해줘야한다.
-                            SharedPreferences test = getSharedPreferences("loginInfo", MODE_PRIVATE);
-                            String isRemovable = test.getString("Set-Cookie", "notFound");
+                            SharedPreferences loginInfo = getSharedPreferences("loginInfo", MODE_PRIVATE);
+                            String isRemovable = loginInfo.getString("Set-Cookie", "notFound");
                             if (!isRemovable.equals("notFound")) {
-                                SharedPreferences.Editor editor2 = test.edit();
+                                SharedPreferences.Editor editor2 = loginInfo.edit();
                                 editor2.remove("Set-Cookie");
                                 editor2.remove("user_id");
                                 editor2.remove("user_nick_name");
                                 editor2.remove("user_password");
                                 editor2.remove("user_phone");
                                 editor2.remove("user_friend_count");
+                                editor2.remove("user_profile");
                                 editor2.commit();
                             }
 
@@ -227,9 +232,8 @@ public class UserLogin extends FontActivity2 {
                                     }
                                 }
                             }
-
+                            /*
                             //로그인한 후에 세션을 관리한다. TestActivity에 저장한다.
-                            SharedPreferences loginInfo = getSharedPreferences("loginInfo", MODE_PRIVATE);
                             SharedPreferences.Editor editor = loginInfo.edit();
                             editor.putString("Set-Cookie", cookieValues); //First라는 key값으로 infoFirst 데이터를 저장한다.
                             editor.putString("user_id", user_id);
@@ -237,26 +241,45 @@ public class UserLogin extends FontActivity2 {
                             editor.putString("user_password", temp.getUser_password());
                             editor.putString("user_phone", temp.getUser_phone2());
                             editor.putInt("user_friend_count", temp.getUser_friend_count());
-
                             editor.commit(); //완료한다.
-
+                            */
                             break;
                     }
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
-                } finally {
                 }
             }
         });
-
         loginThread.start();
         try {
             loginThread.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        //user프로필사진set
+        List<User> user = new ArrayList<>();
+        user.add(temp);
+        JsonConnection.setBitmap(user, Value.contentPhotoURL);
+
+        //로그인한 후에 세션을 관리한다. TestActivity에 저장한다.
+        SharedPreferences loginInfo = getSharedPreferences("loginInfo", MODE_PRIVATE);
+        SharedPreferences.Editor editor = loginInfo.edit();
+        editor.putString("Set-Cookie", cookieValues); //First라는 key값으로 infoFirst 데이터를 저장한다.
+        editor.putString("user_id", user_id);
+        editor.putString("user_nick_name", temp.getUser_nick_name());
+        editor.putString("user_password", temp.getUser_password());
+        editor.putString("user_phone", temp.getUser_phone2());
+        editor.putInt("user_friend_count", temp.getUser_friend_count());
+
+        UserBitmapEncoding ub = new UserBitmapEncoding();
+        if (temp.getBitmap() != null) {
+            String user_profile = ub.BitMapToString(temp.getBitmap());
+            editor.putString("user_profile", user_profile);
+        }
+
+        editor.commit(); //완료한다.
     }
 
 

@@ -48,6 +48,7 @@ public class ContentListAdapter extends RecyclerView.Adapter<ContentListAdapter.
     private int position, content_id=-1;
     private String user_id;
     private String urlflag;
+    private int[] likeFlag, bookmarkFlag;
 
     public int getPosition() {
         return position;
@@ -70,6 +71,7 @@ public class ContentListAdapter extends RecyclerView.Adapter<ContentListAdapter.
         mDataset = myDataset;
         mcontext = mycontext;
         this.urlflag = urlflag;
+        likeFlag = bookmarkFlag = new int[getItemCount()];
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -77,9 +79,9 @@ public class ContentListAdapter extends RecyclerView.Adapter<ContentListAdapter.
         public LinearLayout RLdetailDate, LLmenu;
         public TextView icglobe, icleft, icright, tvleft, tvright, iccal, icmarker, icbookmark, icthumb, iccomment, icshare, btnDetailMenu;
         public TextView tvContentInsertDate, tvContentSubject, tvContentLocation, tvUsername, tvDuring, tvdetailcount, tvContent;
-        public TextView tvLikeCount, tvCommentCount, tvShareCount, btnComment;
+        public TextView tvLikeCount, tvlike, tvbookmark, tvCommentCount, tvShareCount, btnComment;
         public LinearLayout btnLookLeft, btnLookRight, btnLike, btnBookmark;
-        public ImageView ivTopPhoto;
+        public ImageView ivTopPhoto, userProfile;
 
         public ViewHolder(View view) {
             super(view);
@@ -100,6 +102,7 @@ public class ContentListAdapter extends RecyclerView.Adapter<ContentListAdapter.
             tvright = (TextView)view.findViewById(R.id.tvright);
             btnDetailMenu = (TextView) view.findViewById(R.id.btnDetailMenu);
             ivTopPhoto = (ImageView) view.findViewById(R.id.ivTopPhoto);
+            userProfile = (ImageView) view.findViewById(R.id.userProfile);
 
             tvContentInsertDate = (TextView) view.findViewById(R.id.tvContentInsertDate);    //컨텐트입력날짜
             tvContentSubject = (TextView) view.findViewById(R.id.tvContentSubject);           //컨텐트 제목
@@ -108,6 +111,8 @@ public class ContentListAdapter extends RecyclerView.Adapter<ContentListAdapter.
             tvDuring = (TextView) view.findViewById(R.id.tvDuring);                             //컨텐트 날짜첫날 ~ 날짜 끝날(2016.04.20 ~ 2016.06.20)
             tvContent = (TextView) view.findViewById(R.id.tvContent);                            //컨텐트 내용
             tvLikeCount = (TextView) view.findViewById(R.id.tvLikeCount);
+            tvlike = (TextView) view.findViewById(R.id.tvlike);
+            tvbookmark = (TextView) view.findViewById(R.id.tvbookmark);
             tvCommentCount = (TextView) view.findViewById(R.id.tvCommentCount);
             tvShareCount = (TextView) view.findViewById(R.id.tvShareCount);
             tvdetailcount = (TextView) view.findViewById(R.id.tvdetailcount);                    //디테일 수
@@ -163,11 +168,15 @@ public class ContentListAdapter extends RecyclerView.Adapter<ContentListAdapter.
         if(mDataset.get(position).getBookmark_status() == 1){
             holder.icbookmark.setText(R.string.fa_bookmark);
             holder.icbookmark.setTextColor(ContextCompat.getColor(mcontext, R.color.textBlue));
+            holder.tvbookmark.setTextColor(ContextCompat.getColor(mcontext, R.color.textBlue));
+            bookmarkFlag[position]=1;
         }
 
         //좋아요 유무
         if(mDataset.get(position).getGood_status() == 1){
             holder.icthumb.setTextColor(ContextCompat.getColor(mcontext, R.color.textBlue));
+            holder.tvlike.setTextColor(ContextCompat.getColor(mcontext, R.color.textBlue));
+            likeFlag[position]=1;
         }
 
         //주소처리
@@ -189,6 +198,7 @@ public class ContentListAdapter extends RecyclerView.Adapter<ContentListAdapter.
         holder.tvShareCount.setText(String.valueOf(mDataset.get(position).getContent_share_count()));
 
         holder.ivTopPhoto.setImageBitmap(mDataset.get(position).getBitmap());
+        holder.userProfile.setImageBitmap(mDataset.get(position).getUser().getBitmap());
 
         holder.btnLookLeft.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -241,12 +251,21 @@ public class ContentListAdapter extends RecyclerView.Adapter<ContentListAdapter.
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                Intent intent = new Intent(mcontext, ContentListMain.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
-                intent.putExtra("user_id", user_id);
-                intent.putExtra("urlflag", urlflag);
-                mcontext.startActivity(intent);
-                Toast.makeText(mcontext,"좋아요 완료!",Toast.LENGTH_SHORT).show();
+                /*if(urlflag.equals("C")){
+                    SharedPreferences contentInfo = mcontext.getSharedPreferences("content_user_id", mcontext.MODE_PRIVATE);
+                    user_id = contentInfo.getString("content_user_id","notFound");
+                }*/
+                if(likeFlag[position] == 1){
+                    holder.icthumb.setTextColor(ContextCompat.getColor(mcontext, R.color.bgDarkGrey));
+                    holder.tvlike.setTextColor(ContextCompat.getColor(mcontext, R.color.bgDarkGrey));
+                    holder.tvLikeCount.setText(String.valueOf(Integer.parseInt(holder.tvLikeCount.getText().toString())-1));
+                    likeFlag[position]=0;
+                }else{
+                    holder.icthumb.setTextColor(ContextCompat.getColor(mcontext, R.color.textBlue));
+                    holder.tvlike.setTextColor(ContextCompat.getColor(mcontext, R.color.textBlue));
+                    holder.tvLikeCount.setText(String.valueOf(Integer.parseInt(holder.tvLikeCount.getText().toString())+1));
+                    likeFlag[position]=1;
+                }
             }
         });
 
@@ -265,12 +284,20 @@ public class ContentListAdapter extends RecyclerView.Adapter<ContentListAdapter.
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                Intent intent = new Intent(mcontext, ContentListMain.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
-                intent.putExtra("user_id", user_id);
-                intent.putExtra("urlflag", "B");
-                mcontext.startActivity(intent);
-                Toast.makeText(mcontext,"북마크 완료!",Toast.LENGTH_SHORT).show();
+                /*if(urlflag.equals("C")){
+                    SharedPreferences contentInfo = mcontext.getSharedPreferences("content_user_id", mcontext.MODE_PRIVATE);
+                    user_id = contentInfo.getString("content_user_id","notFound");
+                }*/
+                if(bookmarkFlag[position] == 1){
+                    holder.icbookmark.setTextColor(ContextCompat.getColor(mcontext, R.color.bgDarkGrey));
+                    holder.tvbookmark.setTextColor(ContextCompat.getColor(mcontext, R.color.bgDarkGrey));
+                    bookmarkFlag[position]=0;
+                }else{
+                    holder.icbookmark.setText(R.string.fa_bookmark);
+                    holder.icbookmark.setTextColor(ContextCompat.getColor(mcontext, R.color.textBlue));
+                    holder.tvbookmark.setTextColor(ContextCompat.getColor(mcontext, R.color.textBlue));
+                    bookmarkFlag[position]=1;
+                }
             }
         });
 

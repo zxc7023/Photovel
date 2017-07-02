@@ -3,6 +3,7 @@ package com.photovel.common;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
@@ -30,6 +31,7 @@ public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHo
     private Context mcontext;
     private BookMarkAdapter.ViewHolder holder;
     private int position;
+    private int[] likeFlag;
 
     public int getPosition() {
         return position;
@@ -51,6 +53,7 @@ public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHo
     public BookMarkAdapter(List<Content> myDataset, Context mycontext) {
         mDataset = myDataset;
         mcontext = mycontext;
+        likeFlag = new int[getItemCount()];
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -87,7 +90,7 @@ public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHo
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, final int position) {
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
         //imageView를 font로 바꿔주기
         Typeface fontAwesomeFont = Typeface.createFromAsset(mcontext.getAssets(), "fontawesome-webfont.ttf");
         holder.main_icthumb.setTypeface(fontAwesomeFont);
@@ -101,6 +104,9 @@ public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHo
         }
         if(mDataset.get(position).getGood_status() == 1){   //좋아요 유무
             holder.main_icthumb.setTextColor(ContextCompat.getColor(mcontext, R.color.textBlue));
+            likeFlag[position]=1;
+        }else{
+            likeFlag[position]=0;
         }
 
         holder.main_ivphoto.setImageBitmap(mDataset.get(position).getBitmap());
@@ -128,11 +134,12 @@ public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHo
         holder.llthumb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final String id = "leeej9201@gmail.com";
+                SharedPreferences get_to_eat = mcontext.getSharedPreferences("loginInfo", mcontext.MODE_PRIVATE);
+                final String user_id = get_to_eat.getString("user_id","notFound");
                 Thread good = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        JsonConnection.getConnection(Value.contentURL+"/"+mDataset.get(position).getContent_id()+"/good/"+id, "POST", null);
+                        JsonConnection.getConnection(Value.contentURL+"/"+mDataset.get(position).getContent_id()+"/good/"+user_id, "POST", null);
                     }
                 });
                 good.start();
@@ -141,10 +148,13 @@ public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHo
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                Intent intent = new Intent(mcontext, BookMarkMain.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
-                mcontext.startActivity(intent);
-                Toast.makeText(mcontext,"좋아요 완료!",Toast.LENGTH_SHORT).show();
+                if(likeFlag[position] == 1){
+                    holder.main_icthumb.setTextColor(ContextCompat.getColor(mcontext, R.color.bgDarkGrey));
+                    likeFlag[position]=0;
+                }else{
+                    holder.main_icthumb.setTextColor(ContextCompat.getColor(mcontext, R.color.textBlue));
+                    likeFlag[position]=1;
+                }
             }
         });
 

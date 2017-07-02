@@ -43,7 +43,7 @@ import java.net.URL;
 public class KakaoUserJoinDetail extends FontActivity2 {
 
     //로그를 확인하기위하여 작성한 TAG와 Sequence
-    String TAG = "KakaoSignUpTest";
+    String TAG = "KakaoUserJoinDetail";
     int sequence =0;
 
     String nickName, phoneNumber;

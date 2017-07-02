@@ -46,6 +46,7 @@ import android.widget.Toast;
 import android.widget.ViewFlipper;
 
 import com.alibaba.fastjson.JSON;
+import com.mikhaellopez.circularimageview.CircularImageView;
 import com.photovel.FontActivity2;
 import com.photovel.MainActivity;
 import com.photovel.NavigationItemSelected;
@@ -53,6 +54,7 @@ import com.photovel.R;
 import com.photovel.http.JsonConnection;
 import com.photovel.http.Value;
 import com.photovel.setting.SettingMain;
+import com.photovel.user.UserBitmapEncoding;
 import com.vo.Comment;
 import com.vo.Content;
 import com.vo.ContentDetail;
@@ -70,21 +72,18 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
     Toolbar toolbar;
 
     private RelativeLayout RldetailData;
-    private LinearLayout RLdetailDate, LLmenu, btnLike, btnComment;
+    private LinearLayout RLdetailDate, LLmenu, btnLike, btnComment, btnBookmark, btnMoreUserContent;
     private TextView icglobe, icleft, icright, tvleft, tvright, iccal, icmarker, icbookmark, icthumb, iccomment, icshare, btnDetailMenu;
     private TextView tvContentInsertDate, tvContentSubject, tvContentLocation, tvUsername, tvUsername2, tvDuring, tvdetailcount, tvdetailstate, tvContent;
-    private TextView tvLikeCount, tvCommentCount, tvShareCount;
-    private ImageView ivTopPhoto;
+    private TextView tvLikeCount, tvlike, tvbookmark, tvCommentCount, tvShareCount;
+    private ImageView ivTopPhoto, userProfile, userProfile1;
     private LinearLayout btnLookLeft, btnLookRight;
     private FloatingActionButton btnTop;
-    //private Button btnLike, btnComment, btnShare;
     private List<ContentDetail> myDataset;
     private Content content;
-    private int content_id=-1;
-    private String user_id;
-
-    private final String contentURL = Value.contentURL;
-    private final String contentPhotoURL = Value.contentPhotoURL;
+    private int content_id=0, likeFlag=0, bookmarkFlag=0;
+    private String user_id, user_nick_name, user_profile;
+    CircularImageView navUserProfile, myProfile;
 
     //은디수정
     private ViewFlipper mViewFlipper;
@@ -113,7 +112,7 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         setContentView(R.layout.activity_content_slide_show_main);
 
         Intent intent = getIntent();
-        content_id = intent.getIntExtra("content_id",1);
+        content_id = intent.getIntExtra("content_id",-1);
         if(content_id==-1){
             Log.i("content_id","slide_content_id 못받아옴!!!");
         }else {
@@ -122,6 +121,8 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
 
         SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
         user_id = get_to_eat.getString("user_id","notFound");
+        user_nick_name = get_to_eat.getString("user_nick_name","notFound");
+        user_profile = get_to_eat.getString("user_profile","notFound");
 
         // Adding Toolbar to the activity
         toolbar = (Toolbar) findViewById(R.id.slideToolbar);
@@ -140,6 +141,8 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         icshare = (TextView)findViewById(R.id.icshare);
         btnDetailMenu = (TextView) findViewById(R.id.btnDetailMenu);
         ivTopPhoto = (ImageView) findViewById(R.id.ivTopPhoto);
+        userProfile = (ImageView) findViewById(R.id.userProfile);
+        userProfile1 = (ImageView) findViewById(R.id.userProfile1);
 
         tvContentInsertDate = (TextView) findViewById(R.id.tvContentInsertDate);    //컨텐트입력날짜
         tvContentSubject = (TextView) findViewById(R.id.tvContentSubject);           //컨텐트 제목
@@ -150,6 +153,8 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         tvdetailstate = (TextView) findViewById(R.id.tvdetailstate);                   //디테일 수
         tvContent = (TextView) findViewById(R.id.tvContent);                            //보고있는 화면 상태(사진/동영상/지도)
         tvLikeCount = (TextView) findViewById(R.id.tvLikeCount);                        //컨텐트 내용
+        tvlike = (TextView) findViewById(R.id.tvlike);
+        tvbookmark = (TextView) findViewById(R.id.tvbookmark);
         tvCommentCount = (TextView) findViewById(R.id.tvCommentCount);
         tvShareCount = (TextView) findViewById(R.id.tvShareCount);
         tvdetailcount = (TextView) findViewById(R.id.tvdetailcount);
@@ -158,6 +163,8 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         btnLookRight = (LinearLayout) findViewById(R.id.btnLookRight);
         btnLike = (LinearLayout) findViewById(R.id.btnLike);
         btnComment = (LinearLayout) findViewById(R.id.btnComment);
+        btnBookmark = (LinearLayout) findViewById(R.id.btnBookmark);
+        btnMoreUserContent = (LinearLayout) findViewById(R.id.btnMoreUserContent);
 
         //imageView를 font로 바꿔주기
         Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
@@ -205,9 +212,10 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         //content의 bitmap 받아오기
         List<Content> tmpContent = new ArrayList<>();
         tmpContent.add(content);
-        List<Bitmap> contentBitmaps = JsonConnection.getBitmap(tmpContent, Value.contentPhotoURL);
-        for(int i = 0; i < contentBitmaps.size(); i++){
-            tmpContent.get(i).setBitmap(contentBitmaps.get(i));
+        JsonConnection.setBitmap(tmpContent, Value.contentPhotoURL);
+        if(content.getUser().getUser_profile_photo() == null){
+            Bitmap profile = BitmapFactory.decodeResource(getResources(),R.drawable.ic_profile_circle);
+            content.getUser().setBitmap(profile);
         }
 
         //디테일 메뉴 보이기 전에 글쓴이 == 내계정 확인
@@ -231,15 +239,21 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         if(content.getBookmark_status() == 1){
             icbookmark.setText(R.string.fa_bookmark);
             icbookmark.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.textBlue));
+            tvbookmark.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.textBlue));
+            bookmarkFlag=1;
         }
 
         //좋아요 유무
         if(content.getGood_status() == 1){
             icthumb.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.textBlue));
+            tvlike.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.textBlue));
+            likeFlag=1;
         }
 
         //메인 사진 저장
         ivTopPhoto.setImageBitmap(content.getBitmap());
+        userProfile.setImageBitmap(content.getUser().getBitmap());
+        userProfile1.setImageBitmap(content.getUser().getBitmap());
 
         //메인 위치 저장
         GetCurrentAddress getAddress = new GetCurrentAddress();
@@ -257,9 +271,6 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         etComment = (EditText) findViewById(R.id.etComment);
         llBack = (LinearLayout) findViewById(R.id.llBack);
 
-        //Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
-        btnBack.setTypeface(fontAwesomeFont);
-
         //comment recycleview사용선언
         RVComment = (RecyclerView) findViewById(R.id.RVComment);
         RVComment.setHasFixedSize(true);
@@ -268,6 +279,12 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         RVComment.setLayoutManager(mCommentLayoutManager);
         mCommentAdapter = new CommentAdapter(myCommentDataset, ContentSlideShowMain.this);
         RVComment.setAdapter(mCommentAdapter);
+
+        myProfile = (CircularImageView)findViewById(R.id.myProfile);
+        if(!user_profile.equals("notFound")){
+            UserBitmapEncoding ub = new UserBitmapEncoding();
+            myProfile.setImageBitmap(ub.StringToBitMap(user_profile));
+        }
 
         llBack.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -343,11 +360,46 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                Intent intent = new Intent(getApplicationContext(), ContentSlideShowMain.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
-                intent.putExtra("content_id", content_id);
-                startActivity(intent);
-                Toast.makeText(getApplicationContext(),"좋아요 완료!",Toast.LENGTH_SHORT).show();
+                if(likeFlag == 1){
+                    icthumb.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.bgDarkGrey));
+                    tvlike.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.bgDarkGrey));
+                    tvLikeCount.setText(String.valueOf(Integer.parseInt(tvLikeCount.getText().toString())-1));
+                    likeFlag=0;
+                }else{
+                    icthumb.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.textBlue));
+                    tvlike.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.textBlue));
+                    tvLikeCount.setText(String.valueOf(Integer.parseInt(tvLikeCount.getText().toString())+1));
+                    likeFlag=1;
+                }
+            }
+        });
+
+        //북마크
+        btnBookmark.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Thread bookmark = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        JsonConnection.getConnection(Value.contentURL+"/"+content_id+"/bookmark/"+user_id, "POST", null);
+                    }
+                });
+                bookmark.start();
+                try {
+                    bookmark.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if(bookmarkFlag == 1){
+                    icbookmark.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.bgDarkGrey));
+                    tvbookmark.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.bgDarkGrey));
+                    bookmarkFlag=0;
+                }else{
+                    icbookmark.setText(R.string.fa_bookmark);
+                    icbookmark.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.textBlue));
+                    tvbookmark.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.textBlue));
+                    bookmarkFlag=1;
+                }
             }
         });
 
@@ -367,14 +419,18 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), ContentInsertMain.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); //준기오빠의 낮은 버전을 위해 인텐트할때 넣어주기
                 getApplicationContext().startActivity(intent);
             }
         });
         TextView tvUserName = (TextView)hView.findViewById(R.id.tvUserName);
-        tvUserName.setText(user_id);
-        TextView tvProfileUpdate = (TextView)hView.findViewById(R.id.tvProfileUpdate);
-        tvProfileUpdate.setTypeface(fontAwesomeFont);
+        tvUserName.setText(user_nick_name);
+        navUserProfile = (CircularImageView)hView.findViewById(R.id.userProfile);
+        if(!user_profile.equals("notFound")){
+            UserBitmapEncoding ub = new UserBitmapEncoding();
+            navUserProfile.setImageBitmap(ub.StringToBitMap(user_profile));
+        }
+        LinearLayout tvProfileUpdate = (LinearLayout)hView.findViewById(R.id.tvProfileUpdate);
         tvProfileUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -384,6 +440,19 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
             }
         });
         navigationView.setNavigationItemSelectedListener(this);
+
+        //user_content 더보기 버튼
+        btnMoreUserContent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent dintent = new Intent(getApplicationContext(), ContentListMain.class);
+                user_id = content.getUser().getUser_id();
+                dintent.putExtra("user_id",user_id);
+                dintent.putExtra("urlflag","");
+                getApplicationContext().startActivity(dintent);
+                finish();
+            }
+        });
 
         //사진으로보기 버튼
         btnLookLeft.setOnClickListener(new View.OnClickListener() {
@@ -658,8 +727,22 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()){
-                    case R.id.show_profile:
-                        Toast.makeText(getApplicationContext(),"프로필보기",Toast.LENGTH_SHORT).show();
+                    case R.id.friend_plus:
+                        //////////////////친구추가 db처리해야함
+                        //   /friend/new/{user_id1:.+}/{user_id2:.+}   user_id1->나 user_id2 ->친구신청할아이디
+                        Thread friend_plus = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                JsonConnection.getConnection(Value.photovelURL+"/friend/new/"+user_id+"/"+content.getUser().getUser_id(), "POST", null);
+                            }
+                        });
+                        friend_plus.start();
+                        try {
+                            friend_plus.join();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        Toast.makeText(getApplicationContext(),"친구추가성공",Toast.LENGTH_SHORT).show();
                         break;
                 }
                 return false;
@@ -711,6 +794,10 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         }else if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            super.onBackPressed();
             super.onBackPressed();
         }
     }

@@ -4,21 +4,19 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.MatrixCursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.BaseColumns;
 import android.speech.RecognizerIntent;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
@@ -26,17 +24,20 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.photovel.content.ContentSearchView;
-import com.photovel.content.SearchListAdapter;
+import com.mikhaellopez.circularimageview.CircularImageView;
+import com.photovel.search.SearchView;
+import com.photovel.search.SearchListAdapter;
 import com.photovel.http.JsonConnection;
 import com.photovel.setting.SettingMain;
 import com.alibaba.fastjson.JSON;
 import com.photovel.content.ContentInsertMain;
 import com.photovel.http.Value;
+import com.photovel.user.UserBitmapEncoding;
 import com.synnapps.carouselview.CarouselView;
 import com.synnapps.carouselview.ImageListener;
 import com.vo.Content;
@@ -47,7 +48,7 @@ import java.util.List;
 public class MainActivity extends FontActivity2 implements NavigationView.OnNavigationItemSelectedListener {
     private static final String TAG = "MainActivity";
     Toolbar toolbar;
-    private String user_id;
+    private String user_id, user_nick_name, user_profile;
 
     //메인 이미지 케러셀뷰
     CarouselView carouselView;
@@ -72,7 +73,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
     private SearchListAdapter searchListAdapter;
 
     //굳이 클래스로 객체 만들 필요 없이 xml에 태그로 정의하여 호출 가능
-    ContentSearchView searchView;
+    SearchView searchView;
     ListView suggestionsListView;
 
 
@@ -83,13 +84,16 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
 
         SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
         user_id = get_to_eat.getString("user_id","notFound");
+        user_nick_name = get_to_eat.getString("user_nick_name","notFound");
+        user_profile = get_to_eat.getString("user_profile","notFound");
 
-        searchView = (ContentSearchView) findViewById(R.id.search_view);
+        searchView = (SearchView) findViewById(R.id.search_view);
 
         suggestionsListView = (ListView) findViewById(R.id.suggestion_list);
         searchListAdapter = new SearchListAdapter(this, matrixCursor, true, suggestionsListView);
 
         searchView.setAdapter(searchListAdapter);
+        searchView.bringToFront();
 
         //메인이미지 캐러셀뷰 부분
         carouselView = (CarouselView) findViewById(R.id.carouselView);
@@ -111,10 +115,8 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         }
 
         //메인이미지 bitmap 받아오기
-        List<Bitmap> mainImageBitmaps = JsonConnection.getBitmap(images, Value.mainImagePhotoURL);
-        for(int i = 0; i < images.size(); i++){
-            images.get(i).setBitmap(mainImageBitmaps.get(i));
-        }
+        JsonConnection.setBitmap(images, Value.mainImagePhotoURL);
+
 
         carouselView.setPageCount(images.size());
         carouselView.setImageListener(imageListener);
@@ -135,11 +137,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
             e.printStackTrace();
         }
         //추천 스토리 bitmap 받아오기
-        List<Bitmap> recommendBitmaps = JsonConnection.getBitmap(myRecommendDataset, Value.contentPhotoURL);
-        for(int i = 0; i < myRecommendDataset.size(); i++){
-            myRecommendDataset.get(i).setBitmap(recommendBitmaps.get(i));
-        }
-
+        JsonConnection.setBitmap(myRecommendDataset, Value.contentPhotoURL);
 
         //추천 스토리 recycleview사용선언
         RVrecommend = (RecyclerView) findViewById(R.id.RVrecommend);
@@ -166,9 +164,12 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
             e.printStackTrace();
         }
         //신규 스토리 bitmap 받아오기
-        List<Bitmap> newBitmaps = JsonConnection.getBitmap(myNewDataset, Value.contentPhotoURL);
+        JsonConnection.setBitmap(myNewDataset, Value.contentPhotoURL);
         for(int i = 0; i < myNewDataset.size(); i++){
-            myNewDataset.get(i).setBitmap(newBitmaps.get(i));
+            if(myNewDataset.get(i).getUser().getUser_profile_photo() == null){
+                Bitmap profile = BitmapFactory.decodeResource(getResources(),R.drawable.ic_profile_circle);
+                myNewDataset.get(i).getUser().setBitmap(profile);
+            }
         }
 
         //신규 스토리 recycleview사용선언
@@ -180,20 +181,9 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         mNewAdapter = new MainNewAdapter(myNewDataset, MainActivity.this);
         RVnew.setAdapter(mNewAdapter);
 
-
         // Adding Toolbar to the activity
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        // Adding FloatingActionButton to the activity
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -217,9 +207,13 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
             }
         });
         TextView tvUserName = (TextView)hView.findViewById(R.id.tvUserName);
-        tvUserName.setText(user_id);
-        TextView tvProfileUpdate = (TextView)hView.findViewById(R.id.tvProfileUpdate);
-        tvProfileUpdate.setTypeface(fontAwesomeFont);
+        tvUserName.setText(user_nick_name);
+        CircularImageView userProfile = (CircularImageView)hView.findViewById(R.id.userProfile);
+        if(!user_profile.equals("notFound")){
+            UserBitmapEncoding ub = new UserBitmapEncoding();
+            userProfile.setImageBitmap(ub.StringToBitMap(user_profile));
+        }
+        LinearLayout tvProfileUpdate = (LinearLayout)hView.findViewById(R.id.tvProfileUpdate);
         tvProfileUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -230,13 +224,11 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         });
         navigationView.setNavigationItemSelectedListener(this);
 
-
-
         //검색 제안 목록 등록
         searchView.setSuggestions(myNewDataset, matrixCursor, true);
 
         //리스너 등록
-        searchView.setOnQueryTextListener(new ContentSearchView.OnQueryTextListener() {
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 //Do some magic
@@ -249,10 +241,26 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
                 int size = myNewDataset.size();
 
                 //자료 필터
-                matrixCursor = new MatrixCursor(new String[]{BaseColumns._ID, "user_id", "content_subject", "main_ivphoto"});
+                matrixCursor = new MatrixCursor(new String[]{BaseColumns._ID,
+                        "content_id",
+                        "content_bitmap",
+                        "user_nick_name",
+                        "user_bitmap",
+                        "content_subject",
+                        "good_status",
+                        "good_count",
+                        "bookmark_status",
+                        "comment_count",
+                        "content_share_count"
+                });
                 Log.i(TAG, "onQueryTextChange의 searchSuggestionsList.size()= " + size);
 
                 for(int i=0; i<size; i++) {
+
+                    UserBitmapEncoding ub = new UserBitmapEncoding();
+                    String content_bitmap = ub.BitMapToString(myNewDataset.get(i).getBitmap());
+                    String user_bitmap = ub.BitMapToString(myNewDataset.get(i).getUser().getBitmap());
+
                     if ("".equals(newText)) {
 
                     } else if (myNewDataset.get(i).getUser().getUser_id().toLowerCase().startsWith(newText.toLowerCase()) //입력되는 문자열의 시작부분이 "user_id"의 value와 같은지 검사
@@ -261,9 +269,17 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
                         Log.i(TAG, "onQueryTextChange 들어온 getUser_id()= " + myNewDataset.get(i).getUser().getUser_id().toLowerCase());
                         Log.i(TAG, "onQueryTextChange 들어온 getContent_subject()= " + myNewDataset.get(i).getContent_subject().toLowerCase());
                         matrixCursor.addRow(new Object[]{i,
-                                myNewDataset.get(i).getUser().getUser_id(),
+                                myNewDataset.get(i).getContent_id(),
+                                content_bitmap,
+                                myNewDataset.get(i).getUser().getUser_nick_name(),
+                                user_bitmap,
                                 myNewDataset.get(i).getContent_subject(),
-                                myNewDataset.get(i).getBitmap()});
+                                myNewDataset.get(i).getGood_status(),
+                                myNewDataset.get(i).getGood_count(),
+                                myNewDataset.get(i).getBookmark_status(),
+                                myNewDataset.get(i).getComment_count(),
+                                myNewDataset.get(i).getContent_share_count()
+                        });
                     }else{
                         Log.i(TAG, "onQueryTextChange 못들어옴엉엉 " + myNewDataset);
                     }
@@ -275,7 +291,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
             }
         });
 
-        searchView.setOnSearchViewListener(new ContentSearchView.SearchViewListener() {
+        searchView.setOnSearchViewListener(new SearchView.SearchViewListener() {
             @Override
             public void onSearchViewShown() {
                 //Do some magic

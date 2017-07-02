@@ -1,15 +1,16 @@
 package com.vo;
 
 public class Permission {
-	private User user;
+	private String user_id;
 	private int friend_recom_flag;
 	private int friend_search_flag;
 	private int feed_flag;
-	public User getUser() {
-		return user;
+
+	public String getUser_id() {
+		return user_id;
 	}
-	public void setUser(User user) {
-		this.user = user;
+	public void setUser_id(String user_id) {
+		this.user_id = user_id;
 	}
 	public int getFriend_recom_flag() {
 		return friend_recom_flag;
@@ -31,7 +32,7 @@ public class Permission {
 	}
 	@Override
 	public String toString() {
-		return "Permission [user=" + user + ", friend_recom_flag=" + friend_recom_flag + ", friend_search_flag="
+		return "Permission [user_id=" + user_id + ", friend_recom_flag=" + friend_recom_flag + ", friend_search_flag="
 				+ friend_search_flag + ", feed_flag=" + feed_flag + "]";
 	}
 	

@@ -195,16 +195,18 @@
             android:layout_below="@+id/ivTopPhoto"
             android:gravity="center">
             <LinearLayout
-                android:layout_width="match_parent"
+                android:id="@+id/btnUserProfile"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center"
-                android:layout_marginTop="10dp">
+                android:layout_marginTop="10dp"
+                android:onClick="ProFileMenuClick">
                 <com.mikhaellopez.circularimageview.CircularImageView
+                    android:id="@+id/userProfile"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:src="@drawable/ic_profile_circle"
-                    android:onClick="ProFileMenuClick"
                     app:civ_border_width="1dp"
                     android:layout_marginRight="@dimen/between_tv_margin"/>
                 <TextView
@@ -324,6 +326,7 @@
                         android:layout_marginRight="@dimen/between_tv_margin"
                         android:includeFontPadding="false"/>
                     <TextView
+                        android:id="@+id/tvbookmark"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="북마크"
@@ -439,6 +442,7 @@
                         android:layout_marginRight="@dimen/between_tv_margin"
                         android:includeFontPadding="false"/>
                     <TextView
+                        android:id="@+id/tvlike"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:background="@color/bgNo"

@@ -205,6 +205,7 @@
                 android:gravity="center"
                 android:layout_marginTop="10dp">
                 <com.mikhaellopez.circularimageview.CircularImageView
+                    android:id="@+id/userProfile"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:src="@drawable/ic_profile_circle"
@@ -301,6 +302,7 @@
                         android:layout_marginRight="@dimen/between_tv_margin"
                         android:includeFontPadding="false"/>
                     <TextView
+                        android:id="@+id/tvbookmark"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="북마크"
@@ -416,6 +418,7 @@
                         android:layout_marginRight="@dimen/between_tv_margin"
                         android:includeFontPadding="false"/>
                     <TextView
+                        android:id="@+id/tvlike"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:background="@color/bgNo"

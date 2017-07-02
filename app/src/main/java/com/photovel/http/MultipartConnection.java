@@ -113,4 +113,78 @@ public class MultipartConnection {
         }
         return responseData;
     }
+
+    public static void getConnection(String url, JSONObject user, JSONObject permission, Bitmap bitmap){
+        HttpURLConnection conn = null;
+        DataOutputStream dos = null;
+
+        Log.i(TAG, "1. getConnection url= " + url);
+        try {
+            String lineEnd = "\r\n";
+            String twoHyphens = "--";
+            String boundary = "**##**";
+
+            URL connectURL = new URL(url);
+
+            conn = (HttpURLConnection) connectURL.openConnection();
+            conn.setDoInput(true);
+            conn.setDoOutput(true);
+            conn.setUseCaches(false);
+            conn.setRequestMethod("POST");
+
+            conn.setRequestProperty("Connection", "Keep-Alive");
+            conn.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
+            dos = new DataOutputStream(conn.getOutputStream());
+
+            dos.writeBytes(lineEnd + twoHyphens + boundary + lineEnd);
+            dos.writeBytes("Content-Disposition: form-data; name=\"user\"" + lineEnd + lineEnd + URLEncoder.encode(user.toString(), "UTF-8"));
+            dos.writeBytes(lineEnd + twoHyphens + boundary + lineEnd);
+            dos.writeBytes("Content-Disposition: form-data; name=\"permission\"" + lineEnd + lineEnd + URLEncoder.encode(permission.toString(), "UTF-8"));
+
+
+            dos.writeBytes(lineEnd + twoHyphens + boundary + lineEnd);
+            dos.writeBytes("Content-Disposition: form-data; name=\"uploadFile\"; filename=\"uploadFile\"" + lineEnd);
+            dos.writeBytes("Content-Type: image/jpg" + lineEnd + lineEnd);
+
+            ByteArrayOutputStream outPutStream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outPutStream);
+            byte[] byteArray = outPutStream.toByteArray();
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(byteArray);
+            int bytesAvailable = inputStream.available();
+            int maxBufferSize = 1024;
+            int bufferSize = Math.min(bytesAvailable, maxBufferSize);
+            byte[] buffer = new byte[bufferSize];
+
+            int bytesRead = inputStream.read(buffer, 0, bufferSize);
+            while (bytesRead > 0) {
+                dos.write(buffer, 0, bufferSize);
+                bytesAvailable = inputStream.available();
+                bufferSize = Math.min(bytesAvailable, maxBufferSize);
+                bytesRead = inputStream.read(buffer, 0, bufferSize);
+            }
+            inputStream.close();
+
+
+            dos.writeBytes(lineEnd + twoHyphens + boundary + twoHyphens + lineEnd);
+            dos.flush();
+
+            int responseCode = conn.getResponseCode();
+            Log.i("responseCode", responseCode + "");
+
+
+        } catch (ProtocolException e) {
+            e.printStackTrace();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                dos.close();
+                conn.disconnect();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

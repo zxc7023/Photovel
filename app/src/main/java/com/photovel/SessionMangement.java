@@ -89,6 +89,7 @@ public class SessionMangement extends FontActivity2 {
         else{
             Intent intent = new Intent(getApplication(), UserLogin.class);
             startActivity(intent);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
             finish();
         }
     }

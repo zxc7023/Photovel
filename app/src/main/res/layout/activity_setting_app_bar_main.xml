@@ -191,7 +191,8 @@
                             android:background="@color/bgprofileBeige"
                             android:text="user password"
                             android:textColor="@color/textGrey"
-                            android:textSize="@dimen/content_text_size" />
+                            android:textSize="@dimen/content_text_size"
+                            android:inputType="textPassword"/>
                     </LinearLayout>
 
                     <LinearLayout
@@ -219,7 +220,8 @@
                             android:background="@color/bgprofileBeige"
                             android:text="user phone"
                             android:textColor="@color/textGrey"
-                            android:textSize="@dimen/content_text_size" />
+                            android:textSize="@dimen/content_text_size"
+                            android:inputType="number"/>
                     </LinearLayout>
                 </LinearLayout>
 

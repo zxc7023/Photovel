@@ -1,5 +1,7 @@
 package com.vo;
 
+import android.graphics.Bitmap;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -18,6 +20,14 @@ public class User implements Serializable{
 	private String user_sns_token;
 	private String user_push_token;
 	private int user_friend_count;
+	private Bitmap bitmap;
+
+	public Bitmap getBitmap() {
+		return bitmap;
+	}
+	public void setBitmap(Bitmap bitmap) {
+		this.bitmap = bitmap;
+	}
 	public String getUser_id() {
 		return user_id;
 	}

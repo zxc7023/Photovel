@@ -29,6 +29,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
+import com.mikhaellopez.circularimageview.CircularImageView;
 import com.photovel.FontActivity;
 import com.photovel.FontActivity2;
 import com.photovel.MainActivity;
@@ -37,6 +38,7 @@ import com.photovel.R;
 import com.photovel.http.JsonConnection;
 import com.photovel.http.Value;
 import com.photovel.setting.SettingMain;
+import com.photovel.user.UserBitmapEncoding;
 import com.vo.Content;
 import com.vo.ContentDetail;
 import com.vo.Photo;
@@ -59,7 +61,7 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
     private RecyclerView.LayoutManager mLayoutManager;
     private List<Content> myDataset;
     private static final String TAG = "";
-    private String user_id = "";
+    private String content_user_id = "", user_id, user_nick_name, user_profile;
     private String urlflag = "";
 
     Toolbar toolbar;
@@ -74,17 +76,23 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
         toolbar = (Toolbar) findViewById(R.id.contentListToolbar);
         setSupportActionBar(toolbar);
 
+        //현재 로그인한 user_id 받아오기
+        SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
+        user_id = get_to_eat.getString("user_id","notFound");
+        user_nick_name = get_to_eat.getString("user_nick_name","notFound");
+        user_profile = get_to_eat.getString("user_profile","notFound");
+
         Intent intent = getIntent();
-        user_id = intent.getStringExtra("user_id");
-        if(user_id.equals("")){
-            Log.i("user_id","list_user_id 못받아옴!!!");
-            //현재 로그인한 user_id 받아오기
-            SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
-            user_id = get_to_eat.getString("user_id","notFound");
-            Log.i("user_id", user_id);
+        content_user_id = intent.getStringExtra("user_id");
+        if(content_user_id.equals("")){
+            Log.i("user_id","content_list_user_id 못받아옴!!!");
         }else{
-            Log.i("user_id","list_user_id : "+user_id);
+            Log.i("user_id","content_list_user_id : "+content_user_id);
         }
+        SharedPreferences contentInfo = getSharedPreferences("content_user_id", MODE_PRIVATE);
+        SharedPreferences.Editor editor = contentInfo.edit();
+        editor.putString("content_user_id",content_user_id);
+        editor.commit();
 
         urlflag = intent.getStringExtra("urlflag");
         if(urlflag.equals("")){
@@ -101,7 +109,7 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
 
                 String qry = null;
                 if(urlflag.equals("C")){
-                    qry = Value.contentURL+"/user/";
+                    qry = Value.contentURL+"/user/"+content_user_id+"/";
                 }else if(urlflag.equals("M")){
                     qry = Value.contentURL+"/my/";
                 }else if(urlflag.equals("N")){
@@ -121,9 +129,12 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
             e.printStackTrace();
         }
         //스토리 bitmap 받아오기
-        List<Bitmap> newBitmaps = JsonConnection.getBitmap(myDataset, Value.contentPhotoURL);
+        JsonConnection.setBitmap(myDataset, Value.contentPhotoURL);
         for(int i = 0; i < myDataset.size(); i++){
-            myDataset.get(i).setBitmap(newBitmaps.get(i));
+            if(myDataset.get(i).getUser().getUser_profile_photo() == null){
+                Bitmap profile = BitmapFactory.decodeResource(getResources(),R.drawable.ic_profile_circle);
+                myDataset.get(i).getUser().setBitmap(profile);
+            }
         }
 
         //recycleview사용선언
@@ -144,6 +155,7 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
 
         Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
 
+        //메뉴 navigationView
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         View hView =  navigationView.getHeaderView(0);
         TextView btnContentInsert = (TextView)hView.findViewById(R.id.btnContentInsert);
@@ -152,14 +164,18 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), ContentInsertMain.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); //준기오빠의 낮은 버전을 위해 인텐트할때 넣어주기
                 getApplicationContext().startActivity(intent);
             }
         });
         TextView tvUserName = (TextView)hView.findViewById(R.id.tvUserName);
-        tvUserName.setText(user_id);
-        TextView tvProfileUpdate = (TextView)hView.findViewById(R.id.tvProfileUpdate);
-        tvProfileUpdate.setTypeface(fontAwesomeFont);
+        tvUserName.setText(user_nick_name);
+        CircularImageView userProfile = (CircularImageView)hView.findViewById(R.id.userProfile);
+        if(!user_profile.equals("notFound")){
+            UserBitmapEncoding ub = new UserBitmapEncoding();
+            userProfile.setImageBitmap(ub.StringToBitMap(user_profile));
+        }
+        LinearLayout tvProfileUpdate = (LinearLayout)hView.findViewById(R.id.tvProfileUpdate);
         tvProfileUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

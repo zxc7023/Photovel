@@ -1,10 +1,13 @@
 package com.photovel.setting;
 
+import android.Manifest;
+import android.annotation.TargetApi;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -40,10 +43,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -77,13 +82,19 @@ import com.photovel.content.MultiDrawable;
 import com.photovel.content.MySupportMapFragment;
 import com.photovel.content.PhotoGeoDegree;
 import com.photovel.content.PhotoRealPathUtil;
+import com.photovel.friend.FriendListMain;
 import com.photovel.http.JsonConnection;
+import com.photovel.http.MultipartConnection;
 import com.photovel.http.Value;
+import com.photovel.user.UserBitmapEncoding;
 import com.vo.Comment;
 import com.vo.Content;
 import com.vo.ContentDetail;
+import com.vo.Permission;
 import com.vo.Photo;
+import com.vo.User;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -98,14 +109,20 @@ import java.util.Date;
 import java.util.List;
 
 public class SettingMain extends FontActivity2 implements NavigationView.OnNavigationItemSelectedListener{
-    Toolbar toolbar;
-    private String user_id, user_nick_name, user_password, user_phone, path;
+    private Toolbar toolbar;
+    private final int MY_PERMISSION_REQUEST_STORAGE = 100;
+    private static final String TAG = "AppPermission";
+    private String user_id, user_nick_name, user_password, user_phone, user_profile, path;
     private int user_friend_count;
     private TextView tvpen1, tvpen2, tvpen3, tvUserID, tvUserFriendCount;
     private LinearLayout userProfileUpdate;
     private EditText etUserNickName, etUserPassword, etUserPhone;
     private Button btnSettingUpdate, btnUserFriendGo;
+    private Switch userfriendRecommendflag, userfriendSearchflag, userfeedflag;
+    private boolean userfriendRecommendflagSwitch, userfriendSearchflagSwitch, userfeedflagSwitch;
     private CircularImageView userProfile;
+    private Permission permission;
+    private Bitmap bitmap2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,6 +138,7 @@ public class SettingMain extends FontActivity2 implements NavigationView.OnNavig
         user_nick_name = get_to_eat.getString("user_nick_name","notFound");
         user_password = get_to_eat.getString("user_password","notFound");
         user_phone = get_to_eat.getString("user_phone","notFound");
+        user_profile = get_to_eat.getString("user_profile","notFound");
         user_friend_count = get_to_eat.getInt("user_friend_count",0);
 
         tvpen1 = (TextView)findViewById(R.id.tvpen1);
@@ -136,6 +154,9 @@ public class SettingMain extends FontActivity2 implements NavigationView.OnNavig
         btnUserFriendGo = (Button)findViewById(R.id.btnUserFriendGo);
 
         userProfile = (CircularImageView)findViewById(R.id.userProfile);
+        userfriendRecommendflag = (Switch)findViewById(R.id.userfriendRecommendflag);
+        userfriendSearchflag = (Switch)findViewById(R.id.userfriendSearchflag);
+        userfeedflag = (Switch)findViewById(R.id.userfeedflag);
 
         //imageView를 font로 바꿔주기
         Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
@@ -148,6 +169,72 @@ public class SettingMain extends FontActivity2 implements NavigationView.OnNavig
         etUserPassword.setText(user_password);
         etUserPhone.setText(user_phone);
         tvUserFriendCount.setText(String.valueOf(user_friend_count));
+        if(!user_profile.equals("notFound")){
+            UserBitmapEncoding ub = new UserBitmapEncoding();
+            bitmap2 = ub.StringToBitMap(user_profile);
+        }else{
+            bitmap2 = BitmapFactory.decodeResource(getResources(), R.drawable.ic_profile_circle);
+        }
+        userProfile.setImageBitmap(bitmap2);
+
+        //permission 객체 받아오기
+        Thread permissionList = new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                String responseData = JsonConnection.getConnection(Value.photovelURL+"/common/user/setting/"+user_id, "GET", null);
+                permission = JSON.parseObject(responseData, Permission.class);
+            }
+        };
+        permissionList.start();
+        try {
+            permissionList.join();  //모든처리 thread처리 기다리기
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        //친구추천 허용 스위치
+        if(permission.getFriend_recom_flag()==1){
+            userfriendRecommendflagSwitch = true;
+            userfriendRecommendflag.setChecked(true);
+        }else{
+            userfriendRecommendflagSwitch = false;
+            userfriendRecommendflag.setChecked(false);
+        }
+        userfriendRecommendflag.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                //Log.i("ddd",""+isChecked);  //true,false
+                userfriendRecommendflagSwitch = isChecked;
+            }
+        });
+
+        //친구검색 허용 스위치
+        if(permission.getFriend_search_flag()==1){
+            userfriendSearchflagSwitch = true;
+            userfriendSearchflag.setChecked(true);
+        }else{
+            userfriendSearchflagSwitch = false;
+            userfriendSearchflag.setChecked(false);
+        }
+        userfriendSearchflag.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                userfriendSearchflagSwitch = isChecked;
+            }
+        });
+
+        //피드백알림 허용 스위치
+        if(permission.getFeed_flag()==1){
+            userfeedflagSwitch = true;
+            userfeedflag.setChecked(true);
+        }else{
+            userfeedflagSwitch = false;
+            userfeedflag.setChecked(false);
+        }
+        userfeedflag.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                userfeedflagSwitch = isChecked;
+            }
+        });
 
         //toolbar
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -164,14 +251,18 @@ public class SettingMain extends FontActivity2 implements NavigationView.OnNavig
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), ContentInsertMain.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); //준기오빠의 낮은 버전을 위해 인텐트할때 넣어주기
                 getApplicationContext().startActivity(intent);
             }
         });
         TextView tvUserName = (TextView)hView.findViewById(R.id.tvUserName);
         tvUserName.setText(user_nick_name);
-        TextView tvProfileUpdate = (TextView)hView.findViewById(R.id.tvProfileUpdate);
-        tvProfileUpdate.setTypeface(fontAwesomeFont);
+        CircularImageView userProfile = (CircularImageView)hView.findViewById(R.id.userProfile);
+        if(!user_profile.equals("notFound")){
+            UserBitmapEncoding ub = new UserBitmapEncoding();
+            userProfile.setImageBitmap(ub.StringToBitMap(user_profile));
+        }
+        LinearLayout tvProfileUpdate = (LinearLayout)hView.findViewById(R.id.tvProfileUpdate);
         tvProfileUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -185,10 +276,93 @@ public class SettingMain extends FontActivity2 implements NavigationView.OnNavig
         userProfileUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                checkPermission();
                 Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
                 intent.setType("image/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);
+            }
+        });
+
+        btnSettingUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder alert_confirm = new AlertDialog.Builder(SettingMain.this);
+                alert_confirm.setMessage("정보를 수정하시겠습니까?").setCancelable(false).setPositiveButton("확인",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                final JSONObject userObj = new JSONObject();
+                                final JSONObject perObj = new JSONObject();
+                                try {
+                                    userObj.put("user_id",user_id);
+                                    userObj.put("user_nick_name",etUserNickName.getText().toString());
+                                    userObj.put("user_password",etUserPassword.getText().toString());
+                                    userObj.put("user_phone",etUserPhone.getText().toString());
+                                    Log.i("ddd",userObj.toString());
+
+                                    perObj.put("user_id",user_id);
+                                    if(userfriendRecommendflagSwitch==true) perObj.put("friend_recom_flag",1);
+                                    else perObj.put("friend_recom_flag",0);
+                                    if(userfriendSearchflagSwitch==true) perObj.put("friend_search_flag",1);
+                                    else perObj.put("friend_search_flag",0);
+                                    if(userfeedflagSwitch==true) perObj.put("feed_flag",1);
+                                    else perObj.put("feed_flag",0);
+                                    Log.i("ddd",perObj.toString());
+
+                                    Thread settingUpdate =new Thread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            MultipartConnection.getConnection(Value.photovelURL+"/common/user/setting", userObj, perObj, bitmap2);
+                                        }
+                                    });
+                                    settingUpdate.start();
+                                    try {
+                                        settingUpdate.join();
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
+                                //user정보값 수정해주기
+                                SharedPreferences loginInfo = getSharedPreferences("loginInfo", MODE_PRIVATE);
+                                SharedPreferences.Editor editor = loginInfo.edit();
+                                editor.putString("user_nick_name",etUserNickName.getText().toString());
+                                editor.putString("user_password",etUserPassword.getText().toString());
+                                editor.putString("user_phone",etUserPhone.getText().toString());
+                                UserBitmapEncoding ub = new UserBitmapEncoding();
+                                String user_profile = ub.BitMapToString(bitmap2);
+                                editor.putString("user_profile",user_profile);
+                                editor.commit();
+
+                                Toast.makeText(getApplicationContext(),"정보수정 성공",Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(getApplicationContext(), SettingMain.class);
+                                getApplicationContext().startActivity(intent);
+                                finish();
+                            }
+                        }).setNegativeButton("취소",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                return;
+                            }
+                        });
+                AlertDialog alert = alert_confirm.create();
+                alert.show();
+            }
+        });
+
+        btnUserFriendGo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), FriendListMain.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                getApplicationContext().startActivity(intent);
+                finish();
             }
         });
     }
@@ -208,7 +382,7 @@ public class SettingMain extends FontActivity2 implements NavigationView.OnNavig
                     e.printStackTrace();
                 }
                 int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
-                Bitmap bitmap2 = rotateBitmap(bitmap, orientation);
+                bitmap2 = rotateBitmap(bitmap, orientation);
 
                 userProfile.setImageBitmap(bitmap2);
             }
@@ -219,7 +393,7 @@ public class SettingMain extends FontActivity2 implements NavigationView.OnNavig
     private Bitmap resizeBitmap(String path) {
         InputStream in = null;
         try {
-            final int IMAGE_MAX_SIZE = 200000; //고정됨!!!!수정금지!!!!
+            final int IMAGE_MAX_SIZE = 100000; //고정됨!!!!수정금지!!!!
             in = new FileInputStream(path);
 
             // Decode image size
@@ -309,6 +483,46 @@ public class SettingMain extends FontActivity2 implements NavigationView.OnNavig
         } catch (OutOfMemoryError e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    //권한 설정
+    @TargetApi(Build.VERSION_CODES.M)
+    private void checkPermission() {
+        Log.i(TAG, "CheckPermission : " + checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE));
+        if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED
+                || checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Should we show an explanation?
+            if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                // Explain to the user why we need to write the permission.
+                Toast.makeText(this, "Read/Write external storage", Toast.LENGTH_SHORT).show();
+            }
+
+            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    MY_PERMISSION_REQUEST_STORAGE);
+
+            // MY_PERMISSION_REQUEST_STORAGE is an
+            // app-defined int constant
+
+        } else {
+            Log.e(TAG, "permission deny");
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSION_REQUEST_STORAGE:
+                if (grantResults[0] != PackageManager.PERMISSION_GRANTED
+                        && grantResults[1] != PackageManager.PERMISSION_GRANTED) {
+                    Log.d(TAG, "Permission always deny");
+                    finish();
+
+                }
+                break;
         }
     }
 
