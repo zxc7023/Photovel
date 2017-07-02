@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.alibaba.fastjson.JSON;
 import com.kakao.auth.ApiResponseCallback;
 import com.kakao.auth.ErrorCode;
 import com.kakao.network.ErrorResult;
@@ -15,9 +16,14 @@ import com.kakao.usermgmt.response.model.UserProfile;
 import com.photovel.BackPressCloseHandler;
 import com.photovel.MainActivity;
 import com.photovel.http.JsonConnection;
+import com.photovel.http.Value;
 import com.vo.User;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -32,6 +38,8 @@ public class KakaoSignupActivity extends Activity {
 
     //KakaoSignupActivity 액티비티에서 KakaoUserJoinDetail로 전달해주고 받아올때 필요한 requestCode
     int KakaoSuccessCode = 777;
+
+    String connectionResultValue;
 
 
     HashMap<String,String> properties;
@@ -49,7 +57,7 @@ public class KakaoSignupActivity extends Activity {
         requestMe();
     }
 
-    private void saveUserProfiletoInstanceField(){
+    private void joinUser(){
         UserManagement.requestMe(new MeResponseCallback() {
             @Override
             public void onSessionClosed(ErrorResult errorResult) {
@@ -62,9 +70,56 @@ public class KakaoSignupActivity extends Activity {
             }
 
             @Override
-            public void onSuccess(UserProfile result) {
+            public void onSuccess(final UserProfile result) {
                 userProfile=result;
                 Log.i(TAG+sequence++ +"받아온 User정보",result.toString());
+                final Map<String,String> resultMap = result.getProperties();
+
+
+                /*
+                Vo클래스로 필요할때 주석을 풀고 사용하세요.
+                User userToSendServer = new User();
+                userToSendServer.setUser_id(result.getEmail());
+                userToSendServer.setUser_nick_name(result.getNickname());
+                userToSendServer.setUser_profile_photo(result.getProfileImagePath());
+                Map<String,String> resultMap = result.getProperties();
+                userToSendServer.setUser_gender(resultMap.get("user_gender"));
+                userToSendServer.setUser_phone1(Integer.parseInt(resultMap.get("user_phone1")));
+                userToSendServer.setUser_phone2(resultMap.get("user_phone2"));
+                */
+                Thread loginThrad = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        JSONObject job = new JSONObject();
+                        try {
+                            job.put("user_id",result.getEmail());
+                            job.put("user_nick_name",result.getNickname());
+                            job.put("user_profile_photo",result.getProfileImagePath());
+                            job.put("user_gender",resultMap.get("user_gender"));
+                            job.put("user_phone1",resultMap.get("user_phone1"));
+                            job.put("user_phone2",resultMap.get("user_phone2"));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        Log.i(TAG+sequence++ + "보낼유저 toString값",job.toString());
+                        connectionResultValue=JsonConnection.getConnection(Value.userJoinURL,"POST",job);
+                    }
+                });
+                loginThrad.start();
+                try {
+                    loginThrad.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                Log.i(TAG +sequence++ + "받은 값",connectionResultValue);
+                if("1".equals(connectionResultValue)){
+                    //회원가입 성공한경우
+                    //로그인과 같은절차를 진행해준다. 이미 가입되있는 아이디와 중복해서 진행할 수 있으므로 requestMe()에서 진행
+                    requestMe();
+                }else{
+                    Log.i(TAG+sequence++,"카카오톡회원가입 실패");
+                }
             }
         });
     }
@@ -84,7 +139,8 @@ public class KakaoSignupActivity extends Activity {
 
             @Override
             public void onSuccess(Long result) {
-                saveUserProfiletoInstanceField();
+
+                joinUser();
             }
         },properties);
     }
@@ -153,14 +209,8 @@ public class KakaoSignupActivity extends Activity {
             public void onSuccess(UserProfile userProfile) {  //성공 시 userProfile 형태로 반환
                 Log.i(TAG+""+sequence++,"onSuccess");
                 Log.i("UserProfile : " ,userProfile.toString());
-
-
-                //Intent값 만들어놓기
-               /* sendIntent = new Intent(getApplicationContext(),KakaoUserJoinDetail.class);
-                sendIntent.putExtra("user",sendUser);*/
-
-               Log.i(TAG+""+sequence++,"onSignUpFinish");
-               redirectMainActivity(); // 로그인 성공시 MainActivity로
+                Log.i(TAG+""+sequence++,"onSignUpFinish");
+                redirectMainActivity(); // 로그인 성공시 MainActivity로
             }
         }/*,propertyKeys,false*/);
     }
@@ -208,4 +258,19 @@ public class KakaoSignupActivity extends Activity {
         //redirectLoginActivity();
     }
 
+}
+class LoginModuel {
+
+    User user;
+
+    public LoginModuel(User user){
+        this.user=user;
+    }
+
+    public String Login(){
+        String loginSucessValue="0";
+        JsonConnection.getConnection(Value.userLoginURL,"POST",null);
+
+        return loginSucessValue;
+    }
 }
