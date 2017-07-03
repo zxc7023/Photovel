@@ -2,8 +2,10 @@ package com.photovel.user;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -64,6 +66,7 @@ public class KakaoSignupActivity extends Activity {
     UserProfile userProfile;
 
     ProgressDialog progressDialog;
+    Context mContext;
     /**
      * Main으로 넘길지 가입 페이지를 그릴지 판단하기 위해 me를 호출한다.
      *
@@ -73,6 +76,8 @@ public class KakaoSignupActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_kakao_signup);
+        mContext=this;
+        /*
         progressDialog = new ProgressDialog(this);
         new Thread(new Runnable() {
             @Override
@@ -88,6 +93,30 @@ public class KakaoSignupActivity extends Activity {
             }
         }).start();
         requestMe();
+        */
+        progressDialog= new ProgressDialog(this);
+        // show the dialog
+        progressDialog.setTitle("Loading");
+        progressDialog.setMessage("Wait while loading...");
+        SampleTask task = new SampleTask();
+        task.execute();
+    }
+
+    @Override
+    protected void onStop() {
+        /*
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if(progressDialog.isShowing()){
+                    Log.i(TAG+sequence++,"스피닝중");
+                    progressDialog.cancel();
+                }
+            }
+        });
+        */
+        super.onStop();
+
     }
 
     private void joinUser() {
@@ -402,6 +431,24 @@ public class KakaoSignupActivity extends Activity {
 
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+    private class SampleTask extends AsyncTask<Void, Integer, String> {
+
+
+
+        protected String doInBackground(Void... urls) {
+
+            requestMe();
+            return null;
+        }
+
+        protected void onPreExecute(){
+            progressDialog.show();
+        }
+
+        protected void onPostExecute(String result) {
+            progressDialog.hide();
+        }
     }
 
 }

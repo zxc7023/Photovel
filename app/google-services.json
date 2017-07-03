@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "447087643343",
+    "firebase_url": "https://photovel-1496825280188.firebaseio.com",
+    "project_id": "photovel-1496825280188",
+    "storage_bucket": "photovel-1496825280188.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:447087643343:android:f439a6cbaf94e20e",
+        "android_client_info": {
+          "package_name": "com.photovel"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "447087643343-ooir9ciccimkuesi9a2jlminjf48qjm6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.photovel",
+            "certificate_hash": "67b0444537b6362114da73284384479654773430"
+          }
+        },
+        {
+          "client_id": "447087643343-vsqrm0r452tom24dnifkn1ift0f6i5e2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDLjFL0BV8BZdLGrmmmyeaLGFaZnJg3Hi8"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "447087643343-vsqrm0r452tom24dnifkn1ift0f6i5e2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
