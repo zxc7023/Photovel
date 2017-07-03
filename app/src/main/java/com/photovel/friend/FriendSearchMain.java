@@ -2,28 +2,28 @@ package com.photovel.friend;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
+import android.database.MatrixCursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,40 +33,35 @@ import com.photovel.FontActivity2;
 import com.photovel.MainActivity;
 import com.photovel.NavigationItemSelected;
 import com.photovel.R;
-import com.photovel.common.BookMarkAdapter;
-import com.photovel.common.GridSpacingItemDecoration;
 import com.photovel.content.ContentInsertMain;
 import com.photovel.http.JsonConnection;
 import com.photovel.http.Value;
+import com.photovel.search.SearchListAdapter;
+import com.photovel.search.SearchView;
 import com.photovel.setting.SettingMain;
 import com.photovel.user.UserBitmapEncoding;
-import com.vo.Content;
 import com.vo.User;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class FriendListMain extends FontActivity2 implements NavigationView.OnNavigationItemSelectedListener {
+public class FriendSearchMain extends FontActivity2 implements NavigationView.OnNavigationItemSelectedListener {
     private static final String TAG = "Image";
     Toolbar toolbar;
     private String user_id, user_nick_name, user_profile;
 
-    private RecyclerView recyclerNewView, recyclerView;
+    private RecyclerView recyclerNewView;
     private FriendNewListAdapter mFriendNewListAdapter;
-    private FriendListAdapter mFriendListAdapter;
     private RecyclerView.LayoutManager mNewLayoutManager;
-    private List<User> myFriendDataset, myNewFriendDataset;
-    private TextView tvRequestListNone, tvFriendListNone, tvicDown, tvicDown2;
-    private LinearLayout llRequestList, llFriendList;
+    private List<User> myNewFriendDataset;
 
     private Boolean isFabOpen = false;
-    private FloatingActionButton fab_more, fab_search_id, fab_search_phone;
+    private FloatingActionButton fab_more, fab_friend_list, fab_search;
     private Animation fab_open, fab_close, rotate_forward, rotate_backward;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_friend_list_main);
+        setContentView(R.layout.activity_friend_search_main);
 
         //로그인중인 user_id받아오기
         SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
@@ -76,19 +71,19 @@ public class FriendListMain extends FontActivity2 implements NavigationView.OnNa
 
         //FloatingActionButton정의 및 기능
         fab_more = (FloatingActionButton) findViewById(R.id.fab_more);
-        fab_search_id = (FloatingActionButton) findViewById(R.id.fab_search_id);
-        fab_search_phone = (FloatingActionButton) findViewById(R.id.fab_search_phone);
+        fab_friend_list = (FloatingActionButton) findViewById(R.id.fab_friend_list);
+        fab_search = (FloatingActionButton) findViewById(R.id.fab_search);
         fab_open = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_open);
         fab_close = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_close);
         rotate_forward = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate_forward);
         rotate_backward = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate_backward);
-        fab_search_phone.setOnClickListener(new View.OnClickListener() {
+        fab_friend_list.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Toast.makeText(getBaseContext(), "아직 개발중입니다.", Toast.LENGTH_LONG).show();
             }
         });
-        fab_search_id.setOnClickListener(new View.OnClickListener() {
+        fab_search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Toast.makeText(getBaseContext(), "아직 개발중입니다.", Toast.LENGTH_LONG).show();
@@ -102,26 +97,15 @@ public class FriendListMain extends FontActivity2 implements NavigationView.OnNa
                     case R.id.fab_more:
                         animateFAB();
                         break;
-                    case R.id.fab_search_id:
+                    case R.id.fab_friend_list:
                         break;
-                    case R.id.fab_search_phone:
+                    case R.id.fab_search:
                         break;
                 }
             }
         });
 
-        tvRequestListNone = (TextView)findViewById(R.id.tvRequestListNone);
-        tvFriendListNone = (TextView)findViewById(R.id.tvFriendListNone);
-        tvicDown = (TextView)findViewById(R.id.tvicDown);
-        tvicDown2 = (TextView)findViewById(R.id.tvicDown2);
-        llRequestList = (LinearLayout) findViewById(R.id.llRequestList);
-        llFriendList = (LinearLayout) findViewById(R.id.llFriendList);
-
-        final Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
-        tvicDown.setTypeface(fontAwesomeFont);
-        tvicDown2.setTypeface(fontAwesomeFont);
-
-        //친구 신청 목록
+        //친구 신청 목록///////////////////////////////////
         Thread detailList = new Thread(){
             @Override
             public void run() {
@@ -136,90 +120,22 @@ public class FriendListMain extends FontActivity2 implements NavigationView.OnNa
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        if(myNewFriendDataset.size() != 0){
-            //content의 bitmap 받아오기
-            JsonConnection.setBitmap(myNewFriendDataset, Value.contentPhotoURL);
-            for(int i = 0; i < myNewFriendDataset.size(); i++){
-                if(myNewFriendDataset.get(i).getUser_profile_photo() == null){
-                    Bitmap profile = BitmapFactory.decodeResource(getResources(),R.drawable.ic_profile_circle);
-                    myNewFriendDataset.get(i).setBitmap(profile);
-                }
+        //content의 bitmap 받아오기
+        JsonConnection.setBitmap(myNewFriendDataset, Value.contentPhotoURL);
+        for(int i = 0; i < myNewFriendDataset.size(); i++){
+            if(myNewFriendDataset.get(i).getUser_profile_photo() == null){
+                Bitmap profile = BitmapFactory.decodeResource(getResources(),R.drawable.ic_profile_circle);
+                myNewFriendDataset.get(i).setBitmap(profile);
             }
-            recyclerNewView = (RecyclerView) findViewById(R.id.recycler_new_view);
-            recyclerNewView.setHasFixedSize(true);
-            recyclerNewView.setNestedScrollingEnabled(false);
-            mNewLayoutManager = new LinearLayoutManager(this);
-            recyclerNewView.setLayoutManager(mNewLayoutManager);
-            mFriendNewListAdapter = new FriendNewListAdapter(myNewFriendDataset, FriendListMain.this);
-            recyclerNewView.setAdapter(mFriendNewListAdapter);
-        }else{
-            recyclerNewView = (RecyclerView) findViewById(R.id.recycler_new_view);
-            recyclerNewView.setVisibility(View.GONE);
-            tvRequestListNone.setVisibility(View.VISIBLE);
         }
 
-        //친구 목록
-        Thread detailList2 = new Thread(){
-            @Override
-            public void run() {
-                super.run();
-                String responseData = JsonConnection.getConnection(Value.photovelURL+"/friend/"+user_id, "GET", null);
-                myFriendDataset = JSON.parseArray(responseData, User.class);
-            }
-        };
-        detailList2.start();
-        try {
-            detailList2.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        if(myFriendDataset.size() != 0) {
-            //content의 bitmap 받아오기
-            JsonConnection.setBitmap(myFriendDataset, Value.contentPhotoURL);
-            for (int i = 0; i < myFriendDataset.size(); i++) {
-                if (myFriendDataset.get(i).getUser_profile_photo() == null) {
-                    Bitmap profile = BitmapFactory.decodeResource(getResources(), R.drawable.ic_profile_circle);
-                    myFriendDataset.get(i).setBitmap(profile);
-                }
-            }
-            recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-            recyclerView.setHasFixedSize(true);
-            recyclerView.setNestedScrollingEnabled(false);
-            mNewLayoutManager = new LinearLayoutManager(this);
-            recyclerView.setLayoutManager(mNewLayoutManager);
-            mFriendListAdapter = new FriendListAdapter(myFriendDataset, FriendListMain.this);
-            recyclerView.setAdapter(mFriendListAdapter);
-        }else{
-            recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-            recyclerView.setVisibility(View.GONE);
-            tvFriendListNone.setVisibility(View.VISIBLE);
-        }
-
-        tvicDown.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(llRequestList.getVisibility() == View.VISIBLE){
-                    tvicDown.setText(R.string.fa_caret_up);
-                    llRequestList.setVisibility(View.GONE);
-                }else{
-                    tvicDown.setText(R.string.fa_caret_down);
-                    llRequestList.setVisibility(View.VISIBLE);
-                }
-            }
-        });
-
-        tvicDown2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(llFriendList.getVisibility() == View.VISIBLE){
-                    tvicDown2.setText(R.string.fa_caret_up);
-                    llFriendList.setVisibility(View.GONE);
-                }else{
-                    tvicDown2.setText(R.string.fa_caret_down);
-                    llFriendList.setVisibility(View.VISIBLE);
-                }
-            }
-        });
+        recyclerNewView = (RecyclerView) findViewById(R.id.recycler_new_view);
+        recyclerNewView.setHasFixedSize(true);
+        recyclerNewView.setNestedScrollingEnabled(false);
+        mNewLayoutManager = new LinearLayoutManager(this);
+        recyclerNewView.setLayoutManager(mNewLayoutManager);
+        mFriendNewListAdapter = new FriendNewListAdapter(myNewFriendDataset, FriendSearchMain.this);
+        recyclerNewView.setAdapter(mFriendNewListAdapter);
 
         // Adding Toolbar to the activity
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -232,6 +148,8 @@ public class FriendListMain extends FontActivity2 implements NavigationView.OnNa
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
+        final Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
+
         //메뉴 navigationView
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         View hView =  navigationView.getHeaderView(0);
@@ -241,7 +159,7 @@ public class FriendListMain extends FontActivity2 implements NavigationView.OnNa
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), ContentInsertMain.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); //준기오빠의 낮은 버전을 위해 인텐트할때 넣어주기
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 getApplicationContext().startActivity(intent);
             }
         });
@@ -268,17 +186,17 @@ public class FriendListMain extends FontActivity2 implements NavigationView.OnNa
     public void animateFAB() {
         if (isFabOpen) {
             fab_more.startAnimation(rotate_backward);
-            fab_search_id.startAnimation(fab_close);
-            fab_search_phone.startAnimation(fab_close);
-            fab_search_id.setClickable(false);
-            fab_search_phone.setClickable(false);
+            fab_friend_list.startAnimation(fab_close);
+            fab_search.startAnimation(fab_close);
+            fab_friend_list.setClickable(false);
+            fab_search.setClickable(false);
             isFabOpen = false;
         } else {
             fab_more.startAnimation(rotate_forward);
-            fab_search_id.startAnimation(fab_open);
-            fab_search_phone.startAnimation(fab_open);
-            fab_search_id.setClickable(true);
-            fab_search_phone.setClickable(true);
+            fab_friend_list.startAnimation(fab_open);
+            fab_search.startAnimation(fab_open);
+            fab_friend_list.setClickable(true);
+            fab_search.setClickable(true);
             isFabOpen = true;
         }
     }

@@ -50,32 +50,60 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/most_left_tv_margin"
+                    android:layout_marginRight="@dimen/most_rignt_tv_margin"
                     android:layout_marginTop="@dimen/most_rignt_tv_margin"
                     android:orientation="vertical">
-                    <TextView
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:textColor="@color/textBlack"
-                        android:textStyle="bold"
-                        android:textSize="@dimen/content_text_size"
-                        android:text="친구 요청 목록"
-                        android:includeFontPadding="false"
-                        android:gravity="center_vertical"/>
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:textColor="@color/textBlack"
+                            android:textStyle="bold"
+                            android:textSize="@dimen/content_text_size"
+                            android:text="친구 요청 목록"
+                            android:includeFontPadding="false"
+                            android:gravity="center_vertical"/>
+                        <TextView
+                            android:id="@+id/tvicDown"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/fa_caret_down"
+                            android:textSize="@dimen/icon_size"
+                            android:gravity="right"/>
+                    </LinearLayout>
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_alignParentEnd="true"
                         android:layout_centerInParent="true"
                         android:layout_marginBottom="10dp"
-                        android:layout_marginRight="@dimen/most_rignt_tv_margin"
                         android:layout_marginTop="5dp"
                         android:background="@color/bgGrey2" />
                 </LinearLayout>
-                <android.support.v7.widget.RecyclerView
-                    xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:id="@+id/recycler_new_view"
+                <LinearLayout
+                    android:id="@+id/llRequestList"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/tvRequestListNone"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="친구 요청 목록이 없습니다."
+                        android:textSize="@dimen/content_text_size"
+                        android:textColor="@color/bgGrey2"
+                        android:gravity="center"
+                        android:layout_marginLeft="@dimen/most_left_tv_margin"
+                        android:visibility="gone"/>
+                    <android.support.v7.widget.RecyclerView
+                        xmlns:android="http://schemas.android.com/apk/res/android"
+                        android:id="@+id/recycler_new_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"/>
+                </LinearLayout>
             </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
@@ -85,32 +113,60 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/most_left_tv_margin"
+                    android:layout_marginRight="@dimen/most_rignt_tv_margin"
                     android:layout_marginTop="@dimen/most_rignt_tv_margin"
                     android:orientation="vertical">
-                    <TextView
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:textColor="@color/textBlack"
-                        android:textStyle="bold"
-                        android:textSize="@dimen/content_text_size"
-                        android:text="친구 목록"
-                        android:includeFontPadding="false"
-                        android:gravity="center_vertical"/>
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:textColor="@color/textBlack"
+                            android:textStyle="bold"
+                            android:textSize="@dimen/content_text_size"
+                            android:text="친구 목록"
+                            android:includeFontPadding="false"
+                            android:gravity="center_vertical"/>
+                        <TextView
+                            android:id="@+id/tvicDown2"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/fa_caret_down"
+                            android:textSize="@dimen/icon_size"
+                            android:gravity="right"/>
+                    </LinearLayout>
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_alignParentEnd="true"
                         android:layout_centerInParent="true"
                         android:layout_marginBottom="10dp"
-                        android:layout_marginRight="@dimen/most_rignt_tv_margin"
                         android:layout_marginTop="5dp"
                         android:background="@color/bgGrey2" />
                 </LinearLayout>
-                <android.support.v7.widget.RecyclerView
-                    xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:id="@+id/recycler_view"
+                <LinearLayout
+                    android:id="@+id/llFriendList"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/tvFriendListNone"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="친구 목록이 없습니다."
+                        android:textSize="@dimen/content_text_size"
+                        android:textColor="@color/bgGrey2"
+                        android:gravity="center"
+                        android:layout_marginLeft="@dimen/most_left_tv_margin"
+                        android:visibility="gone"/>
+                    <android.support.v7.widget.RecyclerView
+                        xmlns:android="http://schemas.android.com/apk/res/android"
+                        android:id="@+id/recycler_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"/>
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>

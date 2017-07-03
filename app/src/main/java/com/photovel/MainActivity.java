@@ -117,7 +117,6 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         //메인이미지 bitmap 받아오기
         JsonConnection.setBitmap(images, Value.mainImagePhotoURL);
 
-
         carouselView.setPageCount(images.size());
         carouselView.setImageListener(imageListener);
 

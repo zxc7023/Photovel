@@ -8,7 +8,7 @@
     <string name="fa_flag">&#xf024;</string>
     <string name="fa_video_camera">&#xf03d;</string>
     <string name="fa_calendar">&#xf073;</string>
-    <string name="fa_thumbs_o_up">&#xf087;</string>
+    <string name="fa_thumbs_o_up">&#xf164;</string>
     <string name="fa_user">&#xf007;</string>
     <string name="fa_comments">&#xf086;</string>
     <string name="fa_share">&#xf064;</string>
@@ -28,5 +28,9 @@
     <string name="fa_facebook_official">&#xf230;</string>
     <string name="fa_commenting">&#xf27a;</string>
     <string name="fa_user_plus">&#xf234;</string>
+    <string name="fa_list_ul">&#xf0ca;</string>
+    <string name="fa_search">&#xf002;</string>
+    <string name="fa_caret_down">&#xf0d7;</string>
+    <string name="fa_caret_up">&#xf0d8;</string>
 
 </resources>

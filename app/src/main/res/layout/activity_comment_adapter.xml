@@ -57,7 +57,6 @@
                 android:layout_height="match_parent"
                 android:text="댓글내용"
                 android:textSize="@dimen/content_text_size"/>
-
         </LinearLayout>
         <LinearLayout
             android:id="@+id/llupdate"
