@@ -135,7 +135,7 @@ public class ContentSlideShow extends AppCompatActivity {
         slideSeekBar = (SeekBar) findViewById(R.id.slide_seek_bar);
 
         //현재 페이지 표시할 TextView
-        tvCurrPage = (TextView)findViewById(R.id.tv_curr_page);
+        tvCurrPage = (TextView)findViewById(R.id.tv_curr_time);
 
         MAX_PAGES = images.size();
         Log.i(TAG, "MAX_PAGES= " + images.size());

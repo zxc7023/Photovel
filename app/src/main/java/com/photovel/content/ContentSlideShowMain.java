@@ -7,7 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.os.Handler;
+import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -56,8 +56,6 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class ContentSlideShowMain extends FontActivity2 implements NavigationView.OnNavigationItemSelectedListener {
     private SearchView searchView;
@@ -66,26 +64,27 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
 
 ////////////////슬라이드쇼용 필드//////////////////
     private ViewPager vpSlideShow;
-    private Context mContext;
+    private Context mContext = ContentSlideShowMain.this;
     private ArrayList<Bitmap> images = new ArrayList<>();
     private static Bitmap[] imgArray;
     private SeekBar slideSeekBar;
     private ContentSlideShowAdapter contentSlideShowAdapter;
     private ContentSlideShowViewPager contentSlideShowViewPager;
+    private TextView tvCurrTime;
+    private CountDownTimer countDownTimer;
 
 
     //이미지 어댑터
     private static final String KEY_SELECTED_PAGE = "KEY_SELECTED_PAGE";
     private int MAX_PAGES = 0;
+    private int MAX_TIME = 0;
     long DELAY_MILLI;//delay in milliseconds before task is to be executed
     long TRANS_MILLI; // time in milliseconds between successive task executions.
     private int maxOffset;
     private int currOffset;
     int imageViewWidth;
     int currPage = 0;
-    int mToS;
-
-    Timer timer;
+    boolean isTracked = false;
 
 
 /////////////////////////////////////////////////
@@ -263,10 +262,18 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         Log.i(TAG, "imgArray의 크기= " + imgArray.length);
         //뷰 페이저 객체 생성
         vpSlideShow = (ViewPager) this.findViewById(R.id.VP_slide_show);
+        //슬라이드 시크바 객체 생성
+        slideSeekBar = (SeekBar) findViewById(R.id.slide_seek_bar);
+        //시간 보여줄 텍스트 뷰
+        tvCurrTime = (TextView) findViewById(R.id.tv_curr_time);
 
+        //이미지 간 이동 속도 조절 위한 객체 생성
         contentSlideShowViewPager = new ContentSlideShowViewPager(this);
         //어댑터에 이미지 배열 전달
         contentSlideShowAdapter = new ContentSlideShowAdapter(this, imgArray);
+        vpSlideShow.setAdapter(contentSlideShowAdapter);
+
+
 
         //슬라이드 쇼 실행 메소드
         init();
@@ -274,81 +281,66 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
 
     }
 
-//////슬라이드쇼 실행 부분
 
+///////////////슬라이드쇼 실행 부분/////////////////
     private void init(){
-        DELAY_MILLI = 500;//delay in milliseconds before task is to be executed
         TRANS_MILLI = 3000;
         //이미지 간 이동 속도 조절
         contentSlideShowViewPager.setScrollDuration((int)TRANS_MILLI);
 
+        //슬라이드 쇼 전체 이미지 수
+        MAX_PAGES = images.size();
+        //슬라이드 쇼 전체 시간
+        MAX_TIME = (int) TRANS_MILLI * MAX_PAGES;
+        //(다음 이미지 띄울 때까지의 시간 * 이미지 개수).
+        slideSeekBar.setMax(MAX_TIME);
 
 
-        vpSlideShow.setAdapter(contentSlideShowAdapter);
+        //슬라이드 이미지 이동 애니메이션 설정
         vpSlideShow.setPageTransformer(true, new StackTransformer());
 
 
-        final Handler handler = new Handler();
-        final Runnable Update = new Runnable() {
-            public void run() {
-                if (currPage == MAX_PAGES-1) {
-                    currPage = 0;
-                }
-                vpSlideShow.setCurrentItem(currPage++, true);
+        countDownTimer = new CountDownTimer(MAX_TIME, 1) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                Log.i(TAG, "millisUntilFinished= " + millisUntilFinished);
+                //시크바에 시간 진행 표시 -> onSeekBarChangeListener에서 감지
+
+                slideSeekBar.setProgress((int)(MAX_TIME - millisUntilFinished));
+            }
+
+            @Override
+            public void onFinish() {
+                //카운트 다운 타이머 정지
+                countDownTimer.cancel();
+                //마지막 도달 표시
+                slideSeekBar.setProgress(MAX_TIME);
+                //도달시 확인 메시지
+                AlertDialog.Builder restartConfirm = new AlertDialog.Builder(mContext);
+                restartConfirm.setMessage("다시 시작하시겠습니까?").setCancelable(false).setPositiveButton("확인",
+                        //확인 버튼 눌렀을 때
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                currPage = 0;
+                                countDownTimer.start();
+                            }
+                        }).setNegativeButton("취소",
+                        //취소 버튼 눌렀을 때
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                int finishItem = images.size()  - 1;
+                                int finishTime =(int) (TRANS_MILLI * images.size());
+                                vpSlideShow.setCurrentItem(finishItem);
+                                slideSeekBar.setProgress(finishTime);
+                            }
+                        });
+                AlertDialog restartAlert = restartConfirm.create();
+                restartAlert.show();
             }
         };
-
-        timer = new Timer(); // This will create a new Thread
-        timer.schedule(new TimerTask() { // task to be scheduled
-
-            @Override
-            public void run() {
-                handler.post(Update);
-            }
-        }, TRANS_MILLI, TRANS_MILLI);
-
-        vpSlideShow.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                Log.i(TAG, "onPageScrolled의 position= " + position);
-                Log.i(TAG, "onPageScrolled의 positionOffset= " + positionOffset);
-                Log.i(TAG, "onPageScrolled의 positionOffsetPixels= " + positionOffsetPixels);
-
-
-                /*if(vpSlideShow.isFakeDragging()){
-                    //seekbar 클릭시 뷰페이저의 전체 너비 가져온다
-                    //마치 여러 사진이 붙어서 드래그로 이동할 수 있는 것처럼 보여주기 위한 설정
-                    int offset = (int) (maxOffset/100.0) * progress;
-                    int dragBy = -1 * (offset - currOffset);
-                    //fakeDragBy를 사용하려면 먼저 반드시 beginFakeDrag 사용해야 함
-                    vpSlideShow.fakeDragBy(dragBy);
-                    currOffset = offset;
-                }*/
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                //vpSlideShow.beginFakeDrag();
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-                Log.i(TAG, "onPageScrollStateChanged의 state= " + state);
-                //vpSlideShow.endFakeDrag();
-            }
-        });
-
-
-
-
-
-////////seekbar/////
-        slideSeekBar = (SeekBar) findViewById(R.id.slide_seek_bar);
-
-        //(다음 이미지 띄울 때까지의 시간 * (이미지 개수 - 1))
-        slideSeekBar.setMax((int) TRANS_MILLI * images.size());
-        Log.i(TAG, "seekbar의 max= " + slideSeekBar.getMax());
-
+        countDownTimer.start();
 
         slideSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -361,29 +353,84 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
                     //fakeDragBy를 사용하려면 먼저 반드시 beginFakeDrag 사용해야 함
                     vpSlideShow.fakeDragBy(dragBy);
                     currOffset = offset;*/
-                    Log.i(TAG, "onProgressChanged의 progress= " + progress);
-                    mToS = (int) (progress / TRANS_MILLI);
-                    if(mToS < (progress / 1000)){
-                        Log.i(TAG, "onProgressChanged의 mToS= " + mToS);
-                        vpSlideShow.setCurrentItem(mToS);
-                    }
-                }
-            }
 
+                }
+                Log.i(TAG, "onProgressChanged의 progress확인= " + progress);
+                Log.i(TAG, "milliSecondsToTimer(progress)= " + milliSecondsToTimer(progress));
+                //progress 변화에 따라 시간 표시
+                if(progress == 0){
+                    tvCurrTime.setText(milliSecondsToTimer(0));
+                } else {
+                    tvCurrTime.setText(milliSecondsToTimer(progress));
+                }
+                //현재 페이지
+                currPage = (int) (progress / TRANS_MILLI);
+                Log.i(TAG, "onProgressChanged의 currPage= " + currPage);
+                vpSlideShow.setCurrentItem(currPage);
+         }
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                //seekbar 드래그 시작할 때 이미지들이 묶일 전체 가로 너비를 설정
+                //onStopTrackingTouch에서 새로운 카운트다운 타이머 시작 위해 기존 카운트다운 타이머 끄기
+                countDownTimer.cancel();
+
                 vpSlideShow.beginFakeDrag();
             }
 
+            //터치시 시크바의 progress가 변하는 것은 onProgressChanged에서 보여주고
+            //onStopTrackingTouch는 손가락을 놓는 시점의 상태 정보만 알려준다
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                vpSlideShow.endFakeDrag();
+            public void onStopTrackingTouch(final SeekBar seekBar) {
+                //시크바의 현재 위치
+                final int current_position = seekBar.getProgress();
+                Log.i(TAG, "onStopTrackingTouch의 current_position= " + current_position);
+                //전체 범위에서 현재 위치만큼 빼서 전체 이동할 범위를 줄여준다
+                countDownTimer = new CountDownTimer(MAX_TIME - current_position, 1) {
+
+                    @Override
+                    public void onTick(long millisUntilFinished) {
+                        Log.i(TAG, "millisUntilFinished= " + millisUntilFinished);
+                        //시크바에 시간 진행 표시 -> onSeekBarChangeListener에서 감지
+                        //전체 범위에서 줄어든 범위만큼 빼게 되므로 결국 증가한 만큼 보여준다.
+                        slideSeekBar.setProgress((int)(MAX_TIME - millisUntilFinished));
+                    }
+
+                    @Override
+                    public void onFinish() {
+                        //마지막 도달 표시
+                        slideSeekBar.setProgress(MAX_TIME);
+                        //도달시 확인 메시지
+                        AlertDialog.Builder restartConfirm = new AlertDialog.Builder(mContext);
+                        restartConfirm.setMessage("다시 시작하시겠습니까?").setCancelable(false).setPositiveButton("확인",
+                                //확인 버튼 눌렀을 때
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        //처음 페이지로 이동시키고
+                                        currPage = 0;
+                                        //카운트다운 타이머 시작시키기
+                                        countDownTimer.start();
+                                    }
+                                }).setNegativeButton("취소",
+                                //취소 버튼 눌렀을 때
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        //취소를 눌렀을 때 마지막 인덱스와 시간으로 보여주기 위한 값
+                                        int finishItem = images.size()  - 1;
+                                        int finishTime =(int) (TRANS_MILLI * images.size());
+                                        vpSlideShow.setCurrentItem(finishItem);
+                                        slideSeekBar.setProgress(finishTime);
+                                    }
+                                });
+                        AlertDialog restartAlert = restartConfirm.create();
+                        restartAlert.show();
+                    }
+                }.start();
             }
         });
     }
 
-    //텍스트뷰에 시간 표시하기 위한 메소드. milliseconds를 시간으로
+    //텍스트뷰에 시간 표시하기 위한 메소드. milliseconds를 시간 형태로 보여준다.
     public String milliSecondsToTimer(long milliseconds){
         String finalTimerString = "";
         String secondsString = "";

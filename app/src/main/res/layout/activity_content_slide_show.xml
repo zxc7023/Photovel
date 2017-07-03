@@ -33,16 +33,16 @@
         <com.photovel.content.ContentSlideShowViewPager
             android:id="@+id/VP_slide_show"
             android:layout_width="match_parent"
-            android:layout_height="300dp"
-            />
+            android:layout_height="300dp" />
 
         <SeekBar
             android:id="@+id/slide_seek_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/VP_slide_show"/>
+
         <TextView
-            android:id="@+id/tv_curr_page"
+            android:id="@+id/tv_curr_time"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/slide_seek_bar"
