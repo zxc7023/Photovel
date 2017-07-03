@@ -60,6 +60,7 @@
         <activity android:name=".user.KakaoSignupActivity"/>
         <activity android:name=".user.KakaoUserJoinDetail"/>
         <activity android:name=".MainActivity" android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".IntroMain" android:theme="@style/AppTheme.NoActionBar"/>
 
     </application>
 

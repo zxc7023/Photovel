@@ -242,22 +242,15 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
                 //자료 필터
                 matrixCursor = new MatrixCursor(new String[]{BaseColumns._ID,
                         "content_id",
-                        "content_bitmap",
                         "user_nick_name",
                         "user_bitmap",
-                        "content_subject",
-                        "good_status",
-                        "good_count",
-                        "bookmark_status",
-                        "comment_count",
-                        "content_share_count"
+                        "content_subject"
                 });
                 Log.i(TAG, "onQueryTextChange의 searchSuggestionsList.size()= " + size);
 
                 for(int i=0; i<size; i++) {
 
                     UserBitmapEncoding ub = new UserBitmapEncoding();
-                    String content_bitmap = ub.BitMapToString(myNewDataset.get(i).getBitmap());
                     String user_bitmap = ub.BitMapToString(myNewDataset.get(i).getUser().getBitmap());
 
                     if ("".equals(newText)) {
@@ -269,15 +262,9 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
                         Log.i(TAG, "onQueryTextChange 들어온 getContent_subject()= " + myNewDataset.get(i).getContent_subject().toLowerCase());
                         matrixCursor.addRow(new Object[]{i,
                                 myNewDataset.get(i).getContent_id(),
-                                content_bitmap,
                                 myNewDataset.get(i).getUser().getUser_nick_name(),
                                 user_bitmap,
-                                myNewDataset.get(i).getContent_subject(),
-                                myNewDataset.get(i).getGood_status(),
-                                myNewDataset.get(i).getGood_count(),
-                                myNewDataset.get(i).getBookmark_status(),
-                                myNewDataset.get(i).getComment_count(),
-                                myNewDataset.get(i).getContent_share_count()
+                                myNewDataset.get(i).getContent_subject()
                         });
                     }else{
                         Log.i(TAG, "onQueryTextChange 못들어옴엉엉 " + myNewDataset);

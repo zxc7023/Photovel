@@ -115,12 +115,19 @@ public class JsonConnection {
                         }
                         //글쓴이 profile 가져오기
                         for (int i = 0; i < imgs.size(); i++) {
-                            if(((Content)imgs.get(i)).getUser().getUser_profile_photo() != null) {
-                                Bitmap bitmap = BitmapFactory.decodeStream((InputStream)
-                                        new URL(url + "/profile/"+((Content)imgs.get(i)).getUser().getUser_profile_photo()).getContent());
-                                ((Content)imgs.get(i)).getUser().setBitmap(bitmap);
-                                Log.i(TAG, "4. getBitmap (profile)bitmap= " + bitmap);
+                            Bitmap bitmap = null;
+                            if(((Content)imgs.get(i)).getUser().getUser_profile_photo() != null){
+                                if("O".equals(((Content)imgs.get(i)).getUser().getUser_sns_status())) {
+                                    bitmap = BitmapFactory.decodeStream((InputStream)
+                                            new URL(url + "/profile/"+((Content)imgs.get(i)).getUser().getUser_profile_photo()).getContent());
+                                }else{
+                                    bitmap = BitmapFactory.decodeStream((InputStream)
+                                            new URL(((Content)imgs.get(i)).getUser().getUser_profile_photo()).getContent());
+                                }
                             }
+                            ((Content)imgs.get(i)).getUser().setBitmap(bitmap);
+                            Log.i(TAG, "4. getBitmap (profile)bitmap= " + bitmap);
+
                         }
 
                         //ContentDetail 타입일 때
@@ -144,13 +151,16 @@ public class JsonConnection {
                     } else if (imgs.get(0) instanceof User) {
                         for (int i = 0; i < imgs.size(); i++) {
                             Bitmap bitmap = null;
-                            if(((User)imgs.get(i)).getUser_profile_photo().contains("http")){
-                                bitmap = BitmapFactory.decodeStream((InputStream)
-                                        new URL(((User)imgs.get(i)).getUser_profile_photo()).getContent());
-                            }else{
-                                bitmap = BitmapFactory.decodeStream((InputStream)
-                                        new URL(url + "/profile/"+((User)imgs.get(i)).getUser_profile_photo()).getContent());
+                            if(((User)imgs.get(i)).getUser_profile_photo() != null){
+                                if("O".equals(((User)imgs.get(i)).getUser_sns_status())){
+                                    bitmap = BitmapFactory.decodeStream((InputStream)
+                                            new URL(url + "/profile/"+((User)imgs.get(i)).getUser_profile_photo()).getContent());
+                                }else{
+                                    bitmap = BitmapFactory.decodeStream((InputStream)
+                                            new URL(((User)imgs.get(i)).getUser_profile_photo()).getContent());
+                                }
                             }
+
                             ((User)imgs.get(i)).setBitmap(bitmap);
                             Log.i(TAG, "4. getBitmap (User)bitmap= " + bitmap);
                         }

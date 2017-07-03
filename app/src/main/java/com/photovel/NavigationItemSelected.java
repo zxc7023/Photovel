@@ -82,9 +82,9 @@ public class NavigationItemSelected extends FontActivity{
             context.startActivity(intent);
             finish();
         }else if(id==R.id.nav_qna){
-
+            Toast.makeText(context,"아직 개발중입니닷",Toast.LENGTH_SHORT).show();
         }else if(id==R.id.nav_howto){
-
+            Toast.makeText(context,"아직 개발중입니닷",Toast.LENGTH_SHORT).show();
         }
     }
 

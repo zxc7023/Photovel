@@ -46,19 +46,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
-                <LinearLayout
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/most_rignt_tv_margin"
-                    android:orientation="horizontal">
+                    android:layout_height="38dp"
+                    android:layout_marginTop="@dimen/most_rignt_tv_margin">
                     <TextView
-                        android:id="@+id/tvicsearch"
+                        android:id="@+id/icsearch"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:text="@string/fa_search"
                         android:textSize="@dimen/icon_size"
                         android:textColor="@color/bgGrey2"
-                        android:layout_marginLeft="@dimen/most_left_tv_margin"/>
+                        android:layout_marginLeft="@dimen/most_left_tv_margin"
+                        android:gravity="center"/>
                     <EditText
                         android:id="@+id/etSearch"
                         android:layout_width="match_parent"
@@ -70,8 +70,33 @@
                         android:includeFontPadding="false"
                         android:background="@color/bgGrey"
                         android:layout_marginLeft="@dimen/most_left_tv_margin"
-                        android:layout_marginRight="@dimen/most_rignt_tv_margin"/>
-                </LinearLayout>
+                        android:layout_marginRight="@dimen/most_rignt_tv_margin"
+                        android:layout_toRightOf="@id/icsearch"
+                        android:gravity="center_vertical"/>
+                    <RelativeLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="38dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginRight="@dimen/most_rignt_tv_margin">
+                        <TextView
+                            android:id="@+id/icclose"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:text="@string/fa_close"
+                            android:textSize="@dimen/icon_size"
+                            android:layout_marginRight="@dimen/between_tv_margin"
+                            android:gravity="center"
+                            android:visibility="invisible"/>
+                        <TextView
+                            android:id="@+id/btnSearchOk"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:text="확인"
+                            android:textSize="@dimen/content_text_size"
+                            android:layout_toRightOf="@+id/icclose"
+                            android:gravity="center"/>
+                    </RelativeLayout>
+                </RelativeLayout>
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
@@ -82,7 +107,7 @@
                     android:background="@color/bgGrey2" />
                 <android.support.v7.widget.RecyclerView
                     xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:id="@+id/recycler_new_view"
+                    android:id="@+id/recycler_search_view"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"/>
             </LinearLayout>
@@ -112,7 +137,7 @@
         app:elevation="6dp"
         app:backgroundTint="@color/nonpressed"
         app:pressedTranslationZ="12dp"
-        android:src="@drawable/ic_menu_send"
+        android:src="@drawable/btn_list_off"
         android:scaleType="center"/>
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_more"
