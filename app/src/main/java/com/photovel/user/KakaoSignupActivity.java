@@ -106,7 +106,7 @@ public class KakaoSignupActivity extends Activity {
                             job.put("user_id", result.getEmail());
                             job.put("user_password", result.getId());
                             job.put("user_nick_name", result.getNickname());
-                            job.put("user_profile_photo", result.getProfileImagePath());
+                            job.put("user_profile_photo", result.getThumbnailImagePath());
                             job.put("user_gender", resultMap.get("user_gender"));
                             job.put("user_phone1", resultMap.get("user_phone1"));
                             job.put("user_phone2", resultMap.get("user_phone2"));
@@ -224,28 +224,30 @@ public class KakaoSignupActivity extends Activity {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        //user프로필사진set
-        List<User> user = new ArrayList<>();
-        user.add(temp);
-        JsonConnection.setBitmap(user, Value.contentPhotoURL);
+        if(!"".equals(connectionResultValue)){
+            //user프로필사진set
+            List<User> user = new ArrayList<>();
+            user.add(temp);
+            JsonConnection.setBitmap(user, Value.contentPhotoURL);
 
-        //로그인한 후에 세션을 관리한다. TestActivity에 저장한다.
-        SharedPreferences loginInfo = getSharedPreferences("loginInfo", MODE_PRIVATE);
-        SharedPreferences.Editor editor = loginInfo.edit();
-        editor.putString("Set-Cookie", cookieValues); //First라는 key값으로 infoFirst 데이터를 저장한다.
-        editor.putString("user_id", temp.getUser_id());
-        editor.putString("user_nick_name", temp.getUser_nick_name());
-        editor.putString("user_password", temp.getUser_password());
-        editor.putString("user_phone", temp.getUser_phone2());
-        editor.putInt("user_friend_count", temp.getUser_friend_count());
+            //로그인한 후에 세션을 관리한다. TestActivity에 저장한다.
+            SharedPreferences loginInfo = getSharedPreferences("loginInfo", MODE_PRIVATE);
+            SharedPreferences.Editor editor = loginInfo.edit();
+            editor.putString("Set-Cookie", cookieValues); //First라는 key값으로 infoFirst 데이터를 저장한다.
+            editor.putString("user_id", temp.getUser_id());
+            editor.putString("user_nick_name", temp.getUser_nick_name());
+            editor.putString("user_password", temp.getUser_password());
+            editor.putString("user_phone", temp.getUser_phone2());
+            editor.putInt("user_friend_count", temp.getUser_friend_count());
 
-        UserBitmapEncoding ub = new UserBitmapEncoding();
-        if (temp.getBitmap() != null) {
-            String user_profile = ub.BitMapToString(temp.getBitmap());
-            editor.putString("user_profile", user_profile);
+            UserBitmapEncoding ub = new UserBitmapEncoding();
+            if (temp.getBitmap() != null) {
+                String user_profile = ub.BitMapToString(temp.getBitmap());
+                editor.putString("user_profile", user_profile);
+            }
+
+            editor.commit(); //완료한다.
         }
-
-        editor.commit(); //완료한다.
     }
 
     private void requestUpdate() {
