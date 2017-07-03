@@ -143,6 +143,7 @@ public class UserJoin extends FontActivity2 {
                         job.put("user_phone2", phoneNumber);
                         job.put("user_gender", gender);
                         job.put("user_phone1", country_code);
+                        job.put("user_sns_status", "O");
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }

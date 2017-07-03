@@ -110,6 +110,7 @@ public class KakaoSignupActivity extends Activity {
                             job.put("user_gender", resultMap.get("user_gender"));
                             job.put("user_phone1", resultMap.get("user_phone1"));
                             job.put("user_phone2", resultMap.get("user_phone2"));
+                            job.put("user_sns_status", "K");
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
