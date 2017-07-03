@@ -63,7 +63,7 @@
 
     <style name="ContentSearchView">
         <item name="android:background">?android:attr/selectableItemBackgroundBorderless</item>
-        <item name="android:scaleType">center</item>
+        <item name="android:scaleType">fitXY</item>
     </style>
 
     <style name="SplashTheme" parent="AppTheme">

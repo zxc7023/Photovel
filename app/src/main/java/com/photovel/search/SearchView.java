@@ -1,6 +1,9 @@
 package com.photovel.search;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.database.DataSetObserver;
 import android.database.MatrixCursor;
@@ -32,6 +35,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.photovel.R;
+import com.photovel.content.ContentListMain;
 import com.photovel.utils.AnimationUtil.AnimationUtil;
 import com.vo.Content;
 
@@ -69,7 +73,7 @@ public class SearchView extends FrameLayout implements Filter.FilterListener {
     //검색창 비우기 버튼
     private ImageButton btnEmpty;
     //실질적인 검색창 부분
-    private RelativeLayout searchView;
+    private RelativeLayout searchView, RLmoreSearch;
 
     //이전 쿼리 문자
     private CharSequence oldQuery;
@@ -91,6 +95,8 @@ public class SearchView extends FrameLayout implements Filter.FilterListener {
 
     //submit
     private boolean submit = false;
+
+    private String user_id;
 
 
     //데이터 집합 감시자
@@ -139,6 +145,10 @@ public class SearchView extends FrameLayout implements Filter.FilterListener {
     public void setAdapter(SearchListAdapter adapter) {
         searchListAdapter = adapter;
         Log.i(TAG, "searchListAdapter.getCount()= " + searchListAdapter.getCount());
+        if(searchListAdapter.getCount() != 0){
+            Log.i(TAG, "searchListAdapter.content_id()= " + searchListAdapter.getCursor().getColumnIndex("content_id"));
+        }
+
         suggestionsListView.setAdapter(searchListAdapter);
         startFilter(edtSearchSrc.getText());
     }
@@ -184,6 +194,7 @@ public class SearchView extends FrameLayout implements Filter.FilterListener {
         searchLayout = findViewById(R.id.search_layout);
 //
         searchView = (RelativeLayout) searchLayout.findViewById(R.id.top_search_view);
+        RLmoreSearch = (RelativeLayout) searchLayout.findViewById(R.id.RLmoreSearch);
         suggestionsListView = (ListView) searchLayout.findViewById(R.id.suggestion_list);
 //        edtSearchSrc = (EditText) searchLayout.findViewById(R.id.searchEditTextView);
         edtSearchSrc = (AutoCompleteTextView) findViewById(R.id.searchAutoCompleteTextView);
@@ -195,6 +206,7 @@ public class SearchView extends FrameLayout implements Filter.FilterListener {
         btnBack.setOnClickListener(onClickListener);
         btnEmpty.setOnClickListener(onClickListener);
         tintView.setOnClickListener(onClickListener);
+        RLmoreSearch.setOnClickListener(onClickListener);
 
         initSearchView();
 //
@@ -296,7 +308,7 @@ public void setBackground(Drawable background) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             suggestionsListView.setBackground(background);
         } else {
-            suggestionsListView.setBackgroundDrawable(background);
+            suggestionsListView.setBackground(background);
         }
     }
 ////////////////////////////////////////////////
@@ -360,6 +372,16 @@ public void setBackground(Drawable background) {
                 showSuggestions();
             } else if (v == tintView) {
                 closeSearch();
+            } else if (v == RLmoreSearch) {
+                SharedPreferences get_to_eat = context.getSharedPreferences("loginInfo", context.MODE_PRIVATE);
+                user_id = get_to_eat.getString("user_id","notFound");
+                //검색을 했으니까...content_id나 user_nick_name을 같이보내줘야하는데 여기서 받을 방법이없음.....후아.....인생
+
+                Intent intent = new Intent(context, ContentListMain.class);
+                intent.putExtra("urlflag","S");
+                intent.putExtra("user_id",user_id);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(intent);
             }
         }
     };
@@ -427,6 +449,7 @@ public void setBackground(Drawable background) {
         //어댑터가 null이 아니고, 어댑터에 등록된 자료의 수가 1개 이상이고 검색 제안 목록의 visibility과 gone일 때
         if (searchListAdapter != null && searchListAdapter.getCount() > 0 && suggestionsListView.getVisibility() == GONE) {
             suggestionsListView.setVisibility(VISIBLE);
+            RLmoreSearch.setVisibility(VISIBLE);
         }
     }
 
@@ -435,6 +458,7 @@ public void setBackground(Drawable background) {
         //검색 제안 목록의 visibility가 visible이면 gone으로 만든다
         if (suggestionsListView.getVisibility() == VISIBLE) {
             suggestionsListView.setVisibility(GONE);
+            RLmoreSearch.setVisibility(GONE);
         }
     }
 

@@ -255,10 +255,10 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
 
                     if ("".equals(newText)) {
 
-                    } else if (myNewDataset.get(i).getUser().getUser_id().toLowerCase().startsWith(newText.toLowerCase()) //입력되는 문자열의 시작부분이 "user_id"의 value와 같은지 검사
+                    } else if (myNewDataset.get(i).getUser().getUser_nick_name().toLowerCase().startsWith(newText.toLowerCase()) //입력되는 문자열의 시작부분이 "User_nick_name"의 value와 같은지 검사
                             || myNewDataset.get(i).getContent_subject().toLowerCase().startsWith(newText.toLowerCase())) {
                         Log.i(TAG, "onQueryTextChange 들어온 contentList= " + myNewDataset);
-                        Log.i(TAG, "onQueryTextChange 들어온 getUser_id()= " + myNewDataset.get(i).getUser().getUser_id().toLowerCase());
+                        Log.i(TAG, "onQueryTextChange 들어온 getUser_id()= " + myNewDataset.get(i).getUser().getUser_nick_name().toLowerCase());
                         Log.i(TAG, "onQueryTextChange 들어온 getContent_subject()= " + myNewDataset.get(i).getContent_subject().toLowerCase());
                         matrixCursor.addRow(new Object[]{i,
                                 myNewDataset.get(i).getContent_id(),
