@@ -11,17 +11,21 @@ import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -47,9 +51,9 @@ import java.util.List;
 public class FriendSearchMain extends FontActivity2 implements NavigationView.OnNavigationItemSelectedListener {
     private static final String TAG = "Image";
     Toolbar toolbar;
-    private String user_id, user_nick_name, user_profile;
+    private String user_id, user_nick_name, user_profile, searchFlag;
 
-    private RecyclerView recyclerNewView;
+    private RecyclerView recyclerView;
     private FriendNewListAdapter mFriendNewListAdapter;
     private RecyclerView.LayoutManager mNewLayoutManager;
     private List<User> myNewFriendDataset;
@@ -57,6 +61,9 @@ public class FriendSearchMain extends FontActivity2 implements NavigationView.On
     private Boolean isFabOpen = false;
     private FloatingActionButton fab_more, fab_friend_list, fab_search;
     private Animation fab_open, fab_close, rotate_forward, rotate_backward;
+
+    private EditText etSearch;
+    private TextView icsearch, icclose, btnSearchOk;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,16 +84,72 @@ public class FriendSearchMain extends FontActivity2 implements NavigationView.On
         fab_close = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_close);
         rotate_forward = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate_forward);
         rotate_backward = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate_backward);
+
+        icsearch = (TextView)findViewById(R.id.icsearch);
+        icclose = (TextView)findViewById(R.id.icclose);
+        btnSearchOk = (TextView)findViewById(R.id.btnSearchOk);
+        etSearch = (EditText)findViewById(R.id.etSearch);
+
+        final Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
+        icsearch.setTypeface(fontAwesomeFont);
+        icclose.setTypeface(fontAwesomeFont);
+
+        etSearch.addTextChangedListener(new TextWatcher(){
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if(!etSearch.getText().equals("")){
+                    icclose.setVisibility(View.VISIBLE);
+                }else {
+                    icclose.setVisibility(View.GONE);
+                }
+            }
+            @Override
+            public void afterTextChanged(Editable editable) {
+            }
+        });
+
+        icclose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                etSearch.setText("");
+            }
+        });
+
+        //intent받아오기
+        Intent intent = getIntent();
+        searchFlag = intent.getStringExtra("search");
+        if(searchFlag.equals("id")){
+            fab_search.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.btn_number_off));
+        }else{
+            fab_search.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.btn_id_off));
+        }
+
         fab_friend_list.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getBaseContext(), "아직 개발중입니다.", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(getApplicationContext(), FriendListMain.class);
+                startActivity(intent);
+                finish();
             }
         });
         fab_search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getBaseContext(), "아직 개발중입니다.", Toast.LENGTH_LONG).show();
+                if(searchFlag.equals("id")){
+                    Intent intent = new Intent(getApplicationContext(), FriendSearchMain.class);
+                    intent.putExtra("search","phone");
+                    startActivity(intent);
+                    finish();
+                }else{
+                    Intent intent = new Intent(getApplicationContext(), FriendSearchMain.class);
+                    intent.putExtra("search","id");
+                    startActivity(intent);
+                    finish();
+                }
             }
         });
         fab_more.setOnClickListener(new View.OnClickListener() {
@@ -104,6 +167,17 @@ public class FriendSearchMain extends FontActivity2 implements NavigationView.On
                 }
             }
         });
+
+        btnSearchOk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //번호나 아이디를 넘기고 리스트 받기
+                etSearch.getText();
+            }
+        });
+
+
+
 
         //친구 신청 목록///////////////////////////////////
         Thread detailList = new Thread(){
@@ -129,13 +203,16 @@ public class FriendSearchMain extends FontActivity2 implements NavigationView.On
             }
         }
 
-        recyclerNewView = (RecyclerView) findViewById(R.id.recycler_new_view);
-        recyclerNewView.setHasFixedSize(true);
-        recyclerNewView.setNestedScrollingEnabled(false);
+        recyclerView = (RecyclerView) findViewById(R.id.recycler_search_view);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setNestedScrollingEnabled(false);
         mNewLayoutManager = new LinearLayoutManager(this);
-        recyclerNewView.setLayoutManager(mNewLayoutManager);
+        recyclerView.setLayoutManager(mNewLayoutManager);
         mFriendNewListAdapter = new FriendNewListAdapter(myNewFriendDataset, FriendSearchMain.this);
-        recyclerNewView.setAdapter(mFriendNewListAdapter);
+        recyclerView.setAdapter(mFriendNewListAdapter);
+
+
+
 
         // Adding Toolbar to the activity
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -147,8 +224,6 @@ public class FriendSearchMain extends FontActivity2 implements NavigationView.On
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-
-        final Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
 
         //메뉴 navigationView
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
