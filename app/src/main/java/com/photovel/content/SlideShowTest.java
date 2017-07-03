@@ -1,3 +1,4 @@
+/*
 package com.photovel.content;
 
 import android.content.Context;
@@ -30,9 +31,11 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
+*/
 /**
  * Created by daybreak on 2017-06-29.
- */
+ *//*
+
 
 public class SlideShowTest extends AppCompatActivity{
     private static final String TAG = "SlideShowTest";
@@ -81,8 +84,10 @@ public class SlideShowTest extends AppCompatActivity{
 
         //find  view
         vpSlideShow = (ViewPager) this.findViewById(R.id.VP_slide_show2);
+*/
 /*        play = (Button) findViewById(R.id.play);
-        stop = (Button) findViewById(R.id.stop);*/
+        stop = (Button) findViewById(R.id.stop);*//*
+
 
 //        PageIndicator indicator = (PageIndicator) findViewById(R.id.slide_seek_bar);
 
@@ -94,10 +99,12 @@ public class SlideShowTest extends AppCompatActivity{
         MAX_PAGES = images.size();
         Log.i(TAG, "MAX_PAGES= " + images.size());
 
-        /*final long frameInterval = 1000;
+        */
+/*final long frameInterval = 1000;
         final long maxTime = 30000;
         final int totalTime = (int) (maxTime / frameInterval);
-        final int secPerFrame = totalTime / contentData.getDetails().size();*/
+        final int secPerFrame = totalTime / contentData.getDetails().size();*//*
+
 
         //슬라이드쇼 어댑터 등록
         if(vpSlideShow != null){
@@ -188,13 +195,15 @@ public class SlideShowTest extends AppCompatActivity{
             //conn.connect();
             conn.setRequestMethod("GET");
             Log.i(TAG, "2.getPhotoData의 qry= " + qry);
-            /*
+            */
+/*
             OutputStream os = conn.getOutputStream();
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
             // bw.write(id);
 
             bw.flush();
-            bw.close();*/
+            bw.close();*//*
+
 
             final int responseCode = conn.getResponseCode(); //정상인 경우 200번, 그 외 오류있는 경우 오류 번호 반환
             Log.i(TAG, "getPhotoData의 responseCode= " + responseCode);
@@ -280,3 +289,4 @@ public class SlideShowTest extends AppCompatActivity{
 
     }
 }
+*/

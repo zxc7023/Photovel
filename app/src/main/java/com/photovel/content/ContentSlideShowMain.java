@@ -22,7 +22,6 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -40,7 +39,6 @@ import com.photovel.FontActivity2;
 import com.photovel.MainActivity;
 import com.photovel.R;
 import com.photovel.http.Value;
-import com.photovel.utils.AnimationUtil.SlideShowAnimationUtil;
 import com.vo.Content;
 import com.vo.ContentDetail;
 import com.vo.Photo;
@@ -70,18 +68,25 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
     private ViewPager vpSlideShow;
     private Context mContext;
     private ArrayList<Bitmap> images = new ArrayList<>();
+    private static Bitmap[] imgArray;
     private SeekBar slideSeekBar;
+    private ContentSlideShowAdapter contentSlideShowAdapter;
+    private ContentSlideShowViewPager contentSlideShowViewPager;
 
-    private static int currPage = 0;
-    private static int MAX_PAGES = 0;
+
+    //이미지 어댑터
+    private static final String KEY_SELECTED_PAGE = "KEY_SELECTED_PAGE";
+    private int MAX_PAGES = 0;
+    long DELAY_MILLI;//delay in milliseconds before task is to be executed
+    long TRANS_MILLI; // time in milliseconds between successive task executions.
     private int maxOffset;
     private int currOffset;
-    int index;
     int imageViewWidth;
+    int currPage = 0;
+    int mToS;
 
-    private LayoutInflater layoutInflater;
-    private ContentSlideShowAdapter contentSlideShowAdapter;
-    private SlideShowAnimationUtil slideShowAnimationUtil;
+    Timer timer;
+
 
 /////////////////////////////////////////////////
 
@@ -255,128 +260,62 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         });
 
         ///////////////////////슬라이드쇼 테스트/////////////////////
+        Log.i(TAG, "imgArray의 크기= " + imgArray.length);
+        //뷰 페이저 객체 생성
+        vpSlideShow = (ViewPager) this.findViewById(R.id.VP_slide_show);
 
+        contentSlideShowViewPager = new ContentSlideShowViewPager(this);
+        //어댑터에 이미지 배열 전달
+        contentSlideShowAdapter = new ContentSlideShowAdapter(this, imgArray);
+
+        //슬라이드 쇼 실행 메소드
         init();
         ////////////////////////////////////////////////////////////
 
     }
 
+//////슬라이드쇼 실행 부분
+
     private void init(){
-        NestedScrollView scrollView = (NestedScrollView) findViewById (R.id.nestedScrollView);
-        scrollView.setFillViewport (true);
-        //find  view
-        vpSlideShow = (ViewPager) this.findViewById(R.id.VP_slide_show);
-/*        play = (Button) findViewById(R.id.play);
-        stop = (Button) findViewById(R.id.stop);*/
-
-//        PageIndicator indicator = (PageIndicator) findViewById(R.id.slide_seek_bar);
-
-        //SeekBar 찾아오기
-        slideSeekBar = (SeekBar) findViewById(R.id.slide_seek_bar);
-
-        contentSlideShowAdapter = new ContentSlideShowAdapter(images, getApplicationContext());
-
-        //슬라이드쇼 어댑터 등록
-        if(vpSlideShow != null) {
-            Log.i(TAG, "vpSlideShow 있음");
-            for (Bitmap bitmap : images) {
-                Log.i(TAG, "vpSlideShow에 나올 bitmap= " + bitmap.getRowBytes());
-            }
-            vpSlideShow.setAdapter(contentSlideShowAdapter);
-        }
-
-//        imageViewWidth = contentSlideShowAdapter.getFakeMaxWidth();
-        Log.i(TAG, "imageViewWidth= " + imageViewWidth);
-
-        slideSeekBar.setMax(imageViewWidth);
-        //현재 페이지 표시할 TextView
-//        tvCurrPage = (TextView)findViewById(R.id.tv_curr_page);
-        MAX_PAGES = images.size();
-        Log.i(TAG, "MAX_PAGES= " + MAX_PAGES);
-
-        /*final long frameInterval = 1000;
-        final long maxTime = 30000;
-        final int totalTime = (int) (maxTime / frameInterval);
-        final int secPerFrame = totalTime / contentData.getDetails().size();*/
+        DELAY_MILLI = 500;//delay in milliseconds before task is to be executed
+        TRANS_MILLI = 3000;
+        //이미지 간 이동 속도 조절
+        contentSlideShowViewPager.setScrollDuration((int)TRANS_MILLI);
 
 
 
-        //이미지 ArrayList에 추가
-        //setViewPagerImage();
+        vpSlideShow.setAdapter(contentSlideShowAdapter);
+        vpSlideShow.setPageTransformer(true, new StackTransformer());
 
 
-        //뷰 페이저 자동 실행
         final Handler handler = new Handler();
-
-        final Runnable update = new Runnable() {
-            @Override
+        final Runnable Update = new Runnable() {
             public void run() {
-                if(currPage == MAX_PAGES){
+                if (currPage == MAX_PAGES-1) {
                     currPage = 0;
                 }
-                Log.i(TAG, "update의 currpage= "+ currPage);
                 vpSlideShow.setCurrentItem(currPage++, true);
-                Log.i(TAG, "update의 vpSlideShow= "+ vpSlideShow.getCurrentItem());
-//                slideSeekBar.setProgress();
             }
         };
 
+        timer = new Timer(); // This will create a new Thread
+        timer.schedule(new TimerTask() { // task to be scheduled
 
-        //시간 설정
-        Timer timer = new Timer();
-        //시작할 때까지의 딜레이 시간과 각 작업 사이의 딜레이 시간 설정
-        timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                //핸들러가 등록된 곳에서 runnable이 실행된다
-                handler.post(update);
+                handler.post(Update);
             }
-        }, 3000, 3000);
-
-        /*slideShowAnimationUtil = new SlideShowAnimationUtil();
-
-        slideShowAnimationUtil.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
-        vpSlideShow.setAnimation(slideShowAnimationUtil);*/
-
+        }, TRANS_MILLI, TRANS_MILLI);
 
         vpSlideShow.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                Log.i(TAG, "onPageScrolled의 position= " + position);
+                Log.i(TAG, "onPageScrolled의 positionOffset= " + positionOffset);
+                Log.i(TAG, "onPageScrolled의 positionOffsetPixels= " + positionOffsetPixels);
 
 
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-                Log.i(TAG, "onPageScrollStateChanged의 state= " + state);
-            }
-        });
-
-        slideSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if(vpSlideShow.isFakeDragging()){
+                /*if(vpSlideShow.isFakeDragging()){
                     //seekbar 클릭시 뷰페이저의 전체 너비 가져온다
                     //마치 여러 사진이 붙어서 드래그로 이동할 수 있는 것처럼 보여주기 위한 설정
                     int offset = (int) (maxOffset/100.0) * progress;
@@ -384,27 +323,93 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
                     //fakeDragBy를 사용하려면 먼저 반드시 beginFakeDrag 사용해야 함
                     vpSlideShow.fakeDragBy(dragBy);
                     currOffset = offset;
+                }*/
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                //vpSlideShow.beginFakeDrag();
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                Log.i(TAG, "onPageScrollStateChanged의 state= " + state);
+                //vpSlideShow.endFakeDrag();
+            }
+        });
+
+
+
+
+
+////////seekbar/////
+        slideSeekBar = (SeekBar) findViewById(R.id.slide_seek_bar);
+
+        //(다음 이미지 띄울 때까지의 시간 * (이미지 개수 - 1))
+        slideSeekBar.setMax((int) TRANS_MILLI * images.size());
+        Log.i(TAG, "seekbar의 max= " + slideSeekBar.getMax());
+
+
+        slideSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if(vpSlideShow.isFakeDragging()){
+                    /*//seekbar 클릭시 뷰페이저의 전체 너비 가져온다
+                    //마치 여러 사진이 붙어서 드래그로 이동할 수 있는 것처럼 보여주기 위한 설정
+                    int offset = (int) (maxOffset/100.0) * progress;
+                    int dragBy = -1 * (offset - currOffset);
+                    //fakeDragBy를 사용하려면 먼저 반드시 beginFakeDrag 사용해야 함
+                    vpSlideShow.fakeDragBy(dragBy);
+                    currOffset = offset;*/
+                    Log.i(TAG, "onProgressChanged의 progress= " + progress);
+                    mToS = (int) (progress / TRANS_MILLI);
+                    if(mToS < (progress / 1000)){
+                        Log.i(TAG, "onProgressChanged의 mToS= " + mToS);
+                        vpSlideShow.setCurrentItem(mToS);
+                    }
                 }
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
                 //seekbar 드래그 시작할 때 이미지들이 묶일 전체 가로 너비를 설정
-                maxOffset = imageViewWidth;
-                //maxOffset = vpSlideShow.getWidth();
-                Log.i(TAG, "onStartTrackingTouch의 maxOffset= " + maxOffset);
                 vpSlideShow.beginFakeDrag();
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 vpSlideShow.endFakeDrag();
-
-                currOffset = 0;
-//                Log.i(TAG, "onStartTrackingTouch의 currOffset= " + currOffset);
-                seekBar.setProgress(0);
             }
         });
+    }
+
+    //텍스트뷰에 시간 표시하기 위한 메소드. milliseconds를 시간으로
+    public String milliSecondsToTimer(long milliseconds){
+        String finalTimerString = "";
+        String secondsString = "";
+
+
+        //milliseconds를 1시간(1초 * 60 = 60초, 1분 * 60 = 60분)으로 나눈 몫
+        int hours = (int)( milliseconds / (1000*60*60));
+        //milliseconds를 1시간으로 나눈 나머지를 1분으로 나눈 몫
+        int minutes = (int)(milliseconds % (1000*60*60)) / (1000*60);
+        //millisconds를 1시간으로 나눈 나머지를 다시 1분으로 나눠서 초단위로 나눈 몫
+        int seconds = (int) ((milliseconds % (1000*60*60)) % (1000*60) / 1000);
+        // Add hours if there
+        if(hours > 0){
+            finalTimerString = hours + ":";
+        }
+
+        // 10초 미만인 경우 한 자리 숫자
+        if(seconds < 10){
+            secondsString = "0" + seconds;
+        }else{ //10초 이상인 경우 두 자리 숫자
+            secondsString = "" + seconds;}
+
+        finalTimerString = finalTimerString + minutes + ":" + secondsString;
+
+        // return timer string
+        return finalTimerString;
     }
 
 
@@ -760,6 +765,8 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
                         //File filePath = new File(Environment.getExternalStorageDirectory());
                         //FileUtils.copyURLToFile(new URL("http://photovel.com/upload/" + contentData.getContent_id() + "/" + contentData.getDetails().get(i).getPhoto().getPhotoFileName()), );
                     }
+                    //순서가 확실한 이미지 배열 만들기
+                    imgArray = images.toArray(new Bitmap[images.size()]);
 
                 } catch (Exception e) {
                     e.printStackTrace();

@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.os.Handler;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -31,15 +31,15 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class ContentSlideShow extends AppCompatActivity {
     private ViewPager vpSlideShow;
     private Context mContext;
     private ArrayList<Bitmap> images;
 
+    //
     private static int currPage = 0;
+    //보여줄 이미지 수
     private static int MAX_PAGES = 0;
     private int maxOffset;
     private int currOffset;
@@ -47,6 +47,7 @@ public class ContentSlideShow extends AppCompatActivity {
 
 
     private static final String TAG = "ContentSlideShow";
+    public static final String ESTRA_POSTION = "FRAGMENT_POSTION";
 
     RadioButton b1, b2, b3;//radio button for indicator
     Button play, stop;
@@ -56,6 +57,8 @@ public class ContentSlideShow extends AppCompatActivity {
 
     Content contentData;
     List<ContentDetail> contentDetailList;
+
+    FragmentManager fm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,22 +136,18 @@ public class ContentSlideShow extends AppCompatActivity {
 
         //현재 페이지 표시할 TextView
         tvCurrPage = (TextView)findViewById(R.id.tv_curr_page);
+
         MAX_PAGES = images.size();
         Log.i(TAG, "MAX_PAGES= " + images.size());
 
-        final long frameInterval = 1000;
-        final long maxTime = 30000;
-        final int totalTime = (int) (maxTime / frameInterval);
-        final int secPerFrame = totalTime / contentData.getDetails().size();
-
-        //슬라이드쇼 어댑터 등록
-        vpSlideShow.setAdapter(new ContentSlideShowAdapter(images, this));
-
-        //이미지 ArrayList에 추가
-        //setViewPagerImage();
+        fm = getSupportFragmentManager();
+//        //슬라이드쇼 어댑터 등록
 
 
-        //뷰 페이저 자동 실행
+
+
+
+        /*//뷰 페이저 자동 실행
         final Handler handler = new Handler();
 
         final Runnable update = new Runnable() {
@@ -157,11 +156,11 @@ public class ContentSlideShow extends AppCompatActivity {
                 if(currPage == MAX_PAGES){
                     currPage = 0;
                 }
-                vpSlideShow.setCurrentItem(currPage++, true);
+                vpSlideShow.startAnimation(slideShowAnimationUtil);
             }
-        };
+        };*/
 
-        //시간 설정
+        /*//시간 설정
         Timer timer = new Timer();
         //시작할 때까지의 딜레이 시간과 각 작업 사이의 딜레이 시간 설정
         timer.schedule(new TimerTask() {
@@ -170,7 +169,23 @@ public class ContentSlideShow extends AppCompatActivity {
                 //핸들러가 등록된 곳에서 runnable이 실행된다
                 handler.post(update);
             }
-        }, 3000, 3000);
+        }, 3000, 3000);*/
+
+        vpSlideShow.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
 
         slideSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
