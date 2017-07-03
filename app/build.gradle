@@ -56,4 +56,7 @@ dependencies {
 
     //프로필사진 동그랗게
     compile 'com.mikhaellopez:circularimageview:3.0.2'
+
+    //viewpager CircleIndicator
+    compile 'me.relex:circleindicator:1.2.2@aar'
 }

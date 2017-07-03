@@ -85,13 +85,19 @@ public class FriendListMain extends FontActivity2 implements NavigationView.OnNa
         fab_search_phone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getBaseContext(), "아직 개발중입니다.", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(getApplicationContext(), FriendSearchMain.class);
+                intent.putExtra("search","phone");
+                startActivity(intent);
+                finish();
             }
         });
         fab_search_id.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getBaseContext(), "아직 개발중입니다.", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(getApplicationContext(), FriendSearchMain.class);
+                intent.putExtra("search","id");
+                startActivity(intent);
+                finish();
             }
         });
         fab_more.setOnClickListener(new View.OnClickListener() {

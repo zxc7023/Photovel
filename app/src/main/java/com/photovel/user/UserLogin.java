@@ -9,6 +9,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 
 import com.alibaba.fastjson.JSON;
+import com.photovel.IntroMain;
 import com.photovel.MainActivity;
 import com.photovel.R;
 
@@ -119,9 +120,18 @@ public class UserLogin extends FontActivity2 {
                         Toast.makeText(mContext, "로그인실패", Toast.LENGTH_SHORT).show();
                     }else{
                         Toast.makeText(mContext, "로그인성공", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                        startActivity(intent);
-                        finish();
+
+                        SharedPreferences IntroCheck = getSharedPreferences("IntroCheck", MODE_PRIVATE);
+                        String check = IntroCheck.getString("IntroCheck","N");
+                        if(check.equals("Y")){
+                            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                            startActivity(intent);
+                            finish();
+                        }else{
+                            Intent intent = new Intent(getApplicationContext(), IntroMain.class);
+                            startActivity(intent);
+                            finish();
+                        }
                     }
 
                 }
