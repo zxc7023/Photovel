@@ -1,6 +1,7 @@
 package com.photovel.user;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import com.kakao.usermgmt.callback.MeResponseCallback;
 import com.kakao.usermgmt.response.model.UserProfile;
 import com.photovel.BackPressCloseHandler;
 import com.photovel.MainActivity;
+import com.photovel.R;
 import com.photovel.http.JsonConnection;
 import com.photovel.http.Value;
 import com.vo.User;
@@ -61,6 +63,7 @@ public class KakaoSignupActivity extends Activity {
 
     UserProfile userProfile;
 
+    ProgressDialog progressDialog;
     /**
      * Main으로 넘길지 가입 페이지를 그릴지 판단하기 위해 me를 호출한다.
      *
@@ -69,6 +72,21 @@ public class KakaoSignupActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_kakao_signup);
+        progressDialog = new ProgressDialog(this);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressDialog.setTitle("Please Wait..");
+                        progressDialog.setMessage("Preparing to download ...");
+                        progressDialog.show();
+                    }
+                });
+            }
+        }).start();
         requestMe();
     }
 
