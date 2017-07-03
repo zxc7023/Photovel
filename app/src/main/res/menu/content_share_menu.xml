@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/kakao_share"
+        android:title="카카오톡으로 공유"
+        android:icon="@drawable/kakao_icon"
+        app:showAsAction="never" />
+    <item android:id="@+id/facebook_share"
+        android:title="페이스북으로 공유"
+        android:icon="@drawable/facebook_icon"
+        />
+</menu>
