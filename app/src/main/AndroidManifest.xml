@@ -23,7 +23,7 @@
         android:theme="@style/AppTheme">
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDHhbAmLoQolRIfA6C2Xdm-NzKa9naq3XA" />
+            android:value="AIzaSyAiudYhFEK-5EW9nzlu8Tbv1FoUNyLRWz8" />
         <meta-data
             android:name="com.kakao.sdk.AppKey"
             android:value="@string/kakao_app_key" />

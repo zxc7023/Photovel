@@ -90,7 +90,6 @@ public class SearchListAdapter extends CursorAdapter implements Filterable {
         llmainSubject.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("click","메인이 클릭되었당!");
                 Intent intent = new Intent(context, ContentDetailListMain.class);
                 intent.putExtra("content_id", Integer.parseInt(cursor.getString(cursor.getColumnIndex("content_id"))));
                 context.startActivity(intent);
