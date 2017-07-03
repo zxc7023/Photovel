@@ -65,4 +65,7 @@ dependencies {
 
     //viewpager CircleIndicator
     compile 'me.relex:circleindicator:1.2.2@aar'
+
+    //페이스북 링크
+    compile 'com.facebook.android:facebook-android-sdk:4.+'
 }
