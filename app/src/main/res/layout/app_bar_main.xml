@@ -51,7 +51,7 @@
                     android:textStyle="bold"
                     android:textSize="@dimen/content_text_size"
                     android:textColor="@color/textBlack"
-                    android:text="추천 스토리"/>
+                    android:text="추천 스토리" />
 
                 <android.support.v7.widget.RecyclerView
                     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -64,20 +64,24 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior"
-                app:layout_collapseMode="pin"
-                app:layout_scrollFlags="scroll|enterAlways">
+                app:layout_scrollFlags="scroll|exitUntilCollapsed"
+                app:layout_collapseMode="pin">
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize"
-                    android:background="?attr/colorPrimary"/>
+                    android:background="?attr/colorPrimary"
+                    app:layout_scrollFlags="scroll|exitUntilCollapsed"
+                    app:layout_collapseMode="pin"/>
                 <com.photovel.search.SearchView
                     android:id="@+id/search_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="제목, 아이디로 검색 가능합니다"
+                    android:hint="제목, 닉네임으로 검색"
                     android:textColorHint="@color/textGrey"
-                    android:visibility="visible"/>
+                    android:visibility="visible"
+                    app:layout_scrollFlags="scroll|exitUntilCollapsed"
+                    app:layout_collapseMode="pin"/>
             </FrameLayout>
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
