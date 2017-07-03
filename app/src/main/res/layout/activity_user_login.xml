@@ -67,11 +67,13 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginTop="20dp"
             android:layout_weight="1"
-            android:gravity="center"
-            android:includeFontPadding="false">
+            android:gravity="bottom">
 
-            <LinearLayout
+            <!--<LinearLayout
                 android:id="@+id/FacebookLoginLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -109,6 +111,26 @@
                     android:textAllCaps="false"
                     android:textColor="@color/bgWhite" />
 
+            </LinearLayout>-->
+            <LinearLayout
+                android:id="@+id/facebookLoginLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+                <TextView android:text="Login With Facebook"
+                    android:id="@+id/btnLogin"
+                    android:padding="16dp"
+                    android:layout_centerInParent="true"
+                    android:background="#494949"
+                    android:textColor="#fff"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <com.facebook.login.widget.LoginButton
+                    android:id="@+id/facebook_login_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center" />
             </LinearLayout>
 
         </LinearLayout>

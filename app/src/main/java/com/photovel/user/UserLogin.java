@@ -1,5 +1,6 @@
 package com.photovel.user;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,6 +10,15 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 
 import com.alibaba.fastjson.JSON;
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.Profile;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import com.kakao.auth.ISessionCallback;
 import com.kakao.auth.Session;
 import com.kakao.util.exception.KakaoException;
@@ -45,6 +55,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -69,6 +80,7 @@ public class UserLogin extends FontActivity2 {
     String cookieValues = "";
 
     private SessionCallback callback;
+    private CallbackManager callbackManager;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -81,11 +93,13 @@ public class UserLogin extends FontActivity2 {
 
         setContentView(R.layout.activity_user_login);
 
-        //FacebookLogin 배경색을 java로 동적으로 함
-        LinearLayout facebookLayout = (LinearLayout) findViewById(R.id.FacebookLoginLayout);
+
+/*        //FacebookLogin 배경색을 java로 동적으로 함
+        LinearLayout facebookLayout = (LinearLayout) findViewById(R.id.facebookLoginLayout);
         GradientDrawable bgShape = (GradientDrawable) facebookLayout.getBackground();
         int facebookColor = ContextCompat.getColor(this, R.color.facebookColor);
         bgShape.setColor(facebookColor);
+*/
 /*
         //KAKAO 배경색을 java로 동적으로 함
         LinearLayout kakaoLayout = (LinearLayout) findViewById(R.id.kakaoLoginLayout);
@@ -96,7 +110,7 @@ public class UserLogin extends FontActivity2 {
 */
         TextView emailIconView = (TextView) findViewById(R.id.emailIcon);
         TextView passIconView = (TextView) findViewById(R.id.passwordIcon);
-        TextView facebookView = (TextView) findViewById(R.id.fa_facebook_official);
+
 
 
         emailText = (EditText) findViewById(R.id.emailText);
@@ -106,7 +120,7 @@ public class UserLogin extends FontActivity2 {
         Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
         emailIconView.setTypeface(fontAwesomeFont);
         passIconView.setTypeface(fontAwesomeFont);
-        facebookView.setTypeface(fontAwesomeFont);
+
         //kakaoView.setTypeface(fontAwesomeFont);
 
         Button loginButton = (Button) findViewById(R.id.loginButton);
@@ -312,13 +326,87 @@ public class UserLogin extends FontActivity2 {
         }
     }
 
+    LoginButton facebook_login_button;
+    User user;
+    @Override
+    protected void onResume() {
+        super.onResume();
+        callbackManager=CallbackManager.Factory.create();
+
+        facebook_login_button= (LoginButton)findViewById(R.id.facebook_login_button);
+        facebook_login_button.setReadPermissions("public_profile", "email");
+
+        TextView btnLogin= (TextView) findViewById(R.id.btnLogin);
+        btnLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                facebook_login_button.performClick();
+                facebook_login_button.setPressed(true);
+                facebook_login_button.invalidate();
+                facebook_login_button.registerCallback(callbackManager, mCallBack);
+                facebook_login_button.setPressed(false);
+                facebook_login_button.invalidate();
+            }
+        });
+    }
+
+    private FacebookCallback<LoginResult> mCallBack = new FacebookCallback<LoginResult>() {
+        @Override
+        public void onSuccess(LoginResult loginResult) {
+            // App code
+            GraphRequest request = GraphRequest.newMeRequest( loginResult.getAccessToken(),
+                    new GraphRequest.GraphJSONObjectCallback() {
+                        @Override
+                        public void onCompleted(
+                                JSONObject object,
+                                GraphResponse response) {
+                            Log.e("response: ", response + "");
+                            try {
+                                user = new User();
+                                user.setUser_id(object.getString("email"));
+                                user.setUser_password(object.getString("id"));
+                                user.setUser_nick_name(object.getString("name"));
+                                user.setUser_gender(object.getString("gender"));
+                                user.setUser_profile_photo("http://graph.facebook.com/"+object.getString("id")+"/picture");
+                                user.setUser_sns_status("F");
+                            }catch (Exception e){
+                                e.printStackTrace();
+                            }
+                            Toast.makeText(UserLogin.this, "welcome " + user.getUser_id(), Toast.LENGTH_LONG).show();
+                            Intent intent=new Intent(UserLogin.this, UserJoin.class);
+                            intent.putExtra("user", user);
+                            Log.i("ddd1", user.toString());
+                            startActivity(intent);
+                            finish();
+
+                        }
+
+                    });
+
+            Bundle parameters = new Bundle();
+            parameters.putString("fields", "id,name,email,gender, birthday");
+            request.setParameters(parameters);
+            request.executeAsync();
+        }
+
+        @Override
+        public void onCancel() {
+
+        }
+
+        @Override
+        public void onError(FacebookException e) {
+
+        }
+    };
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (Session.getCurrentSession().handleActivityResult(requestCode, resultCode, data)) {
             return;
         }
-
         super.onActivityResult(requestCode, resultCode, data);
+        callbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
