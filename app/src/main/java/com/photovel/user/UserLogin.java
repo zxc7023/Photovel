@@ -85,14 +85,14 @@ public class UserLogin extends FontActivity2 {
         GradientDrawable bgShape = (GradientDrawable) facebookLayout.getBackground();
         int facebookColor = ContextCompat.getColor(this, R.color.facebookColor);
         bgShape.setColor(facebookColor);
-
-/*        //KAKAO 배경색을 java로 동적으로 함
+/*
+        //KAKAO 배경색을 java로 동적으로 함
         LinearLayout kakaoLayout = (LinearLayout) findViewById(R.id.kakaoLoginLayout);
         GradientDrawable bgShape2 = (GradientDrawable)kakaoLayout.getBackground();
         int kakaoColor = ContextCompat.getColor(this,R.color.kakaoColor);
         bgShape2.setColor(kakaoColor);
         TextView kakaoView = (TextView)findViewById(R.id.fa_commenting);
-        */
+*/
         TextView emailIconView = (TextView) findViewById(R.id.emailIcon);
         TextView passIconView = (TextView) findViewById(R.id.passwordIcon);
         TextView facebookView = (TextView) findViewById(R.id.fa_facebook_official);
