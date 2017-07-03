@@ -9,14 +9,21 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.kakao.kakaolink.v2.KakaoLinkResponse;
+import com.kakao.kakaolink.v2.KakaoLinkService;
+import com.kakao.network.ErrorResult;
+import com.kakao.network.callback.ResponseCallback;
+import com.kakao.util.helper.log.Logger;
 import com.photovel.MainActivity;
 import com.photovel.R;
 import com.photovel.content.ContentDetailListMain;
@@ -24,7 +31,11 @@ import com.photovel.http.JsonConnection;
 import com.photovel.http.Value;
 import com.vo.Content;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHolder>{
     private List<Content> mDataset;
@@ -32,6 +43,8 @@ public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHo
     private BookMarkAdapter.ViewHolder holder;
     private int position;
     private int[] likeFlag;
+    private BookMarkAdapter adapter;
+    private String templateId = "4643";
 
     public int getPosition() {
         return position;
@@ -173,13 +186,92 @@ public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHo
         holder.llshare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("click","공유 클릭되었당!");
+                Thread share = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        JsonConnection.getConnection(Value.contentURL+"/"+mDataset.get(position).getContent_id()+"/share", "POST", null);
+                    }
+                });
+                share.start();
+                try {
+                    share.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                contentshare(v);
+                adapter = new BookMarkAdapter();
+                adapter.setHolder(holder);
+                adapter.setPosition(position);
             }
         });
     }
     @Override
     public int getItemCount() {
         return mDataset.size();
+    }
+
+    //공유 메뉴클릭시
+    public void contentshare(View v){
+        PopupMenu menu = new PopupMenu(mcontext, v);
+        menu.inflate(R.menu.content_share_menu);
+        menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.kakao_share:
+                        sendFeedTemplate();
+                        Toast.makeText(mcontext,"카카오",Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.facebook_share:
+                        Toast.makeText(mcontext,"페북",Toast.LENGTH_SHORT).show();
+                        break;
+                }
+                return false;
+            }
+        });
+        try {
+            Field[] fields = menu.getClass().getDeclaredFields();
+            for (Field field : fields) {
+                if ("mPopup".equals(field.getName())) {
+                    field.setAccessible(true);
+                    Object menuPopupHelper = field.get(menu);
+                    Class<?> classPopupHelper = Class.forName(menuPopupHelper
+                            .getClass().getName());
+                    Method setForceIcons = classPopupHelper.getMethod(
+                            "setForceShowIcon", boolean.class);
+                    setForceIcons.invoke(menuPopupHelper, true);
+                    break;
+                }
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+        menu.show();
+    }
+
+    //카카오 링크 공유
+    private void sendFeedTemplate() {
+        Map<String, String> templateArgs = new HashMap<String, String>();
+
+        templateArgs.put("${image_url}", Value.contentPhotoURL+"/"+mDataset.get(adapter.getPosition()).getContent_id()+"/"+mDataset.get(adapter.getPosition()).getPhoto_file_name());
+        templateArgs.put("${user_profile}", Value.contentPhotoURL+"/profile/"+mDataset.get(adapter.getPosition()).getUser().getUser_profile_photo());
+        templateArgs.put("${user_nick_name}", mDataset.get(adapter.getPosition()).getUser().getUser_nick_name());
+        templateArgs.put("${content_subject}", mDataset.get(adapter.getPosition()).getContent_subject());
+        templateArgs.put("${content}", mDataset.get(adapter.getPosition()).getContent());
+        templateArgs.put("${good_count}", String.valueOf(mDataset.get(adapter.getPosition()).getGood_count()));
+        templateArgs.put("${comment_count}",String.valueOf(mDataset.get(adapter.getPosition()).getComment_count()));
+        templateArgs.put("${content_share_count}", String.valueOf(mDataset.get(adapter.getPosition()).getContent_share_count()));
+        KakaoLinkService.getInstance().sendCustom(mcontext, templateId, templateArgs, new ResponseCallback<KakaoLinkResponse>() {
+            @Override
+            public void onFailure(ErrorResult errorResult) {
+                Logger.e(errorResult.toString());
+                Toast.makeText(mcontext, errorResult.toString(), Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onSuccess(KakaoLinkResponse result) {
+            }
+        });
     }
 }
 

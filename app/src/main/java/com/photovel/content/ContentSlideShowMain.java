@@ -46,6 +46,11 @@ import android.widget.Toast;
 import android.widget.ViewFlipper;
 
 import com.alibaba.fastjson.JSON;
+import com.kakao.kakaolink.v2.KakaoLinkResponse;
+import com.kakao.kakaolink.v2.KakaoLinkService;
+import com.kakao.network.ErrorResult;
+import com.kakao.network.callback.ResponseCallback;
+import com.kakao.util.helper.log.Logger;
 import com.mikhaellopez.circularimageview.CircularImageView;
 import com.photovel.FontActivity2;
 import com.photovel.MainActivity;
@@ -62,9 +67,13 @@ import com.vo.ContentDetail;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ContentSlideShowMain extends FontActivity2 implements NavigationView.OnNavigationItemSelectedListener {
     private SearchView searchView;
@@ -72,7 +81,7 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
     Toolbar toolbar;
 
     private RelativeLayout RldetailData;
-    private LinearLayout RLdetailDate, LLmenu, btnLike, btnComment, btnBookmark, btnMoreUserContent;
+    private LinearLayout RLdetailDate, LLmenu, btnLike, btnComment, btnBookmark, btnMoreUserContent, btnShare;
     private TextView icglobe, icleft, icright, tvleft, tvright, iccal, icmarker, icbookmark, icthumb, iccomment, icshare, btnDetailMenu;
     private TextView tvContentInsertDate, tvContentSubject, tvContentLocation, tvUsername, tvUsername2, tvDuring, tvdetailcount, tvdetailstate, tvContent;
     private TextView tvLikeCount, tvlike, tvbookmark, tvCommentCount, tvShareCount;
@@ -100,6 +109,8 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
     private LinearLayout llBack;
     private TextView btnBack;
     private EditText etComment;
+
+    private String templateId = "4639";
 
     RadioButton b1, b2, b3;//radio button for indicator
     Button play, stop;
@@ -165,6 +176,7 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         btnComment = (LinearLayout) findViewById(R.id.btnComment);
         btnBookmark = (LinearLayout) findViewById(R.id.btnBookmark);
         btnMoreUserContent = (LinearLayout) findViewById(R.id.btnMoreUserContent);
+        btnShare = (LinearLayout) findViewById(R.id.btnShare);
 
         //imageView를 font로 바꿔주기
         Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
@@ -401,6 +413,26 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
                     tvbookmark.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.textBlue));
                     bookmarkFlag=1;
                 }
+            }
+        });
+        //공유하기
+        btnShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Thread share = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        JsonConnection.getConnection(Value.contentURL+"/"+content_id+"/share", "POST", null);
+                    }
+                });
+                share.start();
+                try {
+                    share.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                tvShareCount.setText(String.valueOf(content.getContent_share_count()+1));
+                contentshare(v);
             }
         });
 
@@ -801,5 +833,72 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
             super.onBackPressed();
             super.onBackPressed();
         }
+    }
+
+    //공유 메뉴클릭시
+    public void contentshare(View v){
+        android.widget.PopupMenu menu = new android.widget.PopupMenu(this, v);
+        menu.inflate(R.menu.content_share_menu);
+        menu.setOnMenuItemClickListener(new android.widget.PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.kakao_share:
+                        sendFeedTemplate();
+                        Toast.makeText(getApplicationContext(),"카카오",Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.facebook_share:
+                        Toast.makeText(getApplicationContext(),"페북",Toast.LENGTH_SHORT).show();
+                        break;
+                }
+                return false;
+            }
+        });
+        try {
+            Field[] fields = menu.getClass().getDeclaredFields();
+            for (Field field : fields) {
+                if ("mPopup".equals(field.getName())) {
+                    field.setAccessible(true);
+                    Object menuPopupHelper = field.get(menu);
+                    Class<?> classPopupHelper = Class.forName(menuPopupHelper
+                            .getClass().getName());
+                    Method setForceIcons = classPopupHelper.getMethod(
+                            "setForceShowIcon", boolean.class);
+                    setForceIcons.invoke(menuPopupHelper, true);
+                    break;
+                }
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+        menu.show();
+    }
+
+    //카카오 링크 공유
+    private void sendFeedTemplate() {
+        Map<String, String> templateArgs = new HashMap<String, String>();
+        templateArgs.put("${img_size}", String.valueOf(myDataset.size()));
+        for(int i=0; i<3; i++){
+            templateArgs.put("${image_url"+i+"}", Value.contentPhotoURL+"/"+content_id+"/"+myDataset.get(i).getPhoto().getPhoto_file_name());
+        }
+
+        templateArgs.put("${user_profile}", Value.contentPhotoURL+"/profile/"+content.getUser().getUser_profile_photo());
+        templateArgs.put("${user_nick_name}", content.getUser().getUser_nick_name());
+        templateArgs.put("${content_subject}",content.getContent_subject());
+        templateArgs.put("${content}", content.getContent());
+        templateArgs.put("${good_count}", String.valueOf(content.getGood_count()));
+        templateArgs.put("${comment_count}",String.valueOf(content.getComment_count()));
+        templateArgs.put("${content_share_count}", String.valueOf(content.getContent_share_count()));
+        KakaoLinkService.getInstance().sendCustom(this, templateId, templateArgs, new ResponseCallback<KakaoLinkResponse>() {
+            @Override
+            public void onFailure(ErrorResult errorResult) {
+                Logger.e(errorResult.toString());
+                Toast.makeText(getApplicationContext(), errorResult.toString(), Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onSuccess(KakaoLinkResponse result) {
+            }
+        });
     }
 }
