@@ -391,6 +391,7 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
                     e.printStackTrace();
                 }
                 if(bookmarkFlag == 1){
+                    icbookmark.setText(R.string.fa_bookmark_o);
                     icbookmark.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.bgDarkGrey));
                     tvbookmark.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.bgDarkGrey));
                     bookmarkFlag=0;

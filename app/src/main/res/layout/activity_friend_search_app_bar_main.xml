@@ -49,73 +49,47 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/most_left_tv_margin"
                     android:layout_marginTop="@dimen/most_rignt_tv_margin"
-                    android:orientation="vertical">
+                    android:orientation="horizontal">
                     <TextView
+                        android:id="@+id/tvicsearch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/fa_search"
+                        android:textSize="@dimen/icon_size"
+                        android:textColor="@color/bgGrey2"
+                        android:layout_marginLeft="@dimen/most_left_tv_margin"/>
+                    <EditText
+                        android:id="@+id/etSearch"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:textColor="@color/textBlack"
+                        android:textColor="@color/bgDarkGrey"
                         android:textStyle="bold"
                         android:textSize="@dimen/content_text_size"
-                        android:text="친구 요청 목록"
+                        android:hint="포토블 00으로 검색"
                         android:includeFontPadding="false"
-                        android:gravity="center_vertical"/>
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerInParent="true"
-                        android:layout_marginBottom="10dp"
-                        android:layout_marginRight="@dimen/most_rignt_tv_margin"
-                        android:layout_marginTop="5dp"
-                        android:background="@color/bgGrey2" />
+                        android:background="@color/bgGrey"
+                        android:layout_marginLeft="@dimen/most_left_tv_margin"
+                        android:layout_marginRight="@dimen/most_rignt_tv_margin"/>
                 </LinearLayout>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerInParent="true"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginTop="5dp"
+                    android:background="@color/bgGrey2" />
                 <android.support.v7.widget.RecyclerView
                     xmlns:android="http://schemas.android.com/apk/res/android"
                     android:id="@+id/recycler_new_view"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"/>
             </LinearLayout>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/most_left_tv_margin"
-                    android:layout_marginTop="@dimen/most_rignt_tv_margin"
-                    android:orientation="vertical">
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:textColor="@color/textBlack"
-                        android:textStyle="bold"
-                        android:textSize="@dimen/content_text_size"
-                        android:text="친구 목록"
-                        android:includeFontPadding="false"
-                        android:gravity="center_vertical"/>
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerInParent="true"
-                        android:layout_marginBottom="10dp"
-                        android:layout_marginRight="@dimen/most_rignt_tv_margin"
-                        android:layout_marginTop="5dp"
-                        android:background="@color/bgGrey2" />
-                </LinearLayout>
-                <android.support.v7.widget.RecyclerView
-                    xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:id="@+id/recycler_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
-            </LinearLayout>
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_search_phone"
+        android:id="@+id/fab_search"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="140dp"
@@ -128,7 +102,7 @@
         android:src="@drawable/btn_number_off"
         android:scaleType="center"/>
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_search_id"
+        android:id="@+id/fab_friend_list"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="80dp"
@@ -138,7 +112,7 @@
         app:elevation="6dp"
         app:backgroundTint="@color/nonpressed"
         app:pressedTranslationZ="12dp"
-        android:src="@drawable/btn_id_off"
+        android:src="@drawable/ic_menu_send"
         android:scaleType="center"/>
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_more"

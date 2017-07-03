@@ -289,6 +289,7 @@ public class ContentListAdapter extends RecyclerView.Adapter<ContentListAdapter.
                     user_id = contentInfo.getString("content_user_id","notFound");
                 }*/
                 if(bookmarkFlag[position] == 1){
+                    holder.icbookmark.setText(R.string.fa_bookmark_o);
                     holder.icbookmark.setTextColor(ContextCompat.getColor(mcontext, R.color.bgDarkGrey));
                     holder.tvbookmark.setTextColor(ContextCompat.getColor(mcontext, R.color.bgDarkGrey));
                     bookmarkFlag[position]=0;
