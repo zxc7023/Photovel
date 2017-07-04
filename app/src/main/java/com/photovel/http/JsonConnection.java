@@ -58,6 +58,7 @@ public class JsonConnection {
 
             //method가 post면
             if (method.toUpperCase().equals("POST") && json != null) {
+                Log.i(TAG, "1.2 getConnection json= " + json);
                 conn.setDoOutput(true);
                 dos = conn.getOutputStream();
                 dos.write(json.toString().getBytes());
@@ -142,8 +143,16 @@ public class JsonConnection {
                         //Comment 타입일 때
                     } else if (imgs.get(0) instanceof Comment) {
                         for (int i = 0; i < imgs.size(); i++) {
-                            Bitmap bitmap = BitmapFactory.decodeStream((InputStream)
-                                    new URL(url + "/profile/"+((Comment)imgs.get(i)).getUser().getUser_profile_photo()).getContent());
+                            Bitmap bitmap = null;
+                            if(((Comment)imgs.get(i)).getUser().getUser_profile_photo() != null){
+                                if("O".equals(((Comment)imgs.get(i)).getUser().getUser_sns_status())) {
+                                    bitmap = BitmapFactory.decodeStream((InputStream)
+                                            new URL(url + "/profile/"+((Comment)imgs.get(i)).getUser().getUser_profile_photo()).getContent());
+                                }else{
+                                    bitmap = BitmapFactory.decodeStream((InputStream)
+                                            new URL(((Comment)imgs.get(i)).getUser().getUser_profile_photo()).getContent());
+                                }
+                            }
                             ((Comment)imgs.get(i)).getUser().setBitmap(bitmap);
                             Log.i(TAG, "4. getBitmap (Comment)bitmap= " + bitmap);
                         }

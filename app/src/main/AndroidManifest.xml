@@ -9,9 +9,14 @@
     <!-- 갤러리권한설정 -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
-    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
+
+    <provider
+        android:name="com.facebook.FacebookContentProvider"
+        android:authorities="com.facebook.app.FacebookContentProvider836515529860593"
+        android:exported="true" />
 
     <application
         android:name=".user.GlobalApplication"
@@ -38,6 +43,9 @@
         <meta-data
             android:name="com.kakao.sdk.AppKey"
             android:value="@string/kakao_app_key" />
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
         <!-- AIzaSyDHhbAmLoQolRIfA6C2Xdm-NzKa9naq3XA
         준기키-->
         <!-- AIzaSyAoropfQgcXeJI0nf6iyz36wDc9pZIBJUw
@@ -94,6 +102,13 @@
         <activity
             android:name=".IntroMain"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".friend.FriendSearchMain"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name="com.facebook.FacebookActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:label="@string/app_name" />
 
         <service android:name=".FirebaseMessagingService">
             <intent-filter>

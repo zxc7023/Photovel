@@ -128,6 +128,7 @@ public class SettingMain extends FontActivity2 implements NavigationView.OnNavig
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting_main);
+        checkPermission();
 
         // Adding Toolbar to the activity
         toolbar = (Toolbar) findViewById(R.id.settingToolbar);
@@ -276,7 +277,6 @@ public class SettingMain extends FontActivity2 implements NavigationView.OnNavig
         userProfileUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                checkPermission();
                 Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
                 intent.setType("image/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
@@ -393,7 +393,7 @@ public class SettingMain extends FontActivity2 implements NavigationView.OnNavig
     private Bitmap resizeBitmap(String path) {
         InputStream in = null;
         try {
-            final int IMAGE_MAX_SIZE = 100000; //고정됨!!!!수정금지!!!!
+            final int IMAGE_MAX_SIZE = 50000; //고정됨!!!!수정금지!!!!
             in = new FileInputStream(path);
 
             // Decode image size
