@@ -172,24 +172,27 @@ public class UserLogin extends FontActivity2 {
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
-
-                            Profile profile = Profile.getCurrentProfile();
-                            try {
-                                user = new User();
-                                user.setUser_id(object.getString("email"));
-                                user.setUser_sns_token(object.getString("id"));
-                                user.setUser_password(object.getString("id"));
-                                user.setUser_nick_name(object.getString("name"));
-                                user.setUser_gender(object.getString("gender"));
-                                user.setUser_profile_photo(profile.getProfilePictureUri(50,50).toString());
-                                user.setUser_sns_status("F");
-                            }catch (Exception e){
-                                e.printStackTrace();
+                            SharedPreferences loginInfo = getSharedPreferences("loginInfo", MODE_PRIVATE);
+                            String isRemovable = loginInfo.getString("Set-Cookie", "notFound");
+                            if ("notFound".equals(isRemovable)) {
+                                Profile profile = Profile.getCurrentProfile();
+                                try {
+                                    user = new User();
+                                    user.setUser_id(object.getString("email"));
+                                    user.setUser_sns_token(object.getString("id"));
+                                    user.setUser_password(object.getString("id"));
+                                    user.setUser_nick_name(object.getString("name"));
+                                    user.setUser_gender(object.getString("gender"));
+                                    user.setUser_profile_photo(profile.getProfilePictureUri(50,50).toString());
+                                    user.setUser_sns_status("F");
+                                }catch (Exception e){
+                                    e.printStackTrace();
+                                }
+                                Intent intent=new Intent(UserLogin.this, UserJoin.class);
+                                intent.putExtra("user", user);
+                                startActivity(intent);
+                                finish();
                             }
-                            Intent intent=new Intent(UserLogin.this, UserJoin.class);
-                            intent.putExtra("user", user);
-                            startActivity(intent);
-                            finish();
                         }
                     });
             Bundle parameters = new Bundle();
