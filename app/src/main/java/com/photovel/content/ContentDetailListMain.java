@@ -666,7 +666,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
                         Log.i("ddd","friend_state"+friend_state);
 
                         if(friend_state == 0){ //친구가아닐때
-                            Toast.makeText(getApplicationContext(),"친구추가성공!",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(),"친구신청을 성공 하였습니다!",Toast.LENGTH_SHORT).show();
                         }else if(friend_state == 1){ //내가 이미 친구신청을 했을때
                             Toast.makeText(getApplicationContext(),"이미 친구신청을 하였습니다",Toast.LENGTH_SHORT).show();
                         }else if(friend_state == 2){ //친구일때

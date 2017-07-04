@@ -111,9 +111,6 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
             tvContentListName.setText("전체 스토리");
         }else if(urlflag.equals("R")){
             tvContentListName.setText("인기 스토리");
-        }else if(urlflag.equals("S")){
-            tvContentListName.setText("검색 결과");
-            user_id = content_user_id;
         }
 
         //스토리 객체 받아오기
@@ -131,8 +128,6 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
                     qry = Value.contentURL+"/new/";
                 }else if(urlflag.equals("R")){
                     qry = Value.contentURL+"/recommend/";
-                }else if(urlflag.equals("S")){
-                    qry = Value.contentURL+"/recommend/";/////////////////////////////////////////////////////////////
                 }
 
                 String responseData = JsonConnection.getConnection(qry+user_id, "GET", null);

@@ -59,30 +59,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
             </LinearLayout>
-            <FrameLayout
-                android:id="@+id/frame"
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorPrimary"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed"
-                app:layout_collapseMode="pin">
-                <android.support.v7.widget.Toolbar
-                    android:id="@+id/toolbar"
-                    android:layout_width="match_parent"
-                    android:layout_height="?attr/actionBarSize"
-                    android:background="?attr/colorPrimary"
-                    app:layout_scrollFlags="scroll|exitUntilCollapsed"
-                    app:layout_collapseMode="pin"/>
-                <com.photovel.search.SearchView
-                    android:id="@+id/search_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="제목, 닉네임으로 검색"
-                    android:textColorHint="@color/textGrey"
-                    android:visibility="visible"
-                    app:layout_scrollFlags="scroll|exitUntilCollapsed"
-                    app:layout_collapseMode="pin"/>
-            </FrameLayout>
+                app:layout_collapseMode="pin"/>
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
     <android.support.v4.widget.NestedScrollView
@@ -113,4 +96,5 @@
                 android:layout_height="match_parent"/>
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
+    <include layout="@layout/activity_search_main"/>
 </android.support.design.widget.CoordinatorLayout>
