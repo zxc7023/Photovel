@@ -24,6 +24,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -80,7 +81,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
 
     private BottomSheetBehavior bottomSheetBehavior;
     private RelativeLayout RlSearch;
-
+    private ImageButton btnBack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,6 +96,13 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         RlSearch = (RelativeLayout) findViewById(R.id.RlSearch);
         bottomSheetBehavior = BottomSheetBehavior.from(RlSearch);
         bottomSheetBehavior.setPeekHeight(0);
+        btnBack = (ImageButton) findViewById(R.id.btn_action_back);
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+            }
+        });
 
         searchView = (SearchView) findViewById(R.id.search_view);
 
@@ -145,9 +153,11 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         }
         //추천 스토리 bitmap 받아오기
         JsonConnection.setBitmap(myRecommendDataset, Value.contentPhotoURL);
+        Log.i("ddd","오류로그 : "+myRecommendDataset.size());
 
         //추천 스토리 recycleview사용선언
         RVrecommend = (RecyclerView) findViewById(R.id.RVrecommend);
+        RVrecommend.bringToFront();
         RVrecommend.setHasFixedSize(true);
         RVrecommend.setNestedScrollingEnabled(false);
         mRecommendLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
@@ -285,7 +295,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
             }
         });
 
-        searchView.setOnSearchViewListener(new SearchView.SearchViewListener() {
+        /*searchView.setOnSearchViewListener(new SearchView.SearchViewListener() {
             @Override
             public void onSearchViewShown() {
                 //Do some magic
@@ -295,7 +305,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
             public void onSearchViewClosed() {
                 //Do some magic
             }
-        });
+        });*/
     }
 
     //Android BackButton EventListener
@@ -376,6 +386,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);   //search용 bottomSheet열어주기
+                RlSearch.bringToFront();
                 searchView.showSearch();    //검색칸?도 열어주기
                 return false;
             }

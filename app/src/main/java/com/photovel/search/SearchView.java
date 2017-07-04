@@ -360,16 +360,15 @@ public void setBackground(Drawable background) {
 
     //클릭 리스너
     private final OnClickListener onClickListener = new OnClickListener() {
-
         public void onClick(View v) {
             if (v == btnBack) {
-                closeSearch();
+                //closeSearch();
             } else if (v == btnEmpty) {
                 edtSearchSrc.setText(null);
             } else if (v == edtSearchSrc) {
                 showSuggestions();
             } else if (v == tintView) {
-                closeSearch();
+                //closeSearch();
             }
         }
     };
