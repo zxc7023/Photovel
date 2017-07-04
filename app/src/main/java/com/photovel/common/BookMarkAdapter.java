@@ -186,22 +186,10 @@ public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHo
         holder.llshare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Thread share = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        JsonConnection.getConnection(Value.contentURL+"/"+mDataset.get(position).getContent_id()+"/share", "POST", null);
-                    }
-                });
-                share.start();
-                try {
-                    share.join();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                contentshare(v);
                 adapter = new BookMarkAdapter();
                 adapter.setHolder(holder);
                 adapter.setPosition(position);
+                contentshare(v);
             }
         });
     }
@@ -220,6 +208,18 @@ public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHo
                 switch (item.getItemId()) {
                     case R.id.kakao_share:
                         sendFeedTemplate();
+                        Thread share = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                JsonConnection.getConnection(Value.contentURL+"/"+mDataset.get(position).getContent_id()+"/share", "POST", null);
+                            }
+                        });
+                        share.start();
+                        try {
+                            share.join();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                         Toast.makeText(mcontext,"카카오",Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.facebook_share:
