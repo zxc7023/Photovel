@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 
 import com.google.android.gms.internal.pr;
+import com.photovel.http.SessionConnection;
 import com.photovel.http.Value;
 import com.photovel.user.UserLogin;
 
@@ -39,9 +40,11 @@ public class SessionMangement extends FontActivity2 {
 
     String cookieValues;
     String sessionCheckValue="0";
-    String TAG ="SessionMange";
+    String TAG ="SessionMangeTest";
     int sequence = 0;
 
+
+    SharedPreferences loginInfo;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(R.style.Theme_AppCompat_Light_NoActionBar);
@@ -49,23 +52,25 @@ public class SessionMangement extends FontActivity2 {
         setContentView(R.layout.activity_session);
 
         // 저장된 jSession 쿠키값을 받아온다
-        SharedPreferences loginInfo = getSharedPreferences("loginInfo", MODE_PRIVATE);
-        String firstData = loginInfo.getString("Set-Cookie", "fail");
-        Log.i(TAG+sequence+++"쿠키존재?",firstData);
+        loginInfo = getSharedPreferences("loginInfo", MODE_PRIVATE);
+        String jSessionValue = loginInfo.getString("Set-Cookie", "fail");
+        Log.i(TAG+sequence+++"세션값 : ",jSessionValue);
 
 
         /**
          * loginInfo라는 객체속에 "Set-Cookie"로 저장해둔 jSession값에 따라 해당하는 결과를 수행한다.
+         * jSession이 있는경우는 두가지의 경우로 나누어 지는데,
+         * 서버의 loginInfo로 저장된 값과 비교하여 옳은경우와 옳지 않은 경우이다.
          */
-        checkLoginInfo(firstData);
+        checkLoginInfo(jSessionValue);
 
 
     }
 
-    public void checkLoginInfo(String firstData) {
-        if(!firstData.equals("fail")){
+    public void checkLoginInfo(String jSessionValue) {
+        if(!jSessionValue.equals("fail")){
             Log.i(TAG+sequence++," Jsession 값 존재");
-            compareSession(firstData);
+            SessionConnection.compareSession(jSessionValue);
             //jSession값에 일치하는 로그인 인포가 있을경우
             if (sessionCheckValue.equals("1")) {
                 Log.i(TAG+"조건2", "jsession이 일치함 메인으로 이동");
@@ -103,7 +108,6 @@ public class SessionMangement extends FontActivity2 {
     }
 
     public void compareSession(final String jSessionValue){
-        final int returnValue=0;
         Thread compareThread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -132,7 +136,7 @@ public class SessionMangement extends FontActivity2 {
                     bw.flush();
                     bw.close();*/
 
-                    final int responseCode = conn.getResponseCode();
+                    int responseCode = conn.getResponseCode();
                     Log.i("여기까지됨",responseCode+"");
                     switch (responseCode) {
                         case HttpURLConnection.HTTP_OK:
