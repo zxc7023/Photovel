@@ -54,7 +54,7 @@ public class SessionMangement extends FontActivity2 {
         // 저장된 jSession 쿠키값을 받아온다
         loginInfo = getSharedPreferences("loginInfo", MODE_PRIVATE);
         String jSessionValue = loginInfo.getString("Set-Cookie", "fail");
-        Log.i(TAG+sequence+++"세션값 : ",jSessionValue);
+        Log.i(TAG+sequence+++"세션값:",jSessionValue);
 
 
         /**
