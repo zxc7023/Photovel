@@ -101,6 +101,9 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         user_id = get_to_eat.getString("user_id","notFound");
         user_nick_name = get_to_eat.getString("user_nick_name","notFound");
         user_profile = get_to_eat.getString("user_profile","notFound");
+        FirebaseMessaging.getInstance().subscribeToTopic("news");
+        Log.i("pushTokenValue",FirebaseInstanceId.getInstance().getToken());
+        setToken(FirebaseInstanceId.getInstance().getToken());
 
         Log.i(TAG,get_to_eat.getAll().toString());
         Log.i(TAG,user_id);
@@ -412,4 +415,33 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
             imageView.setImageBitmap(images.get(position).getBitmap());
         }
     };
+
+    public void setToken(String token){
+        final JSONObject job = new JSONObject();
+        try {
+            job.put("user_push_token",token);
+        } catch (JSONException e) {
+
+
+        }
+        Thread tokenUpdateThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
+                String tmp =get_to_eat.getString("Set-Cookie","fail");
+                isTokenSucess =JsonConnection.setHeaderConnection(Value.userPushTokenUpdateURL,"POST",job,tmp);
+            }
+        });
+        tokenUpdateThread.start();
+        try {
+            tokenUpdateThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        if ("1".equals(isTokenSucess)){
+            Log.i(TAG,"토큰저장성공");
+        }else{
+            Log.i(TAG,"토큰저장실패");
+        }
+    }
 }

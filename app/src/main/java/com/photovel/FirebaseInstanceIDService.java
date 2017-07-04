@@ -3,6 +3,11 @@ import android.util.Log;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
+import com.photovel.http.JsonConnection;
+import com.photovel.http.Value;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 
@@ -11,7 +16,7 @@ import java.io.IOException;
 public class FirebaseInstanceIDService extends FirebaseInstanceIdService {
 
     private static final String TAG = "MyFirebaseIIDService";
-
+    String result;
     // [START refresh_token]
     @Override
     public void onTokenRefresh() {

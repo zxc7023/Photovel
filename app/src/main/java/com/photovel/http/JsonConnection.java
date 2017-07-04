@@ -186,4 +186,58 @@ public class JsonConnection {
             e.printStackTrace();
         }
     }
+    public static String setHeaderConnection(final String url, final  String method, final JSONObject json,String jSessionValue){
+
+        String responseData = null;
+        HttpURLConnection conn = null;
+        InputStream is = null;
+        OutputStream dos = null;
+        ByteArrayOutputStream baos;
+
+        Log.i(TAG, "1. getConnection url= " + url);
+
+        try {
+            URL connectURL = new URL(url);
+            conn = (HttpURLConnection) connectURL.openConnection();
+
+            //서버로부터 결과값을 응답받음
+            conn.setDoInput(true);
+            conn.setRequestProperty("Connection", "Keep-Alive");
+            conn.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
+            conn.setRequestMethod(method);
+            conn.setRequestProperty("Cookie", jSessionValue);
+
+            //method가 post면
+            if (method.toUpperCase().equals("POST") && json != null) {
+                Log.i(TAG, "1.2 getConnection json= " + json);
+                conn.setDoOutput(true);
+                dos = conn.getOutputStream();
+                dos.write(json.toString().getBytes());
+                dos.flush();
+            }
+
+            //정상인 경우 200번, 그 외 오류있는 경우 오류 번호 반환
+            final int responseCode = conn.getResponseCode();
+            Log.i(TAG, "2. getConnection responseCode= " + responseCode);
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                is = conn.getInputStream();
+                Reader reader = new InputStreamReader(is, "UTF-8");
+                BufferedReader br = new BufferedReader(reader);
+
+                responseData = br.readLine();
+                Log.i(TAG, "3. getConnection responseData= " + responseData);
+
+                br.close();
+                reader.close();
+                is.close();
+            }
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            conn.disconnect();
+        }
+        return responseData;
+    }
 }
