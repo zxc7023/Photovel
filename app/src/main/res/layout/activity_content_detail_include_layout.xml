@@ -110,9 +110,9 @@
             android:layout_height="240dp"
             android:orientation="vertical"
             android:background="@drawable/xml_border2"
+            android:scaleType="centerCrop"
             android:layout_alignParentTop="true"
-            android:layout_alignParentStart="true"
-            android:scaleType="centerCrop">
+            android:layout_alignParentStart="true">
         </ImageView>
         <LinearLayout
             android:id="@+id/lldetailSetting"
@@ -128,8 +128,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
-                android:layout_marginLeft="@dimen/most_left_tv_margin"
-                android:onClick="goLook">
+                android:layout_marginLeft="@dimen/most_left_tv_margin">
                 <TextView
                     android:id="@+id/icleft"
                     android:layout_width="wrap_content"
@@ -160,8 +159,7 @@
                 <LinearLayout
                     android:id="@+id/btnLookRight"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:onClick="goLook">
+                    android:layout_height="wrap_content">
                     <TextView
                         android:id="@+id/icright"
                         android:layout_width="wrap_content"
@@ -197,16 +195,18 @@
             android:layout_below="@+id/ivTopPhoto"
             android:gravity="center">
             <LinearLayout
-                android:layout_width="match_parent"
+                android:id="@+id/btnUserProfile"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center"
-                android:layout_marginTop="10dp">
+                android:layout_marginTop="10dp"
+                android:onClick="ProFileMenuClick">
                 <com.mikhaellopez.circularimageview.CircularImageView
+                    android:id="@+id/userProfile"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:src="@drawable/ic_profile_circle"
-                    android:onClick="ProFileMenuClick"
                     app:civ_border_width="1dp"
                     android:layout_marginRight="@dimen/between_tv_margin"/>
                 <TextView
@@ -307,20 +307,31 @@
                 android:layout_height="50dp"
                 android:layout_below="@+id/lldetailInfo">
                 <LinearLayout
+                    android:id="@+id/btnBookmark"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_weight="0.9"
-                    android:gravity="left">
+                    android:gravity="left|center"
+                    android:orientation="horizontal">
                     <TextView
-                        android:id="@+id/icpow"
+                        android:id="@+id/icbookmark"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:text="@string/fa_paw"
+                        android:text="@string/fa_bookmark_o"
                         android:textSize="@dimen/icon_size"
                         android:textColor="@color/bgDarkGrey"
                         android:gravity="center_vertical"
                         android:layout_gravity="center"
                         android:layout_marginLeft="10dp"
+                        android:layout_marginRight="@dimen/between_tv_margin"
+                        android:includeFontPadding="false"/>
+                    <TextView
+                        android:id="@+id/tvbookmark"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="북마크"
+                        android:textColor="@color/bgDarkGrey"
+                        android:textSize="@dimen/content_text_size"
                         android:includeFontPadding="false"/>
                 </LinearLayout>
                 <LinearLayout
@@ -431,6 +442,7 @@
                         android:layout_marginRight="@dimen/between_tv_margin"
                         android:includeFontPadding="false"/>
                     <TextView
+                        android:id="@+id/tvlike"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:background="@color/bgNo"
@@ -442,6 +454,7 @@
                         android:includeFontPadding="false"/>
                 </LinearLayout>
                 <LinearLayout
+                    android:id="@+id/btnComment"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_weight="2"
@@ -458,7 +471,6 @@
                         android:layout_marginRight="@dimen/between_tv_margin"
                         android:includeFontPadding="false"/>
                     <TextView
-                        android:id="@+id/btnComment"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:background="@color/bgNo"

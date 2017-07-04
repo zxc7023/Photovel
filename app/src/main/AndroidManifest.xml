@@ -9,8 +9,9 @@
     <!-- 갤러리권한설정 -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
+
     <application
-        android:name=".FontApp"
+        android:name=".user.GlobalApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -20,36 +21,46 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAiudYhFEK-5EW9nzlu8Tbv1FoUNyLRWz8" />
+        <meta-data
+            android:name="com.kakao.sdk.AppKey"
+            android:value="@string/kakao_app_key" />
         <!-- AIzaSyDHhbAmLoQolRIfA6C2Xdm-NzKa9naq3XA
         준기키-->
+        <!-- AIzaSyAoropfQgcXeJI0nf6iyz36wDc9pZIBJUw
+        하라키 -->
+        <!-- AIzaSyAiudYhFEK-5EW9nzlu8Tbv1FoUNyLRWz8
+        은지키 -->
         <activity
-            android:name=".MainActivity"
+            android:name=".SessionMangement"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/SplashTheme">
+            <!--android:theme="@style/AppTheme.NoActionBar"-->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity android:name=".FontActivity" />
         <activity android:name=".FontActivity2" />
         <activity android:name=".content.ContentClusterMain" android:theme="@style/AppTheme.NoActionBar"/>
-        <activity android:name=".content.ContentCluster" />
         <activity android:name=".content.ContentInsertMain" />
         <activity android:name=".content.ContentInsertGoogleMap" />
         <activity android:name=".content.ContentUpdateMain" />
         <activity android:name=".content.ContentSlideShowMain" android:theme="@style/AppTheme.NoActionBar"/>
-        <activity android:name=".content.ContentSlideShow"/>
         <activity android:name=".content.ContentDetailListMain" android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".content.ContentListMain" android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".setting.SettingMain" android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".common.BookMarkMain" android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".friend.FriendListMain" android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".TestActivity"/>
-        <activity android:name=".user.UserLogin"/>
+        <activity android:name=".user.UserLogin" android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".user.UserValidityCheck"/>
         <activity android:name=".user.UserJoin"/>
-        <activity android:name=".content.CommentMain"/>
+        <activity android:name=".user.KakaoSignupActivity"/>
+        <activity android:name=".user.KakaoUserJoinDetail"/>
+        <activity android:name=".MainActivity" android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".IntroMain" android:theme="@style/AppTheme.NoActionBar"/>
 
-        <activity android:name=".content.SlideShowTest"/>
     </application>
 
 </manifest>

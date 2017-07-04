@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.photovel.content.ContentDetailListMain">
+    tools:context="com.photovel.content.ContentClusterMain">
 
     <android.support.design.widget.AppBarLayout
         android:layout_height="wrap_content"
@@ -22,8 +22,7 @@
             <include
                 layout="@layout/activity_content_detail_include_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                />
+                android:layout_height="wrap_content" />
             <android.support.v7.widget.Toolbar
                 android:id="@+id/clusterToolbar"
                 android:layout_width="match_parent"
@@ -42,16 +41,16 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:font="normal"
         android:fillViewport="true"
-        android:id="@+id/nestedScrollView">
+        android:id="@+id/cluster_nestedScrollView">
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical">
-            <include
-                layout="@layout/activity_content_cluster"
+            <fragment
+                class="com.photovel.content.MySupportMapFragment"
+                android:id="@+id/cluster_map"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                />
+                android:layout_height="430dp"/>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -80,13 +79,13 @@
                     android:layout_marginLeft="@dimen/most_left_tv_margin"
                     android:background="@drawable/xml_border2">
                     <com.mikhaellopez.circularimageview.CircularImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:id="@+id/userProfile1"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
                         android:src="@drawable/ic_profile_circle"
-                        android:onClick="ProFileMenuClick"
                         app:civ_border_width="1dp"
                         android:gravity="center"
-                        android:layout_marginRight="@dimen/between_tv_margin"/>
+                        android:layout_marginRight="5dp"/>
                     <TextView
                         android:id="@+id/tvUsername2"
                         android:layout_width="wrap_content"
@@ -120,4 +119,5 @@
         android:visibility="gone"
         android:src="@drawable/btn_up"
         app:backgroundTint="@color/bgWhite"/>
+    <include layout="@layout/activity_comment_main"/>
 </android.support.design.widget.CoordinatorLayout>

@@ -4,6 +4,7 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.util.Log;
@@ -64,10 +65,10 @@ public class UserJoin extends FontActivity2 {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mContext =this;
+        mContext = this;
         setContentView(R.layout.activity_user_join);
 
-        backPressCloseHandler = new BackPressCloseHandler(this,new Intent(getApplicationContext(),UserLogin.class));
+        backPressCloseHandler = new BackPressCloseHandler(this, new Intent(getApplicationContext(), UserLogin.class));
         //아이콘
         final TextView nickNameIcon = (TextView) findViewById(R.id.nickNameIcon);
         TextView phoneIcon = (TextView) findViewById(R.id.phoneIcon);
@@ -132,8 +133,9 @@ public class UserJoin extends FontActivity2 {
                     return;
                 } else {
                     Intent intent = getIntent();
-                    User user = (User) intent.getSerializableExtra("user");
+                    User user;
                     JSONObject job = new JSONObject();
+                    user = (User) intent.getSerializableExtra("user");
                     try {
                         job.put("user_id", user.getUser_id());
                         job.put("user_password", user.getUser_password());
@@ -141,6 +143,7 @@ public class UserJoin extends FontActivity2 {
                         job.put("user_phone2", phoneNumber);
                         job.put("user_gender", gender);
                         job.put("user_phone1", country_code);
+                        job.put("user_sns_status", "O");
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -148,14 +151,13 @@ public class UserJoin extends FontActivity2 {
 
                     String url = Value.userJoinURL;
                     join(job.toString(), url);
-                    if(isSucess.equals("1")){
-                        Log.i("isSucess","로그인페이지로 이동");
-                        Intent intent1 = new Intent(getApplicationContext(),UserLogin.class);
-                        intent1.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                    if (isSucess.equals("1")) {
+                        Log.i("isSucess", "로그인페이지로 이동");
+                        Intent intent1 = new Intent(getApplicationContext(), UserLogin.class);
+                        intent1.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                         startActivity(intent1);
                         finish();
                     }
-
                 }
             }
         });
@@ -163,7 +165,7 @@ public class UserJoin extends FontActivity2 {
 
     public void join(final String json, final String url) {
         Log.i("myConsole_idChek", "methodStart");
-        Log.i("jsonTest",json.toString());
+        Log.i("jsonTest", json.toString());
         Thread joinThread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -201,12 +203,12 @@ public class UserJoin extends FontActivity2 {
                             }
                             byteData = baos.toByteArray();
                             isSucess = new String(byteData);
-                            Log.i("isSucess",isSucess);
+                            Log.i("isSucess", isSucess);
                     }
 
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
-                    Log.i("UserJoin's error" ,e.getMessage());
+                    Log.i("UserJoin's error", e.getMessage());
                 } catch (ProtocolException e) {
                     e.printStackTrace();
                 } catch (IOException e) {

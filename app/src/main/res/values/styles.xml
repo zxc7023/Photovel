@@ -6,35 +6,31 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-       <!-- <item name="searchViewStyle">@style/ContentSearchViewTheme</item>-->
     </style>
 
-    <!-- search view style -->
-    <style name="ToolbarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
-        <item name="searchViewStyle">@style/ContentSearchViewTheme</item>
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="CollapsedAppBar" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textSize">24dp</item>
+        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:textStyle">normal</item>
     </style>
 
-    <style name="ContentSearchViewTheme" parent="Widget.AppCompat.SearchView">
-        <!-- 검색 클릭시 툴바를 덮는 레이아웃 -->
-        <item name="layout">@layout/toolbar_search_view_layout</item>-->
-        <!-- 자동 완성 스타일 -->
-
-        <item name="autoCompleteTextViewStyle">@style/myAutoCompleteTextViewStyle</item>
-
-        <item name="colorControlNormal">@color/material_light_active_icon</item>
-
-        <item name="colorControlHighlight">@color/material_ripple_light</item>
-
-        <!-- 검색 결과의 각 행의 레이아웃 -->
-        <item name="suggestionRowLayout">@layout/activity_main_new_list_adapter</item>
-
-        <item name="android:maxWidth">9999dp</item>
+    <style name="ExpandedAppBar" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textSize">20dp</item>
+        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:textStyle">normal</item>
     </style>
 
-    <style name="myAutoCompleteTextViewStyle" parent="Widget.AppCompat.Light.AutoCompleteTextView">
-        <item name="android:popupBackground">@drawable/login_background_image</item>
-        <item name="android:colorFocusedHighlight">@color/bgDarkGrey</item>
-        <item name="android:popupElevation">0dp</item>
+    <style name="MenuStyle" parent="ThemeOverlay.AppCompat.Light">
+        <item name="android:textSize">@dimen/content_text_size</item>
+        <item name="android:colorBackground">@color/bgDarkGrey</item>
+        <item name="android:textColor">@color/bgWhite</item>
     </style>
 
     <style name="ContentSearchViewStyle">
@@ -65,46 +61,16 @@
         <item name="android:inputType">text|textAutoComplete</item>
     </style>
 
-
-
     <style name="ContentSearchView">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">match_parent</item>
         <item name="android:background">?android:attr/selectableItemBackgroundBorderless</item>
-        <item name="android:paddingLeft">@dimen/search_icon_padding</item>
-        <item name="android:paddingRight">@dimen/search_icon_padding</item>
+        <item name="android:scaleType">fitXY</item>
     </style>
 
-    <!--<style name="mySearchResult" parent="TextAppearance.AppCompat.SearchResult.Title">
-        <item name="android:textColor">#FFF</item>
-    </style>-->
-
-
-    <style name="AppTheme.NoActionBar">
-        <item name="windowActionBar">false</item>
+    <style name="SplashTheme" parent="AppTheme">
         <item name="windowNoTitle">true</item>
-    </style>
-
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
-
-    <style name="CollapsedAppBar" parent="@android:style/TextAppearance.Medium">
-        <item name="android:textSize">24dp</item>
-        <item name="android:textColor">@color/colorPrimary</item>
-        <item name="android:textStyle">normal</item>
-    </style>
-
-    <style name="ExpandedAppBar" parent="@android:style/TextAppearance.Medium">
-        <item name="android:textSize">20dp</item>
-        <item name="android:textColor">@color/colorPrimary</item>
-        <item name="android:textStyle">normal</item>
-    </style>
-
-    <style name="MenuStyle" parent="ThemeOverlay.AppCompat.Light">
-        <item name="android:textSize">@dimen/content_text_size</item>
-        <item name="android:colorBackground">@color/bgDarkGrey</item>
-        <item name="android:textColor">@color/bgBlackAlpha</item>
+        <item name="windowActionBar">false</item>
+        <item name="android:windowBackground">@drawable/splash</item>
+        <item name="android:scaleType">fitCenter</item>
     </style>
 
 </resources>

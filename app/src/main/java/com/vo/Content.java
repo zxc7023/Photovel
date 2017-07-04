@@ -30,7 +30,21 @@ public class Content {
 	private Date fr_photo_date;
 	private Date to_photo_date;
 
+	private int good_status;
+	private int bookmark_status;
 
+	public int getGood_status() {
+		return good_status;
+	}
+	public void setGood_status(int good_status) {
+		this.good_status = good_status;
+	}
+	public int getBookmark_status() {
+		return bookmark_status;
+	}
+	public void setBookmark_status(int bookmark_status) {
+		this.bookmark_status = bookmark_status;
+	}
 	public double getPhoto_latitude() {
 		return photo_latitude;
 	}
@@ -51,6 +65,9 @@ public class Content {
 	}
 	public Date getTo_photo_date() {
 		return to_photo_date;
+	}
+	public void setTo_photo_date(Date to_photo_date) {
+		this.to_photo_date = to_photo_date;
 	}
 	public Bitmap getBitmap() {
 		return bitmap;
@@ -154,16 +171,33 @@ public class Content {
 	public void setDetails(List<ContentDetail> details) {
 		this.details = details;
 	}
+
 	@Override
 	public String toString() {
-		return "Content [content_id=" + content_id + ", content_subject=" + content_subject + ", content=" + content
-				+ ", content_written_date=" + content_written_date + ", content_private_flag=" + content_private_flag
-				+ ", content_delete_status=" + content_delete_status + ", content_warning_status="
-				+ content_warning_status + ", content_share_count=" + content_share_count + ", good_count=" + good_count
-				+ ", comment_count=" + comment_count + ", content_detail_count=" + content_detail_count
-				+ ", photo_file_name=" + photo_file_name + ", photo_latitude=" + photo_latitude + ", photo_longitude="
-				+ photo_longitude + ", fr_photo_date=" + fr_photo_date + ", to_photo_date=" + to_photo_date + ", user="
-				+ user + ", ad=" + ad + ", comments=" + comments + ", details=" + details + "]";
+		return "Content{" +
+				"content_id=" + content_id +
+				", content_subject='" + content_subject + '\'' +
+				", content='" + content + '\'' +
+				", content_written_date=" + content_written_date +
+				", content_private_flag='" + content_private_flag + '\'' +
+				", content_delete_status='" + content_delete_status + '\'' +
+				", content_warning_status=" + content_warning_status +
+				", content_share_count=" + content_share_count +
+				", good_count=" + good_count +
+				", comment_count=" + comment_count +
+				", content_detail_count=" + content_detail_count +
+				", photo_file_name='" + photo_file_name + '\'' +
+				", user=" + user +
+				", ad=" + ad +
+				", comments=" + comments +
+				", details=" + details +
+				", bitmap=" + bitmap +
+				", photo_latitude=" + photo_latitude +
+				", photo_longitude=" + photo_longitude +
+				", fr_photo_date=" + fr_photo_date +
+				", to_photo_date=" + to_photo_date +
+				", good_status=" + good_status +
+				", bookmark_status=" + bookmark_status +
+				'}';
 	}
-
 }

@@ -7,23 +7,35 @@
     android:layout_height="match_parent"
     android:background="@drawable/login_background_image">
 
-    <TextView
-        android:id="@+id/mainString"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="25dp"
-        android:layout_marginTop="25dp"
-        android:gravity="center"
-        android:text="Photovel\n사진으로 만드는 여행"
-        android:textColor="@android:color/white" />
+        android:orientation="vertical"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="30dp">
 
-    <TextView
-        android:id="@+id/delimeter"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="----- or -----"
-        android:textColor="@color/bgWhite"
-        android:gravity="center"/>
+        <TextView
+            android:id="@+id/mainString"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:gravity="bottom|center_horizontal"
+            android:includeFontPadding="false"
+            android:text="Photovel"
+            android:textColor="@android:color/white"
+            android:textSize="25dp" />
+
+        <TextView
+            android:id="@+id/subString"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="top|center_horizontal"
+            android:text="사진으로 만드는 여행"
+            android:textColor="@android:color/white"
+            android:includeFontPadding="false"/>
+    </LinearLayout>
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -32,9 +44,7 @@
         android:layout_marginRight="20dp"
         android:padding="10dp"
         android:background="@drawable/border"
-        android:orientation="vertical"
-        >
-
+        android:orientation="vertical">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -47,10 +57,11 @@
                 android:layout_height="match_parent"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="20dp"
-                android:gravity="center_vertical"
                 android:text="@string/fa_user_circle"
                 android:textColor="@color/bgWhite"
-                android:textSize="20dp" />
+                android:textSize="20dp"
+                android:gravity="center"
+                android:includeFontPadding="false"/>
 
             <EditText
                 android:id="@+id/nicknameText"
@@ -79,7 +90,8 @@
                 android:text="@string/fa_globe"
                 android:textColor="@color/bgWhite"
                 android:textSize="20dp"
-                android:gravity="center_vertical"/>
+                android:gravity="center"
+                android:includeFontPadding="false"/>
 
             <Spinner
                 android:layout_width="0dp"
@@ -106,7 +118,8 @@
                 android:text="@string/fa_mobile_phone"
                 android:textColor="@color/bgWhite"
                 android:textSize="20dp"
-                android:gravity="center_vertical"/>
+                android:gravity="center"
+                android:includeFontPadding="false"/>
 
             <EditText
                 android:id="@+id/phoneText"
@@ -137,7 +150,8 @@
                 android:text="@string/fa_transgender"
                 android:textColor="@color/bgWhite"
                 android:textSize="20dp"
-                android:gravity="center_vertical"/>
+                android:gravity="center"
+                android:includeFontPadding="false"/>
 
             <RadioGroup
                 android:layout_width="0dp"
@@ -176,14 +190,9 @@
         android:layout_marginLeft="30dp"
         android:layout_marginRight="30dp"
         android:layout_marginTop="20dp"
-        android:background="@drawable/button_round"
+        android:background="@drawable/layout_round"
         android:text="SignUp"
         android:textColor="@color/bgWhite" />
 
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="로그인없이 넘어가기" />
 </LinearLayout>

@@ -5,13 +5,12 @@ import android.annotation.TargetApi;
 import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.Typeface;
-import android.location.Address;
-import android.location.Geocoder;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
@@ -35,9 +34,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
+import com.mikhaellopez.circularimageview.CircularImageView;
 import com.photovel.R;
 import com.photovel.FontActivity;
+import com.photovel.http.JsonConnection;
+import com.photovel.http.MultipartConnection;
 import com.photovel.http.Value;
+import com.photovel.user.UserBitmapEncoding;
 import com.vo.Content;
 import com.vo.ContentDetail;
 import com.vo.Photo;
@@ -46,41 +49,24 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
-import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 public class ContentUpdateMain extends FontActivity {
     private Button btnSort, btnPhotoSave;
-    private TextView btnBack;
-    private TextView tvTitle;
+    private TextView btnBack, tvTitle, tvUsername;
     private FloatingActionButton  btnAddPhots, btnTop;
     private String path;
     private ExifInterface exif;
     private static final String TAG = "AppPermission";
     private final int MY_PERMISSION_REQUEST_STORAGE = 100;
-
-    private final String contentURL = Value.contentURL;
-    private final String contentPhotoURL = Value.contentPhotoURL;
 
     private RecyclerView mRecyclerView;
     private ContentUpdateAdapter mAdapter;
@@ -94,13 +80,19 @@ public class ContentUpdateMain extends FontActivity {
     private int content_id=-1;
 
     private Content content;
-    private String isSucess;
+    private String user_id, user_nick_name, user_profile;
+    private CircularImageView userProfile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_content_insert_main);
         checkPermission();
+
+        SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
+        user_id = get_to_eat.getString("user_id","notFound");
+        user_nick_name = get_to_eat.getString("user_nick_name","notFound");
+        user_profile = get_to_eat.getString("user_profile","notFound");
 
         Intent intent = getIntent();
         content_id = intent.getIntExtra("content_id",-1);
@@ -112,6 +104,13 @@ public class ContentUpdateMain extends FontActivity {
 
         tvTitle = (TextView)findViewById(R.id.tvTitle);
         tvTitle.setText("여행 편집");
+        tvUsername = (TextView)findViewById(R.id.tvUsername);
+        userProfile = (CircularImageView)findViewById(R.id.userProfile);
+        tvUsername.setText(user_nick_name);
+        if(!user_profile.equals("notFound")){
+            UserBitmapEncoding ub = new UserBitmapEncoding();
+            userProfile.setImageBitmap(ub.StringToBitMap(user_profile));
+        }
 
         CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setExpandedTitleTextAppearance(R.style.ExpandedAppBar);
@@ -150,38 +149,30 @@ public class ContentUpdateMain extends FontActivity {
         Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
         btnBack.setTypeface(fontAwesomeFont);
 
-        //db에 있는 contentId별 content정보 받아오기
-        Thread thread1 = new Thread(){
+        //Content, ContentDetail 객체 받아오기
+        Thread contentList = new Thread(){
             @Override
             public void run() {
                 super.run();
-                content = getContentData(content_id);
+                String responseData = JsonConnection.getConnection(Value.contentURL+"/"+content_id+"/"+user_id, "GET", null);
+                content = JSON.parseObject(responseData, Content.class);
+                myDataset = content.getDetails();
             }
         };
-        thread1.start();
+        contentList.start();
         try {
-            thread1.join();  //모든처리 thread처리 기다리기
+            contentList.join();  //모든처리 thread처리 기다리기
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        getImage(); //content Image받아오기
+
+        //ContentDetail bitmap 받아오기
+        JsonConnection.setBitmap(myDataset, Value.contentPhotoURL);
+        JsonConnection.setBitmap(originData, Value.contentPhotoURL);
 
         //content정보 추가하기
         contentSubject.setText(content.getContent_subject());
         contentText.setText(content.getContent());
-        myDataset = new ArrayList<>();
-        originData = new ArrayList<>();
-        for(int i=0; i<content.getDetails().size(); i++){
-            Photo ph = new Photo();
-            ph.setPhoto_latitude(content.getDetails().get(i).getPhoto().getPhoto_latitude());
-            ph.setPhoto_longitude(content.getDetails().get(i).getPhoto().getPhoto_longitude());
-
-            GetCurrentAddress getAddress = new GetCurrentAddress();
-            String address = getAddress.getAddress(ph);
-            content.getDetails().get(i).getPhoto().setAddress(address);
-            myDataset.add(content.getDetails().get(i));
-            originData.add(content.getDetails().get(i));
-        }
 
         //recycleview사용선언
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
@@ -313,7 +304,7 @@ public class ContentUpdateMain extends FontActivity {
                                     if(myDataset.get(i).getContent_detail_id()==null){
                                         myDataset.get(i).setContent_detail_id("");
                                     }else{
-                                        //원재 DB에있는것인데 지워진것인지 아닌지 판단2
+                                        //원래 DB에있는것인데 지워진것인지 아닌지 판단2
                                         myDataset.get(i).setDetail_delete_status("F");
                                         for(int j=0; j<originData.size(); j++){
                                             if(myDataset.get(i).getContent_detail_id() == originData.get(j).getContent_detail_id()){
@@ -369,110 +360,22 @@ public class ContentUpdateMain extends FontActivity {
 
                                     Log.i("ddd",obj.toString());
 
-                                    final String url = contentURL+"/"+content_id;
-
                                     //Bitmap처리
                                     final List<Bitmap> tmp = new ArrayList<Bitmap>();
                                     for(int i=0; i<sumData.size(); i++){
                                         tmp.add(sumData.get(i).getPhoto().getBitmap());
                                     }
 
-                                    Thread th = new Thread(new Runnable() {
+                                    Thread contentUpdate =new Thread(new Runnable() {
                                         @Override
                                         public void run() {
-                                            DataOutputStream dos = null;
-                                            HttpURLConnection conn = null;
-                                            InputStream is;
-                                            ByteArrayOutputStream baos;
-                                            try {
-                                                String lineEnd = "\r\n";
-                                                String twoHyphens = "--";
-                                                String boundary = "**##**";
-
-                                                URL connectURL = new URL(url);
-
-                                                conn = (HttpURLConnection) connectURL.openConnection();
-                                                conn.setDoInput(true);
-                                                conn.setDoOutput(true);
-                                                conn.setUseCaches(false);
-                                                conn.setRequestMethod("POST");
-
-                                                conn.setRequestProperty("Connection", "Keep-Alive");
-                                                conn.setRequestProperty("Content-Type","multipart/form-data;boundary=" + boundary);
-                                                dos = new DataOutputStream(conn.getOutputStream());
-
-                                                dos.writeBytes(lineEnd + twoHyphens + boundary + lineEnd);
-                                                dos.writeBytes("Content-Disposition: form-data; name=\"content\""+lineEnd+lineEnd+ URLEncoder.encode(obj.toString(),"UTF-8"));
-                                                //dos.writeBytes("Content-Type: application/json;charset=\"UTF-8\"\r\n\r\n");
-
-                                                for(int i=0; i < tmp.size(); i++){
-                                                    dos.writeBytes(lineEnd + twoHyphens + boundary + lineEnd);
-                                                    dos.writeBytes("Content-Disposition: form-data; name=\"uploadFile\"; filename=\"uploadFile\""+lineEnd);
-                                                    dos.writeBytes("Content-Type: image/jpg"+lineEnd+lineEnd);
-                                                    /*dos.writeBytes("Content-Type: application/octet-stream\r\n\r\n");*/
-
-                                                    ByteArrayOutputStream outPutStream = new ByteArrayOutputStream();
-                                                    tmp.get(i).compress(Bitmap.CompressFormat.JPEG, 100, outPutStream);
-                                                    byte[] byteArray = outPutStream.toByteArray();
-                                                    ByteArrayInputStream inputStream = new ByteArrayInputStream(byteArray);
-                                                    int bytesAvailable = inputStream.available();
-                                                    int maxBufferSize = 1024;
-                                                    int bufferSize = Math.min(bytesAvailable, maxBufferSize);
-                                                    byte[] buffer = new byte[bufferSize];
-
-                                                    int bytesRead = inputStream.read(buffer, 0, bufferSize);
-                                                    while (bytesRead > 0)
-                                                    {
-                                                        dos.write(buffer, 0, bufferSize);
-                                                        bytesAvailable = inputStream.available();
-                                                        bufferSize = Math.min(bytesAvailable, maxBufferSize);
-                                                        bytesRead = inputStream.read(buffer, 0, bufferSize);
-                                                    }
-                                                    inputStream.close();
-                                                }
-
-
-                                                dos.writeBytes(lineEnd + twoHyphens + boundary + twoHyphens + lineEnd);
-                                                dos.flush();
-
-                                                int responseCode = conn.getResponseCode();
-                                                Log.i("responseCode",responseCode+"");
-
-                                                switch (responseCode){
-                                                    case HttpURLConnection.HTTP_OK:
-                                                        is = conn.getInputStream();
-                                                        baos = new ByteArrayOutputStream();
-                                                        byte[] byteBuffer = new byte[1024];
-                                                        byte[] byteData = null;
-                                                        int nLength = 0;
-                                                        while ((nLength = is.read(byteBuffer, 0, byteBuffer.length)) != -1) {
-                                                            baos.write(byteBuffer, 0, nLength);
-                                                        }
-                                                        byteData = baos.toByteArray();
-                                                        isSucess = new String(byteData);
-                                                        Log.i("isSucess",isSucess);
-                                                }
-
-                                            } catch (ProtocolException e) {
-                                                e.printStackTrace();
-                                            } catch (MalformedURLException e) {
-                                                e.printStackTrace();
-                                            } catch (IOException e) {
-                                                e.printStackTrace();
-                                            }finally {
-                                                try {
-                                                    dos.close();
-                                                    conn.disconnect();
-                                                } catch (IOException e) {
-                                                    e.printStackTrace();
-                                                }
-
-                                            }
+                                            String responseData = MultipartConnection.getConnection(Value.contentURL+"/"+content_id, obj, tmp);
+                                            content_id = Integer.parseInt(responseData);
                                         }
                                     });
-                                    th.start();
+                                    contentUpdate.start();
                                     try {
-                                        th.join();
+                                        contentUpdate.join();
                                     } catch (InterruptedException e) {
                                         e.printStackTrace();
                                     }
@@ -482,8 +385,8 @@ public class ContentUpdateMain extends FontActivity {
                                 }
 
                                 Intent intent = new Intent(getApplicationContext(), ContentDetailListMain.class);
-                                Log.i("content_id","insert_content_id : "+isSucess);
-                                intent.putExtra("content_id",Integer.parseInt(isSucess));
+                                Log.i("content_id","insert_content_id : " + content_id);
+                                intent.putExtra("content_id", content_id);
                                 getApplicationContext().startActivity(intent);
                                 finish();
 
@@ -546,113 +449,6 @@ public class ContentUpdateMain extends FontActivity {
         }
     }
 
-    //DB에서 content정보 받아오기
-    public Content getContentData(int id){
-        Content content = null;
-        HttpURLConnection conn = null;
-        Log.i(TAG, "getPhotoData의 id= " + id);
-
-        //String qry = photoURL + "/" + id;
-        String qry = contentURL+"/" + id;
-        Log.i(TAG, "1.getPhotoData의 qry= " + qry);
-
-        try {
-            URL strUrl = new URL(qry);
-            conn = (HttpURLConnection) strUrl.openConnection();
-            conn.setDoInput(true);//서버로부터 결과값을 응답받음
-            //conn.setDoOutput(true);//서버로 값을 출력. GET방식의 경우 이 설정을 하면 405에러가 난다. 왜???
-            //conn.connect();
-            conn.setRequestMethod("GET");
-            Log.i(TAG, "2.getPhotoData의 qry= " + qry);
-            /*
-            OutputStream os = conn.getOutputStream();
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-            // bw.write(id);
-
-            bw.flush();
-            bw.close();*/
-
-            final int responseCode = conn.getResponseCode(); //정상인 경우 200번, 그 외 오류있는 경우 오류 번호 반환
-            Log.i(TAG, "getPhotoData의 responseCode= " + responseCode);
-            switch (responseCode){
-                case HttpURLConnection.HTTP_OK:
-
-                    InputStream is = conn.getInputStream();
-                    Reader reader = new InputStreamReader(is, "UTF-8");
-                    BufferedReader br = new BufferedReader(reader);
-                    // while(br.read() != -1 ){
-                    String responseData = null;
-
-                    responseData = br.readLine();
-                    Log.i(TAG, "getPhotoData의 response data= " + responseData);
-
-                    content = JSON.parseObject(responseData, Content.class);
-
-                    br.close();
-                    reader.close();
-                    is.close();
-
-                    break;
-                case HttpURLConnection.HTTP_NOT_FOUND:
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getApplicationContext(), "페이지를 찾을 수 없습니다.", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-
-                    break;
-                default:
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getApplicationContext(), "response code: " + responseCode, Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                    break;
-            }
-
-            return content;
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-
-            conn.disconnect();
-        }
-
-        return null;
-    }
-
-    //DB에서 bitmap정보 받아오기
-    public void getImage(){
-        Thread thread2 = new Thread(){
-            @Override
-            public void run() {
-                super.run();
-                try {
-                    for (int i = 0; i < content.getDetails().size(); i++) {
-                        Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL(contentPhotoURL+"/" + content.getContent_id() + "/" + content.getDetails().get(i).getPhoto().getPhoto_file_name()).getContent());
-                        content.getDetails().get(i).getPhoto().setBitmap(bitmap);
-                        //File filePath = new File(Environment.getExternalStorageDirectory());
-                        //FileUtils.copyURLToFile(new URL("http://photovel.com/upload/" + contentData.getContent_id() + "/" + contentData.getDetails().get(i).getPhoto().getPhotoFileName()), );
-                    }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        thread2.start();
-        try {
-            thread2.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-    }
-
     //사진선택
     private Photo selectPhoto(Uri uri){
         mRecyclerView.setBackgroundResource(R.color.bgGrey);
@@ -667,7 +463,7 @@ public class ContentUpdateMain extends FontActivity {
                 photo.setPhoto_latitude(geo.getLatitude());
                 photo.setPhoto_longitude(geo.getLongitude());
                 GetCurrentAddress getAddress = new GetCurrentAddress();
-                address = getAddress.getAddress(photo); //주소로 바꿔주기
+                address = getAddress.getAddress(geo.getLatitude(), geo.getLongitude()); //주소로 바꿔주기
                 photo.setAddress(address);
             }else {
                 photo.setAddress("주소 미확인");
@@ -684,7 +480,7 @@ public class ContentUpdateMain extends FontActivity {
             exif = new ExifInterface(path);
             int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED); //회전률
             //사진보여주기 전에 용량처리해주기
-            Bitmap bitmap = getBitmap(path);
+            Bitmap bitmap = resizeBitmap(path);
 
             //사진보여주기 전에 회전처리해주기
             photo.setBitmap(rotateBitmap(bitmap,orientation));
@@ -698,10 +494,10 @@ public class ContentUpdateMain extends FontActivity {
     }
 
     //사진 용량 줄이기
-    private Bitmap getBitmap(String path) {
+    private Bitmap resizeBitmap(String path) {
         InputStream in = null;
         try {
-            final int IMAGE_MAX_SIZE = 700000; //고정됨!!!!수정금지!!!!
+            final int IMAGE_MAX_SIZE = 200000; //고정됨!!!!수정금지!!!!
             in = new FileInputStream(path);
 
             // Decode image size

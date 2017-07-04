@@ -7,36 +7,35 @@
     android:layout_height="match_parent"
     android:background="@drawable/login_background_image">
 
-    <TextView
-        android:id="@+id/mainString"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="25dp"
-        android:layout_marginTop="25dp"
-        android:gravity="center"
-        android:text="Photovel\n사진으로 만드는 여행"
-        android:textColor="@android:color/white" />
+        android:orientation="vertical"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="30dp">
 
-    <Button
-        android:id="@+id/FacebookLogin"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="FacebookLogin" />
+        <TextView
+            android:id="@+id/mainString"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:gravity="bottom|center_horizontal"
+            android:includeFontPadding="false"
+            android:text="Photovel"
+            android:textColor="@android:color/white"
+            android:textSize="25dp" />
 
-    <Button
-        android:id="@+id/KakaoLogin"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="KakaoLogin" />
+        <TextView
+            android:id="@+id/subString"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="top|center_horizontal"
+            android:text="사진으로 만드는 여행"
+            android:textColor="@android:color/white"
+            android:includeFontPadding="false"/>
+    </LinearLayout>
 
-    <TextView
-        android:id="@+id/delimeter"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="----- or -----"
-        android:textColor="@color/bgWhite"
-        android:gravity="center"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -140,14 +139,9 @@
         android:layout_marginLeft="30dp"
         android:layout_marginRight="30dp"
         android:layout_marginTop="20dp"
-        android:background="@drawable/button_round"
+        android:background="@drawable/layout_round"
         android:text="SignUp"
         android:textColor="@color/bgWhite" />
 
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="로그인없이 넘어가기" />
 </LinearLayout>

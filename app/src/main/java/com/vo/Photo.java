@@ -18,6 +18,15 @@ public class Photo implements ClusterItem{
     private LatLng position;
     private Bitmap bitmap;
     private String address;
+    private String rank;
+
+    public String getRank() {
+        return rank;
+    }
+
+    public void setRank(String rank) {
+        this.rank = rank;
+    }
 
     public Photo() {
     }
