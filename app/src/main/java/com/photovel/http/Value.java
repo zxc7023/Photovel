@@ -32,4 +32,6 @@ public class Value {
     public static String userLogoutURL = photovelURL + "/common/user/logout";
 
     public static String userPushTokenUpdateURL = photovelURL + "/common/user/push/update";
+
+    public static String usergetPushTokenURL = photovelURL + "/common/user/push/getPushToken";
 }

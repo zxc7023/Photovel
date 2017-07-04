@@ -337,15 +337,24 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
             public void onClick(View v) {
                 final JSONObject comment = new JSONObject();
                 try {
-                    JSONObject user = new JSONObject();
+                    final JSONObject user = new JSONObject();
                     user.put("user_id", user_id);
                     comment.put("content_id", content_id);
                     comment.put("comment_content", etComment.getText());
                     comment.put("user",user);
-                    new Thread(new Runnable() {
+
+                    getnew Thread(new Runnable() {
                         @Override
                         public void run() {
-                            FcmPushTest.pushFCMNotification("dGFXwdYu2Z4:APA91bGgH5KAXQ3PAOwUv5xPdtYuw1nZQEgh3JUELSdJpM_fphrcTslzGmPxtKCihL1z9JBUi-acxyH0BV4b55gkDBDwDjLSiypaq46ELARLouAXmtTZe6VRmCzHUjws18vgcqddbiB6");
+                            JSONObject job = new JSONObject();
+                            try {
+                                job.put("user_id",content.getUser().getUser_id());
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            String token = JsonConnection.getConnection(Value.usergetPushTokenURL,"POST",job);
+                            Log.i("tokenValue",token);
+                            FcmPushTest.pushFCMNotification(token);
                         }
                     }).start();
 
