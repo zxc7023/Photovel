@@ -26,13 +26,14 @@
 
             <AutoCompleteTextView
                 android:id="@+id/searchAutoCompleteTextView"
-                android:layout_width="match_parent"
+                android:layout_width="250dp"
                 android:layout_height="match_parent"
                 android:background="@color/bgWhite"
                 android:imeOptions="actionSearch"
                 android:inputType="textNoSuggestions"
                 android:textColor="@color/textBlack"
                 android:textSize="@dimen/content_text_size"
+                android:maxLines="1"
                 android:layout_toRightOf="@+id/btn_action_back"/>
 
             <ImageButton
@@ -43,11 +44,12 @@
                 android:layout_centerVertical="true"
                 style="@style/ContentSearchView"
                 android:src="@mipmap/ic_back_arrow"
-                android:layout_marginLeft="@dimen/most_left_tv_margin"/>
+                android:layout_marginLeft="@dimen/most_left_tv_margin"
+                android:layout_marginRight="5dp"/>
 
             <ImageButton
                 android:id="@+id/btn_action_empty"
-                android:layout_width="30dp"
+                android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
@@ -59,9 +61,22 @@
         <ListView
             android:id="@+id/suggestion_list"
             android:layout_width="match_parent"
-            android:layout_height="180dp"
+            android:layout_height="360dp"
             android:background="@android:color/white"
-            android:divider="@android:color/transparent"
-            android:transcriptMode="alwaysScroll"/>
+            android:divider="@android:color/transparent" />
+        <RelativeLayout
+            android:id="@+id/RLmoreSearch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:visibility="gone">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="검색결과 더보기"
+                android:textSize="@dimen/content_text_size"
+                android:textColor="@color/bgDarkGrey"
+                android:layout_marginRight="@dimen/most_rignt_tv_margin"/>
+        </RelativeLayout>
     </LinearLayout>
 </FrameLayout>
