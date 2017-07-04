@@ -199,13 +199,59 @@
         app:font="normal"
         android:fillViewport="true"
         android:id="@+id/nestedScrollView">
-        <android.support.v7.widget.RecyclerView
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/recycler_view"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:font="normal"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+            android:orientation="vertical">
+            <android.support.v7.widget.RecyclerView
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:font="normal"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+            <LinearLayout
+                android:id="@+id/llInsetNo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="30dp"
+                android:visibility="gone">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="사진을 추가하면"
+                    android:textColor="@color/textBlack"
+                    android:textSize="@dimen/content_text_size"
+                    android:gravity="center"
+                    android:layout_marginBottom="5dp"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="여행제목, 여행경로, 일정, 장소가 자동생성"
+                    android:textColor="@color/textBlack"
+                    android:textSize="@dimen/content_point_text__size"
+                    android:gravity="center"
+                    android:layout_marginBottom="5dp"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="메모가 필요한 사진이 있다면"
+                    android:textColor="@color/textBlack"
+                    android:textSize="@dimen/content_text_size"
+                    android:gravity="center"
+                    android:layout_marginBottom="5dp"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="간단히 메모만 남기세요~!"
+                    android:textColor="@color/textBlack"
+                    android:textSize="@dimen/content_text_size"
+                    android:gravity="center"
+                    android:layout_marginBottom="5dp"/>
+            </LinearLayout>
+
+        </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
 
     <android.support.design.widget.FloatingActionButton

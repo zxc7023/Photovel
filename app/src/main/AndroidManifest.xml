@@ -52,6 +52,7 @@
         <activity android:name=".setting.SettingMain" android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".common.BookMarkMain" android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".friend.FriendListMain" android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".friend.FriendSearchMain" android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".TestActivity"/>
         <activity android:name=".user.UserLogin" android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".user.UserValidityCheck"/>
