@@ -213,7 +213,8 @@ public class MainRecommendAdapter extends RecyclerView.Adapter<MainRecommendAdap
     }
     @Override
     public int getItemCount() {
-        return mDataset.size();
+        //return mDataset.size();
+        return 0;
     }
 
     //공유 메뉴클릭시
