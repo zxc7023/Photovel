@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -18,6 +19,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.FacebookSdk;
+import com.facebook.share.model.ShareContent;
+import com.facebook.share.model.ShareLinkContent;
 import com.kakao.network.ErrorResult;
 import com.kakao.network.callback.ResponseCallback;
 import com.kakao.util.helper.log.Logger;
@@ -33,6 +37,8 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import bolts.AppLinks;
 
 public class MainRecommendAdapter extends RecyclerView.Adapter<MainRecommendAdapter.ViewHolder>{
     private List<Content> mDataset;
@@ -202,7 +208,7 @@ public class MainRecommendAdapter extends RecyclerView.Adapter<MainRecommendAdap
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                holder.shareCount.setText(mDataset.get(position).getContent_share_count()+1);
+                //holder.shareCount.setText(mDataset.get(position).getContent_share_count()+1);
                 adapter = new MainRecommendAdapter();
                 adapter.setHolder(holder);
                 adapter.setPosition(position);
@@ -230,6 +236,7 @@ public class MainRecommendAdapter extends RecyclerView.Adapter<MainRecommendAdap
                         Toast.makeText(mcontext,"카카오",Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.facebook_share:
+                        sendFacebook();
                         Toast.makeText(mcontext,"페북",Toast.LENGTH_SHORT).show();
                         break;
                 }
@@ -256,10 +263,19 @@ public class MainRecommendAdapter extends RecyclerView.Adapter<MainRecommendAdap
         menu.show();
     }
 
+    //페이스북 링크 공유
+    private void sendFacebook() {
+        /*Uri targetUrl =
+                AppLinks.getTargetUrlFromInboundIntent(this, mcontext.getIntent());
+        if (targetUrl != null) {
+            Log.i("Activity", "App Link Target URL: " + targetUrl.toString());
+        }*/
+    }
+
     //카카오 링크 공유
     private void sendFeedTemplate() {
         Map<String, String> templateArgs = new HashMap<String, String>();
-
+        templateArgs.put("${content_id}", String.valueOf(mDataset.get(adapter.getPosition()).getContent_id()));
         templateArgs.put("${image_url}", Value.contentPhotoURL+"/"+mDataset.get(adapter.getPosition()).getContent_id()+"/"+mDataset.get(adapter.getPosition()).getPhoto_file_name());
         templateArgs.put("${user_profile}", Value.contentPhotoURL+"/profile/"+mDataset.get(adapter.getPosition()).getUser().getUser_profile_photo());
         templateArgs.put("${user_nick_name}", mDataset.get(adapter.getPosition()).getUser().getUser_nick_name());

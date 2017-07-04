@@ -3,6 +3,7 @@ package com.photovel.user;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
@@ -20,7 +21,9 @@ import android.widget.Toast;
 
 import com.photovel.BackPressCloseHandler;
 import com.photovel.FontActivity2;
+import com.photovel.MainActivity;
 import com.photovel.R;
+import com.photovel.http.JsonConnection;
 import com.photovel.http.Value;
 import com.vo.User;
 
@@ -35,6 +38,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.Class.forName;
@@ -79,6 +83,7 @@ public class UserJoin extends FontActivity2 {
         final EditText nicknameText = (EditText) findViewById(R.id.nicknameText);
         final EditText phoneText = (EditText) findViewById(R.id.phoneText);
         Spinner spinner = (Spinner) findViewById(R.id.countrySpiner);
+        spinner.setPrompt("82");
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -138,12 +143,14 @@ public class UserJoin extends FontActivity2 {
                     user = (User) intent.getSerializableExtra("user");
                     try {
                         job.put("user_id", user.getUser_id());
+                        job.put("user_sns_token", user.getUser_sns_token());
                         job.put("user_password", user.getUser_password());
                         job.put("user_nick_name", nickName);
                         job.put("user_phone2", phoneNumber);
                         job.put("user_gender", gender);
                         job.put("user_phone1", country_code);
-                        job.put("user_sns_status", "O");
+                        job.put("user_sns_status", user.getUser_sns_status());
+                        job.put("user_profile_photo", user.getUser_profile_photo());
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -152,8 +159,38 @@ public class UserJoin extends FontActivity2 {
                     String url = Value.userJoinURL;
                     join(job.toString(), url);
                     if (isSucess.equals("1")) {
-                        Log.i("isSucess", "로그인페이지로 이동");
+                        /*Log.i("isSucess", "로그인페이지로 이동");
                         Intent intent1 = new Intent(getApplicationContext(), UserLogin.class);
+                        intent1.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                        startActivity(intent1);
+                        finish();*/
+
+                        List<User> userlist = new ArrayList<>();
+                        userlist.add(user);
+                        JsonConnection.setBitmap(userlist, Value.contentPhotoURL);
+
+                        //로그인한 후에 세션을 관리한다. TestActivity에 저장한다.
+                        SharedPreferences loginInfo = getSharedPreferences("loginInfo", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = loginInfo.edit();
+                        //editor.putString("Set-Cookie", cookieValues); //First라는 key값으로 infoFirst 데이터를 저장한다.
+                        editor.putString("user_id", user.getUser_id());
+                        editor.putString("user_nick_name", user.getUser_nick_name());
+                        editor.putString("user_password", user.getUser_password());
+                        editor.putString("user_phone", user.getUser_phone2());
+                        editor.putInt("user_friend_count", user.getUser_friend_count());
+
+                        UserBitmapEncoding ub = new UserBitmapEncoding();
+                        if (user.getBitmap() != null) {
+                            String user_profile = ub.BitMapToString(user.getBitmap());
+                            editor.putString("user_profile", user_profile);
+                        }
+                        editor.commit(); //완료한다.
+
+                        /*Intent intent=new Intent(getApplicationContext(), MainActivity.class);
+                        startActivity(intent);
+                        finish();*/
+                        Log.i("isSucess", "로그인페이지로 이동");
+                        Intent intent1 = new Intent(getApplicationContext(), MainActivity.class);
                         intent1.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                         startActivity(intent1);
                         finish();
