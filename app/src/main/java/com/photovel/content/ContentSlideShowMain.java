@@ -60,16 +60,8 @@ import com.vo.ContentDetail;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -85,7 +77,6 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
     private ViewPager vpSlideShow;
     private Context mContext = ContentSlideShowMain.this;
     private ArrayList<Bitmap> images = new ArrayList<>();
-    private static Bitmap[] imgArray;
     private SeekBar slideSeekBar;
     private ContentSlideShowAdapter contentSlideShowAdapter;
     private ContentSlideShowViewPager contentSlideShowViewPager;
@@ -245,6 +236,34 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
             Bitmap profile = BitmapFactory.decodeResource(getResources(),R.drawable.ic_profile_circle);
             content.getUser().setBitmap(profile);
         }
+
+        //content의 이미지 bitmap 가져오기
+        JsonConnection.setBitmap(myDataset, Value.contentPhotoURL);
+        Log.i(TAG, "myDataset의 크기= " + myDataset.size());
+        Log.i(TAG, "myDataset.get(0).getContent_detail_id()= " + myDataset.get(0).getContent_detail_id());
+        Log.i(TAG, "myDataset.get(0).getPhoto().getBitmap()= " + myDataset.get(0).getPhoto().getBitmap());
+
+
+        for(int i=0; i<myDataset.size(); i++){
+            images.add(myDataset.get(i).getPhoto().getBitmap());
+        }
+
+        /*//content의 이미지 bitmap 가져오기
+        for (int i = 0; i < content.getDetails().size(); i++) {
+            //Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL("http://photovel.com/upload/" + content.getContent_id() + "/" + content.getDetails().get(i).getPhoto().getPhoto_file_name()).getContent());
+            Bitmap bitmap = null;
+            try {
+                bitmap = BitmapFactory.decodeStream((InputStream) new URL(Value.contentPhotoURL+ "/" + content.getContent_id() + "/" + content.getDetails().get(i).getPhoto().getPhoto_file_name()).getContent());
+                content.getDetails().get(i).getPhoto().setBitmap(bitmap);
+                //리스트에 이미지 저장
+                images.add(bitmap);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        //이미지 배열 만들기
+        imgArray = images.toArray(new Bitmap[images.size()]);*/
+
 
         //디테일 메뉴 보이기 전에 글쓴이 == 내계정 확인
         if(!content.getUser().getUser_id().equals(user_id)){
@@ -526,7 +545,6 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         });
 
         ///////////////////////슬라이드쇼/////////////////////
-        Log.i(TAG, "imgArray의 크기= " + imgArray.length);
         //뷰 페이저 객체 생성
         vpSlideShow = (ViewPager) this.findViewById(R.id.VP_slide_show);
         //슬라이드 시크바 객체 생성
@@ -537,7 +555,7 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         //이미지 간 이동 속도 조절 위한 객체 생성
         contentSlideShowViewPager = new ContentSlideShowViewPager(this);
         //어댑터에 이미지 배열 전달
-        contentSlideShowAdapter = new ContentSlideShowAdapter(this, imgArray);
+        contentSlideShowAdapter = new ContentSlideShowAdapter(this, images);
 
         vpSlideShow.setAdapter(contentSlideShowAdapter);
 
@@ -555,8 +573,9 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
 
 ///////////////슬라이드쇼 실행 부분/////////////////
     private void init(){
+        //이미지 넘어가는 텀
         TRANS_MILLI = 3000;
-        //이미지 간 이동 속도 조절
+        //이미지가 넘어가는 속도 조절
         contentSlideShowViewPager.setScrollDuration((int)TRANS_MILLI);
 
         //슬라이드 쇼 전체 이미지 수
@@ -945,7 +964,7 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
 
 
 
-    //DB에서 content정보 받아오기
+    /*//DB에서 content정보 받아오기
     public Content getContentData(int id){
         Content content = null;
         HttpURLConnection conn = null;
@@ -962,13 +981,13 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
             //conn.connect();
             conn.setRequestMethod("GET");
             Log.i(TAG, "2.getPhotoData의 qry= " + qry);
-            /*
+            *//*
             OutputStream os = conn.getOutputStream();
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
             // bw.write(id);
 
             bw.flush();
-            bw.close();*/
+            bw.close();*//*
 
             final int responseCode = conn.getResponseCode(); //정상인 경우 200번, 그 외 오류있는 경우 오류 번호 반환
             Log.i(TAG, "getPhotoData의 responseCode= " + responseCode);
@@ -1021,7 +1040,7 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         }
 
         return null;
-    }
+    }*/
 
     //Android BackButton EventListener
     @Override
@@ -1110,7 +1129,7 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
 
 
 
-    //DB에서 bitmap정보 받아오기
+   /* //DB에서 bitmap정보 받아오기
     public void getImage(){
         Thread thread2 = new Thread(){
             @Override
@@ -1141,7 +1160,7 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
             e.printStackTrace();
         }
 
-    }
+    }*/
 
 
 }

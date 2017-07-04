@@ -12,6 +12,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.photovel.R;
+
+import java.util.ArrayList;
+
 /**
  * Created by daybreak on 2017-06-30.
  */
@@ -20,10 +23,10 @@ public class ContentSlideShowAdapter extends PagerAdapter {
 
     private Context context;
     private LayoutInflater layoutInflater;
-    private Bitmap[] imgArray;
+    private ArrayList<Bitmap> imgArray;
     private SparseArray<Fragment> registeredFragments = new SparseArray<>();
 
-    public ContentSlideShowAdapter(Context context, Bitmap[] imgs) {
+    public ContentSlideShowAdapter(Context context, ArrayList<Bitmap> imgs) {
         this.context = context;
         this.layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         this.imgArray = imgs;
@@ -31,7 +34,7 @@ public class ContentSlideShowAdapter extends PagerAdapter {
 
     @Override
     public int getCount() {
-        return imgArray.length;
+        return imgArray.size();
     }
 
     @Override
@@ -46,8 +49,8 @@ public class ContentSlideShowAdapter extends PagerAdapter {
 
         ImageView imageView = (ImageView) imgLayout.findViewById(R.id.slide_images_view);
         //해당 위치의 이미지를 찾아서 이미지 붙이기
-        imageView.setImageBitmap(imgArray[position]);
-        BitmapDrawable bitmapDrawable = new BitmapDrawable(context.getResources(), imgArray[position]);
+        imageView.setImageBitmap(imgArray.get(position));
+        BitmapDrawable bitmapDrawable = new BitmapDrawable(context.getResources(), imgArray.get(position));
         bitmapDrawable.setAlpha(100);
         imageView.setBackground(bitmapDrawable);
 

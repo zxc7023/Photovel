@@ -81,13 +81,13 @@
                     android:layout_marginLeft="@dimen/most_left_tv_margin"
                     android:background="@drawable/xml_border2">
                     <com.mikhaellopez.circularimageview.CircularImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
                         android:src="@drawable/ic_profile_circle"
                         android:onClick="ProFileMenuClick"
                         app:civ_border_width="1dp"
                         android:gravity="center"
-                        android:layout_marginRight="@dimen/between_tv_margin"/>
+                        android:layout_marginRight="5dp"/>
                     <TextView
                         android:id="@+id/tvUsername2"
                         android:layout_width="wrap_content"
@@ -120,6 +120,6 @@
         android:visibility="gone"
         android:src="@drawable/btn_up"
         app:backgroundTint="@color/bgWhite"/>
-
+    <include layout="@layout/activity_comment_main"/>
 </android.support.design.widget.CoordinatorLayout>
 
