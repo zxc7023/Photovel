@@ -195,20 +195,6 @@ public class MainRecommendAdapter extends RecyclerView.Adapter<MainRecommendAdap
         holder.llshare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                Thread share = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        JsonConnection.getConnection(Value.contentURL+"/"+mDataset.get(position).getContent_id()+"/share", "POST", null);
-                    }
-                });
-                share.start();
-                try {
-                    share.join();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                //holder.shareCount.setText(mDataset.get(position).getContent_share_count()+1);
                 adapter = new MainRecommendAdapter();
                 adapter.setHolder(holder);
                 adapter.setPosition(position);
@@ -233,6 +219,20 @@ public class MainRecommendAdapter extends RecyclerView.Adapter<MainRecommendAdap
                 switch (item.getItemId()) {
                     case R.id.kakao_share:
                         sendFeedTemplate();
+                        adapter.getHolder().shareCount.setText(String.valueOf(Integer.parseInt(adapter.getHolder().shareCount.getText().toString())+1));
+                        Thread share = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                JsonConnection.getConnection(Value.contentURL+"/"+mDataset.get(adapter.getPosition()).getContent_id()+"/share", "POST", null);
+                            }
+                        });
+                        share.start();
+                        try {
+                            share.join();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+
                         Toast.makeText(mcontext,"카카오",Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.facebook_share:

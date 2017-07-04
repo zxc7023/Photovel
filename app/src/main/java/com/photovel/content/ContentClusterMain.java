@@ -455,19 +455,6 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
         btnShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Thread share = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        JsonConnection.getConnection(Value.contentURL+"/"+content_id+"/share", "POST", null);
-                    }
-                });
-                share.start();
-                try {
-                    share.join();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                tvShareCount.setText(String.valueOf(content.getContent_share_count()+1));
                 contentshare(v);
             }
         });
@@ -916,6 +903,19 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
                 switch (item.getItemId()) {
                     case R.id.kakao_share:
                         sendFeedTemplate();
+                        tvShareCount.setText(String.valueOf(content.getContent_share_count()+1));
+                        Thread share = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                JsonConnection.getConnection(Value.contentURL+"/"+content_id+"/share", "POST", null);
+                            }
+                        });
+                        share.start();
+                        try {
+                            share.join();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                         Toast.makeText(getApplicationContext(),"카카오",Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.facebook_share:
