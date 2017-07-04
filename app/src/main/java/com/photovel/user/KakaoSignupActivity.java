@@ -10,6 +10,8 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.kakao.auth.ApiResponseCallback;
 import com.kakao.auth.ErrorCode;
 import com.kakao.network.ErrorResult;
@@ -21,6 +23,7 @@ import com.photovel.BackPressCloseHandler;
 import com.photovel.MainActivity;
 import com.photovel.R;
 import com.photovel.http.JsonConnection;
+import com.photovel.http.LoginConnection;
 import com.photovel.http.Value;
 import com.vo.User;
 
@@ -48,14 +51,14 @@ import java.util.Set;
 public class KakaoSignupActivity extends Activity {
 
     //로그를 확인하기위하여 작성한 TAG와 Sequence
-    String TAG = "KakaoSignUpTest";
+    String TAG = "KakaoSignUp";
     int sequence = 0;
 
     //KakaoSignupActivity 액티비티에서 KakaoUserJoinDetail로 전달해주고 받아올때 필요한 requestCode
     int KakaoSuccessCode = 777;
 
     String connectionResultValue;
-    JSONObject job = new JSONObject();
+    JSONObject job;
     User temp;
     String cookieValues = "";
     HttpURLConnection conn;
@@ -78,6 +81,7 @@ public class KakaoSignupActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_kakao_signup);
         mContext = this;
+        job=new JSONObject();
         progressDialog = new ProgressDialog(this);
         progressDialog.setTitle("Loading");
         progressDialog.setMessage("Wait while loading...");
@@ -140,7 +144,7 @@ public class KakaoSignupActivity extends Activity {
                 userToSendServer.setUser_phone1(Integer.parseInt(resultMap.get("user_phone1")));
                 userToSendServer.setUser_phone2(resultMap.get("user_phone2"));
                 */
-                Thread loginThrad = new Thread(new Runnable() {
+                Thread joinThrad = new Thread(new Runnable() {
                     @Override
                     public void run() {
 
@@ -160,9 +164,9 @@ public class KakaoSignupActivity extends Activity {
                         connectionResultValue = JsonConnection.getConnection(Value.userJoinURL, "POST", job);
                     }
                 });
-                loginThrad.start();
+                joinThrad.start();
                 try {
-                    loginThrad.join();
+                    joinThrad.join();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -288,7 +292,7 @@ public class KakaoSignupActivity extends Activity {
                 String user_profile = ub.BitMapToString(temp.getBitmap());
                 editor.putString("user_profile", user_profile);
             }
-
+            Log.i(TAG,loginInfo.getAll().toString());
             editor.commit(); //완료한다.
         }
     }
@@ -382,14 +386,16 @@ public class KakaoSignupActivity extends Activity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                enrollServerSession(job);
+                //enrollServerSession(job);
+                LoginConnection.login(mContext,Value.userLoginURL,"POST",job);
                 Log.i(TAG + "" + sequence++, "onSignUpFinish");
-                redirectMainActivity(); // 로그인 성공시 MainActivity로
+                //redirectMainActivity(); // 로그인 성공시 MainActivity로
             }
         }/*,propertyKeys,false*/);
     }
 
     private void redirectMainActivity() {
+
         startActivity(new Intent(this, MainActivity.class));
         finish();
 
