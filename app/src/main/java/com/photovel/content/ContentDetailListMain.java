@@ -42,6 +42,7 @@ import com.kakao.network.ErrorResult;
 import com.kakao.network.callback.ResponseCallback;
 import com.kakao.util.helper.log.Logger;
 import com.mikhaellopez.circularimageview.CircularImageView;
+import com.photovel.FcmPushTest;
 import com.photovel.FontActivity2;
 import com.photovel.MainActivity;
 import com.photovel.NavigationItemSelected;
@@ -341,6 +342,13 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
                     comment.put("content_id", content_id);
                     comment.put("comment_content", etComment.getText());
                     comment.put("user",user);
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            FcmPushTest.pushFCMNotification("dGFXwdYu2Z4:APA91bGgH5KAXQ3PAOwUv5xPdtYuw1nZQEgh3JUELSdJpM_fphrcTslzGmPxtKCihL1z9JBUi-acxyH0BV4b55gkDBDwDjLSiypaq46ELARLouAXmtTZe6VRmCzHUjws18vgcqddbiB6");
+                        }
+                    }).start();
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
