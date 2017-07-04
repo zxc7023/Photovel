@@ -1,5 +1,6 @@
 package com.photovel.content;
 
+import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -72,19 +73,16 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
     private ContentSlideShowViewPager contentSlideShowViewPager;
     private TextView tvCurrTime;
     private CountDownTimer countDownTimer;
+    private Fragment page;
+    private Bitmap image;
 
 
     //이미지 어댑터
-    private static final String KEY_SELECTED_PAGE = "KEY_SELECTED_PAGE";
     private int MAX_PAGES = 0;
     private int MAX_TIME = 0;
-    long DELAY_MILLI;//delay in milliseconds before task is to be executed
     long TRANS_MILLI; // time in milliseconds between successive task executions.
-    private int maxOffset;
-    private int currOffset;
-    int imageViewWidth;
     int currPage = 0;
-    boolean isTracked = false;
+    int currItem = 0;
 
 
 /////////////////////////////////////////////////
@@ -271,7 +269,11 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         contentSlideShowViewPager = new ContentSlideShowViewPager(this);
         //어댑터에 이미지 배열 전달
         contentSlideShowAdapter = new ContentSlideShowAdapter(this, imgArray);
+
         vpSlideShow.setAdapter(contentSlideShowAdapter);
+
+
+
 
 
 
@@ -297,7 +299,38 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
 
 
         //슬라이드 이미지 이동 애니메이션 설정
-        vpSlideShow.setPageTransformer(true, new StackTransformer());
+        vpSlideShow.setPageTransformer(true, new ViewPager.PageTransformer() {
+            @Override
+            public void transformPage(View page, float position) {
+                page.setRotationX(0);
+                page.setRotationY(0);
+                page.setRotation(0);
+                page.setScaleX(1);
+                page.setScaleY(1);
+                page.setPivotX(0);
+                page.setPivotY(0);
+                page.setTranslationY(0);
+                page.setTranslationX(0f);
+            }
+        });
+
+        vpSlideShow.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                /*vpSlideShow.setBackground(new BitmapDrawable(getApplicationContext().getResources(),
+                        vpSlideShow.));*/
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
 
 
         countDownTimer = new CountDownTimer(MAX_TIME, 1) {
