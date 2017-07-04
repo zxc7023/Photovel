@@ -23,7 +23,7 @@
         android:theme="@style/AppTheme">
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAiudYhFEK-5EW9nzlu8Tbv1FoUNyLRWz8" />
+            android:value="AIzaSyAoropfQgcXeJI0nf6iyz36wDc9pZIBJUw" />
         <meta-data
             android:name="com.kakao.sdk.AppKey"
             android:value="@string/kakao_app_key" />
@@ -53,12 +53,12 @@
         <activity android:name=".content.ContentInsertGoogleMap" />
         <activity android:name=".content.ContentUpdateMain" />
         <activity android:name=".content.ContentSlideShowMain" android:theme="@style/AppTheme.NoActionBar"/>
-        <activity android:name=".content.ContentSlideShow"/>
         <activity android:name=".content.ContentDetailListMain" android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".content.ContentListMain" android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".setting.SettingMain" android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".common.BookMarkMain" android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".friend.FriendListMain" android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".friend.FriendSearchMain" android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".TestActivity"/>
         <activity android:name=".user.UserLogin" android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".user.UserValidityCheck"/>
@@ -67,6 +67,21 @@
         <activity android:name=".user.KakaoUserJoinDetail"/>
         <activity android:name=".MainActivity" android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".IntroMain" android:theme="@style/AppTheme.NoActionBar"/>
+        <!--
+        <service
+            android:name=".MyFirebaseMessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
+        <service
+            android:name=".MyFirebaseInstanceIDService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+            </intent-filter>
+        </service>
+        -->
+
         <activity android:name="com.facebook.FacebookActivity"
             android:configChanges=
                 "keyboard|keyboardHidden|screenLayout|screenSize|orientation"

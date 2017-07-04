@@ -1,9 +1,6 @@
-package com.photovel.search;
+package com.photovel.content;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.database.DataSetObserver;
 import android.database.MatrixCursor;
@@ -29,13 +26,11 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.photovel.R;
-import com.photovel.content.ContentListMain;
 import com.photovel.utils.AnimationUtil.AnimationUtil;
 import com.vo.Content;
 
@@ -45,7 +40,7 @@ import java.util.List;
  * @author Miguel Catalan Bañuls
  */
 
-public class SearchView extends FrameLayout implements Filter.FilterListener {
+public class ContentSearchView extends FrameLayout implements Filter.FilterListener {
 
     private static final String TAG = "ContentSearchView";
     //메뉴 xml의 아이템. searchItem 가져오기
@@ -96,8 +91,6 @@ public class SearchView extends FrameLayout implements Filter.FilterListener {
     //submit
     private boolean submit = false;
 
-    private String user_id;
-
 
     //데이터 집합 감시자
     private DataSetObserver dataSetObserver;
@@ -116,21 +109,21 @@ public class SearchView extends FrameLayout implements Filter.FilterListener {
     }
 
     //생성자
-    public SearchView(@NonNull Context context) {
+    public ContentSearchView(@NonNull Context context) {
         super(context);
         this.context = context;
         initiateView();
         getAttrs(null, 0);
     }
 
-    public SearchView(@NonNull Context context, @Nullable AttributeSet attrs) {
+    public ContentSearchView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         this.context = context;
         initiateView();
         getAttrs(attrs, 0);
     }
 
-    public SearchView(@NonNull Context context, @Nullable AttributeSet attrs, @AttrRes int defStyleAttr) {
+    public ContentSearchView(@NonNull Context context, @Nullable AttributeSet attrs, @AttrRes int defStyleAttr) {
         super(context, attrs);
         this.context = context;
         //뷰 객체화
@@ -145,10 +138,6 @@ public class SearchView extends FrameLayout implements Filter.FilterListener {
     public void setAdapter(SearchListAdapter adapter) {
         searchListAdapter = adapter;
         Log.i(TAG, "searchListAdapter.getCount()= " + searchListAdapter.getCount());
-        if(searchListAdapter.getCount() != 0){
-            Log.i(TAG, "searchListAdapter.content_id()= " + searchListAdapter.getCursor().getColumnIndex("content_id"));
-        }
-
         suggestionsListView.setAdapter(searchListAdapter);
         startFilter(edtSearchSrc.getText());
     }
@@ -190,7 +179,7 @@ public class SearchView extends FrameLayout implements Filter.FilterListener {
 
 ////화면에 보일 뷰 객체 생성. 미리 만들어둔 xml 파일을 할당해주고 각각의 View를 설정
     private void initiateView() {
-        LayoutInflater.from(context).inflate(R.layout.activity_search_view, this, true);
+        LayoutInflater.from(context).inflate(R.layout.search_view, this, true);
         searchLayout = findViewById(R.id.search_layout);
 //
         searchView = (RelativeLayout) searchLayout.findViewById(R.id.top_search_view);
@@ -306,7 +295,7 @@ public void setBackground(Drawable background) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             suggestionsListView.setBackground(background);
         } else {
-            suggestionsListView.setBackground(background);
+            suggestionsListView.setBackgroundDrawable(background);
         }
     }
 ////////////////////////////////////////////////
@@ -336,7 +325,7 @@ public void setBackground(Drawable background) {
                 usersQuey = s;
                 //
                 startFilter(s);
-                SearchView.this.onTextChanged(s);
+                ContentSearchView.this.onTextChanged(s);
             }
 
             @Override
@@ -360,15 +349,16 @@ public void setBackground(Drawable background) {
 
     //클릭 리스너
     private final OnClickListener onClickListener = new OnClickListener() {
+
         public void onClick(View v) {
             if (v == btnBack) {
-                //closeSearch();
+                closeSearch();
             } else if (v == btnEmpty) {
                 edtSearchSrc.setText(null);
             } else if (v == edtSearchSrc) {
                 showSuggestions();
             } else if (v == tintView) {
-                //closeSearch();
+                closeSearch();
             }
         }
     };
@@ -414,7 +404,6 @@ public void setBackground(Drawable background) {
     //SearchView 클래스가 원래 가지는 setSuggestionAdapter 대신 구현
     public void setSuggestions(List<Content> suggestions, MatrixCursor matrixCursor, boolean flag) {
         if (suggestions != null && suggestions.size() > 0) {
-            Log.i(TAG, "setSuggestions의 suggestions=" + suggestions);
             tintView.setVisibility(VISIBLE);
             searchListAdapter = new SearchListAdapter(context, matrixCursor, flag);
             setAdapter(searchListAdapter);
@@ -426,7 +415,6 @@ public void setBackground(Drawable background) {
                 }
             });
         } else {
-            Log.i(TAG, "setSuggestions의 suggestions 없음");
             tintView.setVisibility(GONE);
         }
     }
@@ -467,6 +455,8 @@ public void setBackground(Drawable background) {
     }
 
 
+
+
     //EditText뷰 객체 포커싱 변화될 때 requestFocus로 포커스 요청하고 입력 장치 보여줌
     public void showKeyboard(View view) {
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD_MR1 && view.hasFocus()) {
@@ -494,7 +484,7 @@ public void setBackground(Drawable background) {
         if (searchListAdapter != null && searchListAdapter instanceof Filterable) {
 //            ((Filterable) searchListAdapter).getFilter().filter(s, ContentSearchView.this);
             //이전에 실행되지 않은 필터 요청을 지우고 나중에 실행될 새로운 필터 요청
-            (searchListAdapter).getFilter().filter(s, SearchView.this);
+            (searchListAdapter).getFilter().filter(s, ContentSearchView.this);
         }
     }
 

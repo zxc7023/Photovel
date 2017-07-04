@@ -53,14 +53,13 @@ public class FriendSearchAdapter extends RecyclerView.Adapter<FriendSearchAdapte
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public CircularImageView userProfile;
-        public TextView tvUserNickName, tvUserID, btnFriendPlus;
+        public TextView tvUserNickName, btnFriendPlus;
         public LinearLayout lluser;
 
         public ViewHolder(View view) {
             super(view);
             userProfile = (CircularImageView)view.findViewById(R.id.userProfile);
             tvUserNickName = (TextView)view.findViewById(R.id.tvUserNickName);
-            tvUserID = (TextView)view.findViewById(R.id.tvUserID);
             btnFriendPlus = (TextView)view.findViewById(R.id.btnFriendPlus);
         }
     }
@@ -83,7 +82,6 @@ public class FriendSearchAdapter extends RecyclerView.Adapter<FriendSearchAdapte
 
         holder.userProfile.setImageBitmap(mDataset.get(position).getBitmap());
         holder.tvUserNickName.setText(mDataset.get(position).getUser_nick_name());
-        holder.tvUserID.setText(mDataset.get(position).getUser_id());
 
         holder.btnFriendPlus.setOnClickListener(new View.OnClickListener() {
             @Override

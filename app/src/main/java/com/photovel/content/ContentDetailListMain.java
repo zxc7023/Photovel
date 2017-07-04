@@ -21,7 +21,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
@@ -29,7 +28,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -46,12 +44,8 @@ import com.kakao.util.helper.log.Logger;
 import com.mikhaellopez.circularimageview.CircularImageView;
 import com.photovel.FontActivity2;
 import com.photovel.MainActivity;
-import com.photovel.MainNewAdapter;
-import com.photovel.MainRecommendAdapter;
 import com.photovel.NavigationItemSelected;
 import com.photovel.R;
-import com.photovel.common.BookMarkMain;
-import com.photovel.friend.FriendListMain;
 import com.photovel.http.JsonConnection;
 import com.photovel.http.Value;
 import com.photovel.setting.SettingMain;
@@ -666,7 +660,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
                         Log.i("ddd","friend_state"+friend_state);
 
                         if(friend_state == 0){ //친구가아닐때
-                            Toast.makeText(getApplicationContext(),"친구추가성공!",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(),"친구신청을 성공 하였습니다!",Toast.LENGTH_SHORT).show();
                         }else if(friend_state == 1){ //내가 이미 친구신청을 했을때
                             Toast.makeText(getApplicationContext(),"이미 친구신청을 하였습니다",Toast.LENGTH_SHORT).show();
                         }else if(friend_state == 2){ //친구일때

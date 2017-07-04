@@ -61,22 +61,9 @@
         <ListView
             android:id="@+id/suggestion_list"
             android:layout_width="match_parent"
-            android:layout_height="360dp"
+            android:layout_height="match_parent"
             android:background="@android:color/white"
-            android:divider="@android:color/transparent" />
-        <RelativeLayout
-            android:id="@+id/RLmoreSearch"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="right"
-            android:visibility="gone">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="검색결과 더보기"
-                android:textSize="@dimen/content_text_size"
-                android:textColor="@color/bgDarkGrey"
-                android:layout_marginRight="@dimen/most_rignt_tv_margin"/>
-        </RelativeLayout>
+            android:divider="@android:color/transparent"
+            android:transcriptMode="alwaysScroll"/>
     </LinearLayout>
 </FrameLayout>
