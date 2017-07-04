@@ -40,7 +40,7 @@ public class SessionMangement extends FontActivity2 {
 
     String cookieValues;
     String sessionCheckValue="0";
-    String TAG ="SessionMangeTest";
+    String TAG ="SessionManageTest";
     int sequence = 0;
 
 
@@ -67,17 +67,45 @@ public class SessionMangement extends FontActivity2 {
 
     }
 
-    public void checkLoginInfo(String jSessionValue) {
+    public void checkLoginInfo(final String jSessionValue) {
         if(!jSessionValue.equals("fail")){
             Log.i(TAG+sequence++," Jsession 값 존재");
-            SessionConnection.compareSession(jSessionValue);
+            //compareSession(jSessionValue);
+            Thread compareSession = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    sessionCheckValue = SessionConnection.compareSession(jSessionValue);
+                }
+            });
+            compareSession.start();
+            try {
+                compareSession.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            Log.i(TAG+sequence ++ +"받은값",sessionCheckValue);
+
+            //SessionConnection.compareSession(jSessionValue);
+
             //jSession값에 일치하는 로그인 인포가 있을경우
             if (sessionCheckValue.equals("1")) {
-                Log.i(TAG+"조건2", "jsession이 일치함 메인으로 이동");
+                Log.i(TAG+sequence ++ +"조건2", "jsession이 일치함 메인으로 이동");
                 SharedPreferences loginInfo = getSharedPreferences("loginInfo", MODE_PRIVATE);
-                Log.i(TAG+"세션값",loginInfo.getAll().toString());
-                Intent intent = new Intent(getApplication(), MainActivity.class);
-                startActivity(intent);
+                Log.i(TAG+sequence ++ +"세션값",loginInfo.getAll().toString());
+
+                SharedPreferences IntroCheck = getSharedPreferences("IntroCheck", MODE_PRIVATE);
+                String check = IntroCheck.getString("IntroCheck","N");
+                if(check.equals("Y")){
+                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                }else{
+                    Intent intent = new Intent(getApplicationContext(), IntroMain.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                }
                 finish();
             }
             //jSession에 일치하는 로그인 인포가 없을 경우
@@ -88,8 +116,7 @@ public class SessionMangement extends FontActivity2 {
                 String isRemovable = test.getString("Set-Cookie","notFound");
                 if(!isRemovable.equals("notFound")){
                     SharedPreferences.Editor editor2 = test.edit();
-                    editor2.remove("Set-Cookie");
-                    editor2.remove("user_id");
+                    editor2.clear();
                     editor2.commit();
                 }
                 Intent intent = new Intent(getApplication(), UserLogin.class);
@@ -105,72 +132,5 @@ public class SessionMangement extends FontActivity2 {
             intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
             finish();
         }
-    }
-
-    public void compareSession(final String jSessionValue){
-        Thread compareThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                URL url;
-                HttpURLConnection conn = null;
-                OutputStream os;
-                BufferedWriter bw;
-                InputStream is = null;
-                ByteArrayOutputStream baos;
-
-                try {
-                    String startURL = Value.userCompareURL;
-                    url = new URL(startURL);
-                    conn = (HttpURLConnection) url.openConnection();
-                    conn.setRequestMethod("GET");
-                    conn.setDoInput(true);
-                    //conn.setDoOutput(true);
-                    conn.setUseCaches(false);
-                    conn.setRequestProperty("Cookie", jSessionValue);
-/*
-                    //요청데이터 전송
-                    String queryString="jSessionValue="+jSessionValue;
-                    os = conn.getOutputStream();
-                    bw = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-                    bw.write(queryString);
-                    bw.flush();
-                    bw.close();*/
-
-                    int responseCode = conn.getResponseCode();
-                    Log.i("여기까지됨",responseCode+"");
-                    switch (responseCode) {
-                        case HttpURLConnection.HTTP_OK:
-                            is=conn.getInputStream();
-                            baos = new ByteArrayOutputStream();
-                            byte[] byteBuffer = new byte[1024];
-                            byte[] byteData = null;
-                            int nLength =0;
-                            while((nLength = is.read(byteBuffer,0,byteBuffer.length))!=-1){
-                                baos.write(byteBuffer,0,nLength);
-                            }
-                            byteData=baos.toByteArray();
-                            sessionCheckValue = new String(byteData);
-                            Log.i(TAG,sessionCheckValue);
-                            break;
-                        default:
-                            Log.i(TAG,"responseCode="+responseCode);
-                    }
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                } catch (ProtocolException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-            }
-        });
-        compareThread.start();
-        try {
-            compareThread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
     }
 }

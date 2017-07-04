@@ -102,6 +102,8 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         user_nick_name = get_to_eat.getString("user_nick_name","notFound");
         user_profile = get_to_eat.getString("user_profile","notFound");
 
+        Log.i(TAG,get_to_eat.getAll().toString());
+        Log.i(TAG,user_id);
         RlSearch = (RelativeLayout) findViewById(R.id.RlSearch);
         bottomSheetBehavior = BottomSheetBehavior.from(RlSearch);
         bottomSheetBehavior.setPeekHeight(0);

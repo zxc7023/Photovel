@@ -31,10 +31,6 @@ import java.util.List;
 
 public class JsonConnection {
     private static final String TAG = "JsonConnection";
-    private String url;
-    private String method;
-    private JSONObject json;
-
 
     public static String getConnection(final String url, final  String method, final JSONObject json){
 

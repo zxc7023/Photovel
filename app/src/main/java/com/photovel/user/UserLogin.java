@@ -36,6 +36,7 @@ import android.widget.Toast;
 import com.photovel.FontActivity2;
 
 import com.photovel.http.JsonConnection;
+import com.photovel.http.LoginConnection;
 import com.photovel.http.Value;
 import com.vo.User;
 
@@ -58,10 +59,6 @@ public class UserLogin extends FontActivity2 {
     EditText passwordTextView;
     String user_id;
     String user_password;
-    User temp;
-
-    String isSucess;
-    String cookieValues = "";
 
     private SessionCallback callback;
     private CallbackManager callbackManager;
@@ -92,21 +89,7 @@ public class UserLogin extends FontActivity2 {
         //페이스북 세션이 있으면서, 로그아웃이 안되면
         accessToken = AccessToken.getCurrentAccessToken();
         if(accessToken !=null && !accessToken.isExpired()){
-            Log.i("ddd", "id"+accessToken.getUserId());
-
-            Thread loginThread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    isSucess = JsonConnection.getConnection(Value.userLoginWithFBURL+"/"+accessToken.getUserId(), "GET", null);
-                }
-            });
-            loginThread.start();
-            try {
-                loginThread.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            setSharedPreferences();
+            LoginConnection.login(UserLogin.this, Value.userLoginWithFBURL+"/"+accessToken.getUserId(), "GET", null);
         }
 
         //회원가입
@@ -138,90 +121,14 @@ public class UserLogin extends FontActivity2 {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-
-                    Thread loginThread = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            isSucess = JsonConnection.getConnection(Value.userLoginURL, "POST", job);
-                        }
-                    });
-                    loginThread.start();
-                    try {
-                        loginThread.join();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    setSharedPreferences();
-
+                    LoginConnection.login(UserLogin.this, Value.userLoginURL, "POST", job);
                 }
             }
         });
 
     }
 
-    private void setSharedPreferences() {
-        //로그인이 삭제되건 성공하건 이전의 세션은 삭제해줘야한다.
-        SharedPreferences loginInfo = getSharedPreferences("loginInfo", MODE_PRIVATE);
-        String isRemovable = loginInfo.getString("Set-Cookie", "notFound");
-        if (!isRemovable.equals("notFound")) {
-            SharedPreferences.Editor editor2 = loginInfo.edit();
-            editor2.remove("Set-Cookie");
-            editor2.remove("user_id");
-            editor2.remove("user_nick_name");
-            editor2.remove("user_password");
-            editor2.remove("user_phone");
-            editor2.remove("user_friend_count");
-            editor2.remove("user_profile");
-            editor2.commit();
-        }
-
-        if ("".equals(isSucess) || isSucess == null) {
-            Toast.makeText(getApplicationContext(), "로그인실패", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(getApplicationContext(), "로그인성공", Toast.LENGTH_SHORT).show();
-
-            temp = JSON.parseObject(isSucess, User.class);
-
-            //user프로필사진set
-            List<User> user = new ArrayList<>();
-            user.add(temp);
-            JsonConnection.setBitmap(user, Value.contentPhotoURL);
-
-            //로그인한 후에 세션을 관리한다. TestActivity에 저장한다.
-            SharedPreferences.Editor editor = loginInfo.edit();
-            editor.putString("Set-Cookie", cookieValues); //First라는 key값으로 infoFirst 데이터를 저장한다.
-            editor.putString("user_id", temp.getUser_id());
-            editor.putString("user_nick_name", temp.getUser_nick_name());
-            editor.putString("user_password", temp.getUser_password());
-            editor.putString("user_phone", temp.getUser_phone2());
-            editor.putInt("user_friend_count", temp.getUser_friend_count());
-
-            UserBitmapEncoding ub = new UserBitmapEncoding();
-            if (temp.getBitmap() != null) {
-                String user_profile = ub.BitMapToString(temp.getBitmap());
-                editor.putString("user_profile", user_profile);
-            }
-
-            editor.commit(); //완료한다.
-            Log.i(TAG,loginInfo.getAll().toString());
-
-
-            SharedPreferences IntroCheck = getSharedPreferences("IntroCheck", MODE_PRIVATE);
-            String check = IntroCheck.getString("IntroCheck","N");
-            if(check.equals("Y")){
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(intent);
-                finish();
-            }else{
-                Intent intent = new Intent(getApplicationContext(), IntroMain.class);
-                startActivity(intent);
-                finish();
-            }
-        }
-    }
-
     //페이스북
-
     LoginButton facebook_login_button;
     User user;
     @Override
@@ -232,7 +139,7 @@ public class UserLogin extends FontActivity2 {
 
         facebook_login_button= (LoginButton)findViewById(R.id.facebook_login_button);
         facebook_login_button.setClickable(false);
-        facebook_login_button.setReadPermissions("public_profile", "email", "publish_actions");
+        facebook_login_button.setReadPermissions("public_profile", "email");
 
         RelativeLayout btnLogin= (RelativeLayout) findViewById(R.id.btnLogin);
         btnLogin.bringToFront();
@@ -261,50 +168,30 @@ public class UserLogin extends FontActivity2 {
                                 GraphResponse response) {
                             Log.e("response: ", response + "");
                             try {
-                                final String user_sns_token = object.getString("id");
-                                Thread loginThread = new Thread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        isSucess = JsonConnection.getConnection(Value.userLoginWithFBURL+"/"+user_sns_token, "GET", null);
-                                    }
-                                });
-                                loginThread.start();
-                                try {
-                                    loginThread.join();
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
+                                LoginConnection.login(UserLogin.this, Value.userLoginWithFBURL+"/"+object.getString("id"), "GET", null);
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
 
-                            if(isSucess != null) {
-                                setSharedPreferences();
-                            }else{
-                                Profile profile = Profile.getCurrentProfile();
-                                Log.i("ddd", "profile :"+profile.getProfilePictureUri(50,50));
-                                try {
-                                    user = new User();
-                                    user.setUser_id(object.getString("email"));
-                                    user.setUser_sns_token(object.getString("id"));
-                                    user.setUser_password(object.getString("id"));
-                                    user.setUser_nick_name(object.getString("name"));
-                                    user.setUser_gender(object.getString("gender"));
-                                    user.setUser_profile_photo(profile.getProfilePictureUri(50,50).toString());
-                                    user.setUser_sns_status("F");
-                                }catch (Exception e){
-                                    e.printStackTrace();
-                                }
-                                Toast.makeText(UserLogin.this, "welcome " + user.getUser_id(), Toast.LENGTH_LONG).show();
-                                Intent intent=new Intent(UserLogin.this, UserJoin.class);
-                                intent.putExtra("user", user);
-                                Log.i("ddd1", user.toString());
-                                startActivity(intent);
-                                finish();
+                            Profile profile = Profile.getCurrentProfile();
+                            try {
+                                user = new User();
+                                user.setUser_id(object.getString("email"));
+                                user.setUser_sns_token(object.getString("id"));
+                                user.setUser_password(object.getString("id"));
+                                user.setUser_nick_name(object.getString("name"));
+                                user.setUser_gender(object.getString("gender"));
+                                user.setUser_profile_photo(profile.getProfilePictureUri(50,50).toString());
+                                user.setUser_sns_status("F");
+                            }catch (Exception e){
+                                e.printStackTrace();
                             }
+                            Intent intent=new Intent(UserLogin.this, UserJoin.class);
+                            intent.putExtra("user", user);
+                            startActivity(intent);
+                            finish();
                         }
                     });
-
             Bundle parameters = new Bundle();
             parameters.putString("fields", "id,name,email,gender, birthday");
             request.setParameters(parameters);
