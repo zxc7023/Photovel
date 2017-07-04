@@ -32,6 +32,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -74,6 +75,7 @@ import java.util.Locale;
 public class ContentInsertMain extends FontActivity {
     private Button btnSort, btnPhotoSave;
     private TextView btnBack, tvUsername;
+    private LinearLayout llInsetNo;
     private FloatingActionButton  btnAddPhots, btnTop;
     private String path;
     private ExifInterface exif;
@@ -104,10 +106,6 @@ public class ContentInsertMain extends FontActivity {
         setContentView(R.layout.activity_content_insert_main);
         mContext = this;
         checkPermission();
-
-        /*CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        collapsingToolbar.setExpandedTitleTextAppearance(R.style.ExpandedAppBar);
-        collapsingToolbar.setCollapsedTitleTextAppearance(R.style.CollapsedAppBar);*/
 
         SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
         user_id = get_to_eat.getString("user_id","notFound");
@@ -161,8 +159,11 @@ public class ContentInsertMain extends FontActivity {
         mAdapter = new ContentInsertAdapter(myDataset, ContentInsertMain.this);
         mRecyclerView.setAdapter(mAdapter);
 
+        llInsetNo = (LinearLayout) findViewById(R.id.llInsetNo);
         if(myDataset.size()==0) {
-            mRecyclerView.setBackgroundResource(R.drawable.bg_content_insert_main);
+            llInsetNo.setVisibility(View.VISIBLE);
+        }else{
+            llInsetNo.setVisibility(View.GONE);
         }
 
         //top버튼
@@ -378,7 +379,6 @@ public class ContentInsertMain extends FontActivity {
                         Collections.sort(myDataset);    //정렬해줘야함
                         mAdapter.notifyDataSetChanged();
                     }
-
                 } else {  //갤러리에서 사진 한개 클릭시
                     Uri uri = data.getData();   //갤러리에서 선택한 dataUri 받아오기
                     Photo photo = selectPhoto(uri);
@@ -389,7 +389,7 @@ public class ContentInsertMain extends FontActivity {
                     Collections.sort(myDataset);
                     mAdapter.notifyDataSetChanged();
                 }
-
+                llInsetNo.setVisibility(View.GONE);
             } else if (requestCode == 2) {
                 mAdapter.photoGoogleMapResult(data);
             }

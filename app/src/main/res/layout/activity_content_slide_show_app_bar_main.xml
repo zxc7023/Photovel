@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.photovel.content.ContentSlideShowMain">
+
     <android.support.design.widget.AppBarLayout
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
@@ -17,10 +18,7 @@
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             android:fitsSystemWindows="true"
             app:titleEnabled="false">
-            <include
-                layout="@layout/activity_content_detail_include_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+
             <android.support.v7.widget.Toolbar
                 android:id="@+id/slideToolbar"
                 android:layout_width="match_parent"
@@ -30,8 +28,14 @@
                 app:layout_scrollFlags="scroll|exitUntilCollapsed"
                 app:layout_collapseMode="pin"
                 app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+            <include
+                layout="@layout/activity_content_detail_include_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
+
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -39,6 +43,7 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:font="normal"
         android:fillViewport="true"
+        android:layout_gravity="fill_vertical"
         android:id="@+id/nestedScrollView">
         <LinearLayout
             android:layout_width="match_parent"
@@ -47,8 +52,7 @@
             <include
                 layout="@layout/activity_content_slide_show"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                class="com.photovel.content.ContentSlideShow"/>
+                android:layout_height="wrap_content"/>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -77,10 +81,10 @@
                     android:layout_marginLeft="@dimen/most_left_tv_margin"
                     android:background="@drawable/xml_border2">
                     <com.mikhaellopez.circularimageview.CircularImageView
-                        android:id="@+id/userProfile1"
                         android:layout_width="30dp"
                         android:layout_height="30dp"
                         android:src="@drawable/ic_profile_circle"
+                        android:onClick="ProFileMenuClick"
                         app:civ_border_width="1dp"
                         android:gravity="center"
                         android:layout_marginRight="5dp"/>
@@ -105,7 +109,6 @@
             </LinearLayout>
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
-
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/btnTop"
         android:layout_width="wrap_content"
@@ -119,3 +122,4 @@
         app:backgroundTint="@color/bgWhite"/>
     <include layout="@layout/activity_comment_main"/>
 </android.support.design.widget.CoordinatorLayout>
+

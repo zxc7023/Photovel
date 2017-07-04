@@ -60,6 +60,7 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
     private ContentListAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private List<Content> myDataset;
+    private TextView iclist, tvContentListName;
     private static final String TAG = "";
     private String content_user_id = "", user_id, user_nick_name, user_profile;
     private String urlflag = "";
@@ -75,6 +76,12 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
         // Adding Toolbar to the activity
         toolbar = (Toolbar) findViewById(R.id.contentListToolbar);
         setSupportActionBar(toolbar);
+
+        iclist = (TextView)findViewById(R.id.iclist);
+        tvContentListName = (TextView)findViewById(R.id.tvContentListName);
+
+        Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
+        iclist.setTypeface(fontAwesomeFont);
 
         //현재 로그인한 user_id 받아오기
         SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
@@ -96,9 +103,14 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
 
         urlflag = intent.getStringExtra("urlflag");
         if(urlflag.equals("")){
+            tvContentListName.setText(content_user_id+"님의 스토리");
             urlflag = "C";
-        }else{
-            Log.i("urlflag","list_urlflag : "+urlflag);
+        }else if(urlflag.equals("M")){
+            tvContentListName.setText("내 스토리");
+        }else if(urlflag.equals("N")){
+            tvContentListName.setText("전체 스토리");
+        }else if(urlflag.equals("R")){
+            tvContentListName.setText("인기 스토리");
         }
 
         //스토리 객체 받아오기
@@ -152,8 +164,6 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-
-        Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
 
         //메뉴 navigationView
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);

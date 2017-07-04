@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.provider.BaseColumns;
 import android.speech.RecognizerIntent;
 import android.support.annotation.NonNull;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -23,9 +24,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -76,6 +79,9 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
     SearchView searchView;
     ListView suggestionsListView;
 
+    private BottomSheetBehavior bottomSheetBehavior;
+    private RelativeLayout RlSearch;
+    private ImageButton btnBack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,13 +93,23 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         user_nick_name = get_to_eat.getString("user_nick_name","notFound");
         user_profile = get_to_eat.getString("user_profile","notFound");
 
+        RlSearch = (RelativeLayout) findViewById(R.id.RlSearch);
+        bottomSheetBehavior = BottomSheetBehavior.from(RlSearch);
+        bottomSheetBehavior.setPeekHeight(0);
+        btnBack = (ImageButton) findViewById(R.id.btn_action_back);
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+            }
+        });
+
         searchView = (SearchView) findViewById(R.id.search_view);
 
         suggestionsListView = (ListView) findViewById(R.id.suggestion_list);
         searchListAdapter = new SearchListAdapter(this, matrixCursor, true, suggestionsListView);
 
         searchView.setAdapter(searchListAdapter);
-        searchView.bringToFront();
 
         //메인이미지 캐러셀뷰 부분
         carouselView = (CarouselView) findViewById(R.id.carouselView);
@@ -137,9 +153,11 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         }
         //추천 스토리 bitmap 받아오기
         JsonConnection.setBitmap(myRecommendDataset, Value.contentPhotoURL);
+        Log.i("ddd","오류로그 : "+myRecommendDataset.size());
 
         //추천 스토리 recycleview사용선언
         RVrecommend = (RecyclerView) findViewById(R.id.RVrecommend);
+        RVrecommend.bringToFront();
         RVrecommend.setHasFixedSize(true);
         RVrecommend.setNestedScrollingEnabled(false);
         mRecommendLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
@@ -255,10 +273,10 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
 
                     if ("".equals(newText)) {
 
-                    } else if (myNewDataset.get(i).getUser().getUser_id().toLowerCase().startsWith(newText.toLowerCase()) //입력되는 문자열의 시작부분이 "user_id"의 value와 같은지 검사
+                    } else if (myNewDataset.get(i).getUser().getUser_nick_name().toLowerCase().startsWith(newText.toLowerCase()) //입력되는 문자열의 시작부분이 "User_nick_name"의 value와 같은지 검사
                             || myNewDataset.get(i).getContent_subject().toLowerCase().startsWith(newText.toLowerCase())) {
                         Log.i(TAG, "onQueryTextChange 들어온 contentList= " + myNewDataset);
-                        Log.i(TAG, "onQueryTextChange 들어온 getUser_id()= " + myNewDataset.get(i).getUser().getUser_id().toLowerCase());
+                        Log.i(TAG, "onQueryTextChange 들어온 getUser_id()= " + myNewDataset.get(i).getUser().getUser_nick_name().toLowerCase());
                         Log.i(TAG, "onQueryTextChange 들어온 getContent_subject()= " + myNewDataset.get(i).getContent_subject().toLowerCase());
                         matrixCursor.addRow(new Object[]{i,
                                 myNewDataset.get(i).getContent_id(),
@@ -277,7 +295,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
             }
         });
 
-        searchView.setOnSearchViewListener(new SearchView.SearchViewListener() {
+        /*searchView.setOnSearchViewListener(new SearchView.SearchViewListener() {
             @Override
             public void onSearchViewShown() {
                 //Do some magic
@@ -287,7 +305,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
             public void onSearchViewClosed() {
                 //Do some magic
             }
-        });
+        });*/
     }
 
     //Android BackButton EventListener
@@ -296,9 +314,9 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        } else if (searchView.isSearchOpen()) {
-            searchView.closeSearch();
-        } else {
+        }else if(bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED){
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        }else {
             if (doubleBackToExitPressedOnce) {
                 super.onBackPressed();
                 return;
@@ -364,6 +382,15 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
             Log.i(TAG, "searchItem != null");
             searchView.setMenuItem(searchItem);
         }
+        searchItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);   //search용 bottomSheet열어주기
+                RlSearch.bringToFront();
+                searchView.showSearch();    //검색칸?도 열어주기
+                return false;
+            }
+        });
         return true;
     }
 

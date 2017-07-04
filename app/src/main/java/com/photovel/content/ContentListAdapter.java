@@ -323,7 +323,7 @@ public class ContentListAdapter extends RecyclerView.Adapter<ContentListAdapter.
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                holder.tvShareCount.setText(mDataset.get(position).getContent_share_count()+1);
+                holder.tvShareCount.setText(String.valueOf(Integer.parseInt(holder.tvShareCount.getText().toString())+1));
                 contentshare(v);
                 adapter = new ContentListAdapter();
                 adapter.setHolder(holder);

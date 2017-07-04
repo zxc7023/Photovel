@@ -19,6 +19,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
@@ -54,7 +55,7 @@ public class FriendSearchMain extends FontActivity2 implements NavigationView.On
     private String user_id, user_nick_name, user_profile, searchFlag;
 
     private RecyclerView recyclerView;
-    private FriendNewListAdapter mFriendNewListAdapter;
+    private FriendSearchAdapter mFriendNewListAdapter;
     private RecyclerView.LayoutManager mNewLayoutManager;
     private List<User> myNewFriendDataset;
 
@@ -63,7 +64,7 @@ public class FriendSearchMain extends FontActivity2 implements NavigationView.On
     private Animation fab_open, fab_close, rotate_forward, rotate_backward;
 
     private EditText etSearch;
-    private TextView icsearch, icclose, btnSearchOk;
+    private TextView icsearch, icclose, btnSearchOk, tvSearchNo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +89,7 @@ public class FriendSearchMain extends FontActivity2 implements NavigationView.On
         icsearch = (TextView)findViewById(R.id.icsearch);
         icclose = (TextView)findViewById(R.id.icclose);
         btnSearchOk = (TextView)findViewById(R.id.btnSearchOk);
+        tvSearchNo = (TextView)findViewById(R.id.tvSearchNo);
         etSearch = (EditText)findViewById(R.id.etSearch);
 
         final Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
@@ -103,8 +105,6 @@ public class FriendSearchMain extends FontActivity2 implements NavigationView.On
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 if(!etSearch.getText().equals("")){
                     icclose.setVisibility(View.VISIBLE);
-                }else {
-                    icclose.setVisibility(View.GONE);
                 }
             }
             @Override
@@ -116,6 +116,7 @@ public class FriendSearchMain extends FontActivity2 implements NavigationView.On
             @Override
             public void onClick(View view) {
                 etSearch.setText("");
+                icclose.setVisibility(View.INVISIBLE);
             }
         });
 
@@ -123,8 +124,11 @@ public class FriendSearchMain extends FontActivity2 implements NavigationView.On
         Intent intent = getIntent();
         searchFlag = intent.getStringExtra("search");
         if(searchFlag.equals("id")){
+            etSearch.setHint("아이디, 닉네임 검색");
             fab_search.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.btn_number_off));
         }else{
+            etSearch.setHint("전화번호 검색");
+            etSearch.setInputType(InputType.TYPE_CLASS_NUMBER);
             fab_search.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.btn_id_off));
         }
 
@@ -172,47 +176,52 @@ public class FriendSearchMain extends FontActivity2 implements NavigationView.On
             @Override
             public void onClick(View view) {
                 //번호나 아이디를 넘기고 리스트 받기
-                etSearch.getText();
+
+                final String url;
+                if(searchFlag.equals("id")){
+                    url = "/selectid/";
+                }else{
+                    url = "/selectphone/";
+                }
+
+                Thread searchList = new Thread(){
+                    @Override
+                    public void run() {
+                        super.run();
+                        String responseData = JsonConnection.getConnection(Value.photovelURL + "/friend" + url + etSearch.getText().toString() +"/" + user_id, "GET", null);
+                        myNewFriendDataset = JSON.parseArray(responseData, User.class);
+                    }
+                };
+                searchList.start();
+                try {
+                    searchList.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                //user의 bitmap 받아오기
+                if(myNewFriendDataset != null){
+                    tvSearchNo.setVisibility(View.GONE);
+                    JsonConnection.setBitmap(myNewFriendDataset, Value.contentPhotoURL);
+                    for(int i = 0; i < myNewFriendDataset.size(); i++){
+                        if(myNewFriendDataset.get(i).getUser_profile_photo() == null){
+                            Bitmap profile = BitmapFactory.decodeResource(getResources(),R.drawable.ic_profile_circle);
+                            myNewFriendDataset.get(i).setBitmap(profile);
+                        }
+                    }
+
+                    recyclerView = (RecyclerView) findViewById(R.id.recycler_search_view);
+                    recyclerView.setHasFixedSize(true);
+                    recyclerView.setNestedScrollingEnabled(false);
+                    mNewLayoutManager = new LinearLayoutManager(FriendSearchMain.this);
+                    recyclerView.setLayoutManager(mNewLayoutManager);
+                    mFriendNewListAdapter = new FriendSearchAdapter(myNewFriendDataset, FriendSearchMain.this);
+                    recyclerView.setAdapter(mFriendNewListAdapter);
+                }else{
+                    tvSearchNo.setVisibility(View.VISIBLE);
+                }
+
             }
         });
-
-
-
-
-        //친구 신청 목록///////////////////////////////////
-        Thread detailList = new Thread(){
-            @Override
-            public void run() {
-                super.run();
-                String responseData = JsonConnection.getConnection(Value.photovelURL+"/friend/new/"+user_id, "GET", null);
-                myNewFriendDataset = JSON.parseArray(responseData, User.class);
-            }
-        };
-        detailList.start();
-        try {
-            detailList.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        //content의 bitmap 받아오기
-        JsonConnection.setBitmap(myNewFriendDataset, Value.contentPhotoURL);
-        for(int i = 0; i < myNewFriendDataset.size(); i++){
-            if(myNewFriendDataset.get(i).getUser_profile_photo() == null){
-                Bitmap profile = BitmapFactory.decodeResource(getResources(),R.drawable.ic_profile_circle);
-                myNewFriendDataset.get(i).setBitmap(profile);
-            }
-        }
-
-        recyclerView = (RecyclerView) findViewById(R.id.recycler_search_view);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setNestedScrollingEnabled(false);
-        mNewLayoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(mNewLayoutManager);
-        mFriendNewListAdapter = new FriendNewListAdapter(myNewFriendDataset, FriendSearchMain.this);
-        recyclerView.setAdapter(mFriendNewListAdapter);
-
-
-
 
         // Adding Toolbar to the activity
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -234,7 +243,7 @@ public class FriendSearchMain extends FontActivity2 implements NavigationView.On
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), ContentInsertMain.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); //준기오빠의 낮은 버전을 위해 인텐트할때 넣어주기
                 getApplicationContext().startActivity(intent);
             }
         });

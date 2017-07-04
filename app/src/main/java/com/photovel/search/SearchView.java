@@ -1,6 +1,9 @@
 package com.photovel.search;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.database.DataSetObserver;
 import android.database.MatrixCursor;
@@ -32,6 +35,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.photovel.R;
+import com.photovel.content.ContentListMain;
 import com.photovel.utils.AnimationUtil.AnimationUtil;
 import com.vo.Content;
 
@@ -92,6 +96,8 @@ public class SearchView extends FrameLayout implements Filter.FilterListener {
     //submit
     private boolean submit = false;
 
+    private String user_id;
+
 
     //데이터 집합 감시자
     private DataSetObserver dataSetObserver;
@@ -139,6 +145,10 @@ public class SearchView extends FrameLayout implements Filter.FilterListener {
     public void setAdapter(SearchListAdapter adapter) {
         searchListAdapter = adapter;
         Log.i(TAG, "searchListAdapter.getCount()= " + searchListAdapter.getCount());
+        if(searchListAdapter.getCount() != 0){
+            Log.i(TAG, "searchListAdapter.content_id()= " + searchListAdapter.getCursor().getColumnIndex("content_id"));
+        }
+
         suggestionsListView.setAdapter(searchListAdapter);
         startFilter(edtSearchSrc.getText());
     }
@@ -296,7 +306,7 @@ public void setBackground(Drawable background) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             suggestionsListView.setBackground(background);
         } else {
-            suggestionsListView.setBackgroundDrawable(background);
+            suggestionsListView.setBackground(background);
         }
     }
 ////////////////////////////////////////////////
@@ -350,16 +360,15 @@ public void setBackground(Drawable background) {
 
     //클릭 리스너
     private final OnClickListener onClickListener = new OnClickListener() {
-
         public void onClick(View v) {
             if (v == btnBack) {
-                closeSearch();
+                //closeSearch();
             } else if (v == btnEmpty) {
                 edtSearchSrc.setText(null);
             } else if (v == edtSearchSrc) {
                 showSuggestions();
             } else if (v == tintView) {
-                closeSearch();
+                //closeSearch();
             }
         }
     };
