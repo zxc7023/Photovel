@@ -3,6 +3,7 @@ package com.photovel;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.text.LoginFilter;
 import android.util.Log;
@@ -38,7 +39,8 @@ public class SessionMangement extends FontActivity2 {
 
     String cookieValues;
     String sessionCheckValue="0";
-    String TAG ="junkiSession";
+    String TAG ="SessionMange";
+    int sequence = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +51,7 @@ public class SessionMangement extends FontActivity2 {
         // 저장된 jSession 쿠키값을 받아온다
         SharedPreferences loginInfo = getSharedPreferences("loginInfo", MODE_PRIVATE);
         String firstData = loginInfo.getString("Set-Cookie", "fail");
-        Log.i(TAG,firstData);
+        Log.i(TAG+sequence+++"쿠키존재?",firstData);
 
 
         /**
@@ -61,17 +63,21 @@ public class SessionMangement extends FontActivity2 {
     }
 
     public void checkLoginInfo(String firstData) {
-        //jSession값이 있는경우
         if(!firstData.equals("fail")){
+            Log.i(TAG+sequence++," Jsession 값 존재");
             compareSession(firstData);
             //jSession값에 일치하는 로그인 인포가 있을경우
             if (sessionCheckValue.equals("1")) {
+                Log.i(TAG+"조건2", "jsession이 일치함 메인으로 이동");
+                SharedPreferences loginInfo = getSharedPreferences("loginInfo", MODE_PRIVATE);
+                Log.i(TAG+"세션값",loginInfo.getAll().toString());
                 Intent intent = new Intent(getApplication(), MainActivity.class);
                 startActivity(intent);
                 finish();
             }
             //jSession에 일치하는 로그인 인포가 없을 경우
             else{
+                Log.i(TAG+"조건3", "jsession이 일치하지않음 로그인으로 이동");
                 //내 로컬에 저장된 jSession의 값이 서버의 저장된 세션의 인포와 똑같은게 없을때 삭제를 해줘야한다.
                 SharedPreferences test = getSharedPreferences("loginInfo", MODE_PRIVATE);
                 String isRemovable = test.getString("Set-Cookie","notFound");
@@ -88,6 +94,7 @@ public class SessionMangement extends FontActivity2 {
         }
         //jSession이 없는경우
         else{
+            Log.i(TAG+"조건4", "jsession이 없음 로그인으로 이동");
             Intent intent = new Intent(getApplication(), UserLogin.class);
             startActivity(intent);
             intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
@@ -162,89 +169,4 @@ public class SessionMangement extends FontActivity2 {
         }
 
     }
-
-
-
-/*
-
-    public void getSession(final String url){
-        Thread loginThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                HttpURLConnection conn = null;
-                InputStream is = null;
-                URL connectURL = null;
-                ByteArrayOutputStream baos;
-
-
-                try {
-                    Log.i("myStatus",url);
-                    connectURL = new URL(url);
-                    conn = (HttpURLConnection) connectURL.openConnection();
-                    conn.setDoOutput(true);
-                    conn.setRequestMethod("Post");
-                    conn.setRequestProperty("Connection", "Keep-Alive");
-
-
-                    int responseCode = conn.getResponseCode();
-                    Log.i("myStatus", responseCode + "");
-                    switch (responseCode){
-                        case HttpURLConnection.HTTP_OK :
-                            is=conn.getInputStream();
-                            baos = new ByteArrayOutputStream();
-                            byte[] byteBuffer = new byte[1024];
-                            byte[] byteData = null;
-                            int nLength =0;
-                            while((nLength = is.read(byteBuffer,0,byteBuffer.length))!=-1){
-                                baos.write(byteBuffer,0,nLength);
-                            }
-                            byteData=baos.toByteArray();
-                            isSucess = new String(byteData);
-                            Log.i("myStatus",isSucess);
-
-                            //로그인이 삭제되건 성공하건 이전의 세션은 삭제해줘야한다.
-                            SharedPreferences test = getSharedPreferences("loginInfo", MODE_PRIVATE);
-                            SharedPreferences.Editor editor2 = test.edit();
-                            editor2.remove("Set-Cookie");
-                            editor2.commit();
-
-                            Map<String,List<String>> responseHeaders = conn.getHeaderFields();
-                            Set<String> keys = responseHeaders.keySet();
-                            Log.i("myStatus","응답헤더목록");
-                            for(String key: keys){
-                                List<String>values = responseHeaders.get(key);
-                                Log.i("myStatus",key+"="+values.toString());
-                                if("Set-Cookie".equals(key)){
-                                    for(String value:values){
-                                        cookieValues +=value;
-                                        cookieValues+=":";
-                                    }
-                                }
-                            }
-
-                            //로그인한 후에 세션을 관리한다. TestActivity에 저장한다.
-                            SharedPreferences loginInfo = getSharedPreferences("loginInfo", MODE_PRIVATE);
-                            SharedPreferences.Editor editor = loginInfo.edit();
-                            editor.putString("Set-Cookie", cookieValues); //First라는 key값으로 infoFirst 데이터를 저장한다.
-                            editor.commit(); //완료한다.
-                            break;
-                    }
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }finally {
-                }
-            }
-        });
-
-        loginThread.start();
-        try {
-            loginThread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-*/
-
 }

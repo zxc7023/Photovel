@@ -55,7 +55,7 @@ import java.util.Set;
 
 public class UserLogin extends FontActivity2 {
     //LOG값을 순서대로 찍어보기위해서 사용
-    String TAG = "UserLoginTest";
+    String TAG = "UserLogin";
     int sequence = 0;
 
     Context mContext;
@@ -291,6 +291,7 @@ public class UserLogin extends FontActivity2 {
             }
 
             editor.commit(); //완료한다.
+            Log.i(TAG,loginInfo.getAll().toString());
         }
     }
 

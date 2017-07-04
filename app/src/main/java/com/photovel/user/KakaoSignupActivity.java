@@ -10,6 +10,8 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.kakao.auth.ApiResponseCallback;
 import com.kakao.auth.ErrorCode;
 import com.kakao.network.ErrorResult;
@@ -48,7 +50,7 @@ import java.util.Set;
 public class KakaoSignupActivity extends Activity {
 
     //로그를 확인하기위하여 작성한 TAG와 Sequence
-    String TAG = "KakaoSignUpTest";
+    String TAG = "KakaoSignUp";
     int sequence = 0;
 
     //KakaoSignupActivity 액티비티에서 KakaoUserJoinDetail로 전달해주고 받아올때 필요한 requestCode
@@ -288,7 +290,7 @@ public class KakaoSignupActivity extends Activity {
                 String user_profile = ub.BitMapToString(temp.getBitmap());
                 editor.putString("user_profile", user_profile);
             }
-
+            Log.i(TAG,loginInfo.getAll().toString());
             editor.commit(); //완료한다.
         }
     }
@@ -390,6 +392,7 @@ public class KakaoSignupActivity extends Activity {
     }
 
     private void redirectMainActivity() {
+
         startActivity(new Intent(this, MainActivity.class));
         finish();
 

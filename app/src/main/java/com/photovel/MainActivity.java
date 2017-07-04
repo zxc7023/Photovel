@@ -29,6 +29,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.mikhaellopez.circularimageview.CircularImageView;
 import com.photovel.search.SearchView;
 import com.photovel.search.SearchListAdapter;
@@ -42,6 +44,10 @@ import com.synnapps.carouselview.CarouselView;
 import com.synnapps.carouselview.ImageListener;
 import com.vo.Content;
 import com.vo.MainImage;
+import com.vo.User;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.List;
 
@@ -77,10 +83,13 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
     ListView suggestionsListView;
 
 
+    String isTokenSucess;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
         SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
         user_id = get_to_eat.getString("user_id","notFound");
