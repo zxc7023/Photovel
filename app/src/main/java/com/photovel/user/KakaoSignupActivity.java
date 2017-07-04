@@ -171,12 +171,14 @@ public class KakaoSignupActivity extends Activity {
                     e.printStackTrace();
                 }
 
-                Log.i(TAG + sequence++ + "받은 값", connectionResultValue);
-                if ("1".equals(connectionResultValue)) {
+
+                if ( "".equals(connectionResultValue) || connectionResultValue == null) {
+                    Log.i(TAG + sequence++, "카카오톡회원가입 실패");
+                } else {
+                    Log.i(TAG + sequence++ + "받은 값", connectionResultValue);
                     //회원가입 성공한경우
                     //로그인과 같은절차를 진행해준다. 이미 가입되있는 아이디와 중복해서 진행할 수 있으므로 requestMe()에서 진행
                     requestMe();
-                } else {
                     Log.i(TAG + sequence++, "카카오톡회원가입 실패");
                 }
             }
