@@ -143,6 +143,7 @@ public class UserJoin extends FontActivity2 {
                     user = (User) intent.getSerializableExtra("user");
                     try {
                         job.put("user_id", user.getUser_id());
+                        job.put("user_sns_token", user.getUser_sns_token());
                         job.put("user_password", user.getUser_password());
                         job.put("user_nick_name", nickName);
                         job.put("user_phone2", phoneNumber);
