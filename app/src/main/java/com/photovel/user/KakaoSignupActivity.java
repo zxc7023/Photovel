@@ -67,6 +67,7 @@ public class KakaoSignupActivity extends Activity {
 
     ProgressDialog progressDialog;
     Context mContext;
+
     /**
      * Main으로 넘길지 가입 페이지를 그릴지 판단하기 위해 me를 호출한다.
      *
@@ -76,9 +77,11 @@ public class KakaoSignupActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_kakao_signup);
-        mContext=this;
-        /*
+        mContext = this;
         progressDialog = new ProgressDialog(this);
+        progressDialog.setTitle("Loading");
+        progressDialog.setMessage("Wait while loading...");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -93,30 +96,22 @@ public class KakaoSignupActivity extends Activity {
             }
         }).start();
         requestMe();
-        */
-        progressDialog= new ProgressDialog(this);
-        // show the dialog
-        progressDialog.setTitle("Loading");
-        progressDialog.setMessage("Wait while loading...");
-        SampleTask task = new SampleTask();
-        task.execute();
+
+
     }
 
     @Override
-    protected void onStop() {
-        /*
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if(progressDialog.isShowing()){
-                    Log.i(TAG+sequence++,"스피닝중");
+    protected void onDestroy() {
+        if (progressDialog.isShowing()) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Log.i(TAG + sequence++, "스피닝중");
                     progressDialog.cancel();
                 }
-            }
-        });
-        */
-        super.onStop();
-
+            });
+        }
+        super.onDestroy();
     }
 
     private void joinUser() {
@@ -261,7 +256,7 @@ public class KakaoSignupActivity extends Activity {
                     e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
-                }finally {
+                } finally {
                     conn.disconnect();
                 }
             }
@@ -272,7 +267,7 @@ public class KakaoSignupActivity extends Activity {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        if(!"".equals(connectionResultValue)){
+        if (!"".equals(connectionResultValue)) {
             //user프로필사진set
             List<User> user = new ArrayList<>();
             user.add(temp);
@@ -382,8 +377,8 @@ public class KakaoSignupActivity extends Activity {
                 Log.i(TAG + "" + sequence++, "onSuccess");
                 Log.i("UserProfile : ", userProfile.toString());
                 try {
-                    job.put("user_id",userProfile.getEmail());
-                    job.put("user_password",userProfile.getId());
+                    job.put("user_id", userProfile.getEmail());
+                    job.put("user_password", userProfile.getId());
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -432,23 +427,4 @@ public class KakaoSignupActivity extends Activity {
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
-    private class SampleTask extends AsyncTask<Void, Integer, String> {
-
-
-
-        protected String doInBackground(Void... urls) {
-
-            requestMe();
-            return null;
-        }
-
-        protected void onPreExecute(){
-            progressDialog.show();
-        }
-
-        protected void onPostExecute(String result) {
-            progressDialog.hide();
-        }
-    }
-
 }
