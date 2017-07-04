@@ -343,7 +343,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
                     comment.put("comment_content", etComment.getText());
                     comment.put("user",user);
 
-                    getnew Thread(new Runnable() {
+                    new Thread(new Runnable() {
                         @Override
                         public void run() {
                             JSONObject job = new JSONObject();
