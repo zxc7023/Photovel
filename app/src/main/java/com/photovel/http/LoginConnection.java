@@ -82,7 +82,7 @@ public class LoginConnection {
                             Log.i(TAG, "3. login 로그인실패");
                             return;
                         }
-                        Log.i(TAG, "3. login 로그인성공");
+                        Log.i(TAG, "3. login 로그인성공-"+isSuccess);
 
                         user = JSON.parseObject(isSuccess, User.class);
                         Log.i(TAG, "4. login user = " + user);

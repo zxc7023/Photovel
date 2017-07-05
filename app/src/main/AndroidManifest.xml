@@ -8,15 +8,8 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> <!-- 앱이 장소 선택기를 사용하는경우를 위한 퍼미션 -->
     <!-- 갤러리권한설정 -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-
-
-    <provider
-        android:name="com.facebook.FacebookContentProvider"
-        android:authorities="com.facebook.app.FacebookContentProvider836515529860593"
-        android:exported="true" />
 
     <application
         android:name=".user.GlobalApplication"
@@ -26,6 +19,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <!--facebook 로그인-->
+        <provider
+            android:name="com.facebook.FacebookContentProvider"
+            android:authorities="com.facebook.app.FacebookContentProvider836515529860593"
+            android:exported="true" />
+
         <!-- Set custom default icon. This is used when no icon is set for incoming notification messages.
         See README(https://goo.gl/l4GJaQ) for more. -->
         <meta-data
@@ -39,7 +39,7 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDHhbAmLoQolRIfA6C2Xdm-NzKa9naq3XA" />
+            android:value="AIzaSyBYCBK88cIufBSLUCUcCxx8qbyOzlEeP7g" />
         <meta-data
             android:name="com.kakao.sdk.AppKey"
             android:value="@string/kakao_app_key" />
@@ -50,8 +50,10 @@
         준기키-->
         <!-- AIzaSyAoropfQgcXeJI0nf6iyz36wDc9pZIBJUw
         하라키 -->
-        <!-- AIzaSyAiudYhFEK-5EW9nzlu8Tbv1FoUNyLRWz8
+        <!-- AIzaSyBYCBK88cIufBSLUCUcCxx8qbyOzlEeP7g
         은지키 -->
+        <!-- AIzaSyCGPt22XKMrANEHYi-NcZy6UMWsVC3L9Ak
+        플레이스토어용 -->
         <activity
             android:name=".SessionMangement"
             android:label="@string/app_name"
@@ -122,7 +124,6 @@
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
-
 
     </application>
 

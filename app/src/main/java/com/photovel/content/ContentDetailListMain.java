@@ -790,8 +790,14 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
     private void sendFeedTemplate() {
         Map<String, String> templateArgs = new HashMap<String, String>();
         templateArgs.put("${img_size}", String.valueOf(myDataset.size()));
-        for(int i=0; i<3; i++){
-            templateArgs.put("${image_url"+i+"}", Value.contentPhotoURL+"/"+content_id+"/"+myDataset.get(i).getPhoto().getPhoto_file_name());
+        if(myDataset.size() >= 3){
+            for(int i=0; i<3; i++){
+                templateArgs.put("${image_url"+i+"}", Value.contentPhotoURL+"/"+content_id+"/"+myDataset.get(i).getPhoto().getPhoto_file_name());
+            }
+        }else{
+            for(int i=0; i<myDataset.size(); i++){
+                templateArgs.put("${image_url"+i+"}", Value.contentPhotoURL+"/"+content_id+"/"+myDataset.get(i).getPhoto().getPhoto_file_name());
+            }
         }
 
         templateArgs.put("${user_profile}", Value.contentPhotoURL+"/profile/"+content.getUser().getUser_profile_photo());
