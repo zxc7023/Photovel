@@ -1,13 +1,10 @@
 package com.photovel.content;
 
-import android.content.ClipData;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -26,11 +23,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.mikhaellopez.circularimageview.CircularImageView;
-import com.photovel.FontActivity;
 import com.photovel.FontActivity2;
 import com.photovel.MainActivity;
 import com.photovel.NavigationItemSelected;
@@ -40,18 +35,7 @@ import com.photovel.http.Value;
 import com.photovel.setting.SettingMain;
 import com.photovel.user.UserBitmapEncoding;
 import com.vo.Content;
-import com.vo.ContentDetail;
-import com.vo.Photo;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
+
 import java.util.List;
 
 public class ContentListMain extends FontActivity2 implements NavigationView.OnNavigationItemSelectedListener{
@@ -60,6 +44,7 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
     private ContentListAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private List<Content> myDataset;
+    private TextView iclist, tvContentListName;
     private static final String TAG = "";
     private String content_user_id = "", user_id, user_nick_name, user_profile;
     private String urlflag = "";
@@ -75,6 +60,12 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
         // Adding Toolbar to the activity
         toolbar = (Toolbar) findViewById(R.id.contentListToolbar);
         setSupportActionBar(toolbar);
+
+        iclist = (TextView)findViewById(R.id.iclist);
+        tvContentListName = (TextView)findViewById(R.id.tvContentListName);
+
+        Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
+        iclist.setTypeface(fontAwesomeFont);
 
         //현재 로그인한 user_id 받아오기
         SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
@@ -96,9 +87,14 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
 
         urlflag = intent.getStringExtra("urlflag");
         if(urlflag.equals("")){
+            tvContentListName.setText(content_user_id+"님의 스토리");
             urlflag = "C";
-        }else{
-            Log.i("urlflag","list_urlflag : "+urlflag);
+        }else if(urlflag.equals("M")){
+            tvContentListName.setText("내 스토리");
+        }else if(urlflag.equals("N")){
+            tvContentListName.setText("전체 스토리");
+        }else if(urlflag.equals("R")){
+            tvContentListName.setText("인기 스토리");
         }
 
         //스토리 객체 받아오기
@@ -152,8 +148,6 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-
-        Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
 
         //메뉴 navigationView
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
@@ -232,7 +226,7 @@ public class ContentListMain extends FontActivity2 implements NavigationView.OnN
         ns.selected(id, getApplicationContext());
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
-        finish();
+        //finish();
         return true;
     }
 

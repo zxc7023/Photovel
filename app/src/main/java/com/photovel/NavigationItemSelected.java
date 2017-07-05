@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.facebook.login.LoginManager;
 import com.kakao.usermgmt.UserManagement;
 import com.kakao.usermgmt.callback.LogoutResponseCallback;
 import com.photovel.common.BookMarkMain;
@@ -72,7 +73,9 @@ public class NavigationItemSelected extends FontActivity{
             Toast.makeText(context, "로그아웃", Toast.LENGTH_SHORT).show();
             logout(Value.userLogoutURL, context);
             kakaoLogout(context);
+            facebookLogout();
             intent = new Intent(context, SessionMangement.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
             finish();
@@ -82,9 +85,11 @@ public class NavigationItemSelected extends FontActivity{
             context.startActivity(intent);
             finish();
         }else if(id==R.id.nav_qna){
-
+            Toast.makeText(context,"아직 개발중입니닷",Toast.LENGTH_SHORT).show();
+            return;
         }else if(id==R.id.nav_howto){
-
+            Toast.makeText(context,"아직 개발중입니닷",Toast.LENGTH_SHORT).show();
+            return;
         }
     }
 
@@ -93,10 +98,15 @@ public class NavigationItemSelected extends FontActivity{
             @Override
             public void onCompleteLogout() {
                 Intent intent = new Intent(context,SessionMangement.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
             }
         });
+    }
+
+    private void facebookLogout() {
+        LoginManager.getInstance().logOut();
     }
 
     public void logout(final String userLogoutURL, final Context context){

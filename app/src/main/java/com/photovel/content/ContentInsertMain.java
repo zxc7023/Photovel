@@ -12,14 +12,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.Typeface;
-import android.location.Address;
-import android.location.Geocoder;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AlertDialog;
@@ -32,15 +29,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mikhaellopez.circularimageview.CircularImageView;
-import com.photovel.MainActivity;
-import com.photovel.MainNewAdapter;
-import com.photovel.R;
 import com.photovel.FontActivity;
+import com.photovel.R;
 import com.photovel.http.MultipartConnection;
 import com.photovel.http.Value;
 import com.photovel.user.UserBitmapEncoding;
@@ -52,28 +48,20 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
-import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 public class ContentInsertMain extends FontActivity {
     private Button btnSort, btnPhotoSave;
     private TextView btnBack, tvUsername;
+    private LinearLayout llInsetNo;
     private FloatingActionButton  btnAddPhots, btnTop;
     private String path;
     private ExifInterface exif;
@@ -104,10 +92,6 @@ public class ContentInsertMain extends FontActivity {
         setContentView(R.layout.activity_content_insert_main);
         mContext = this;
         checkPermission();
-
-        /*CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        collapsingToolbar.setExpandedTitleTextAppearance(R.style.ExpandedAppBar);
-        collapsingToolbar.setCollapsedTitleTextAppearance(R.style.CollapsedAppBar);*/
 
         SharedPreferences get_to_eat = getSharedPreferences("loginInfo", MODE_PRIVATE);
         user_id = get_to_eat.getString("user_id","notFound");
@@ -161,8 +145,11 @@ public class ContentInsertMain extends FontActivity {
         mAdapter = new ContentInsertAdapter(myDataset, ContentInsertMain.this);
         mRecyclerView.setAdapter(mAdapter);
 
+        llInsetNo = (LinearLayout) findViewById(R.id.llInsetNo);
         if(myDataset.size()==0) {
-            mRecyclerView.setBackgroundResource(R.drawable.bg_content_insert_main);
+            llInsetNo.setVisibility(View.VISIBLE);
+        }else{
+            llInsetNo.setVisibility(View.GONE);
         }
 
         //top버튼
@@ -378,7 +365,6 @@ public class ContentInsertMain extends FontActivity {
                         Collections.sort(myDataset);    //정렬해줘야함
                         mAdapter.notifyDataSetChanged();
                     }
-
                 } else {  //갤러리에서 사진 한개 클릭시
                     Uri uri = data.getData();   //갤러리에서 선택한 dataUri 받아오기
                     Photo photo = selectPhoto(uri);
@@ -389,7 +375,7 @@ public class ContentInsertMain extends FontActivity {
                     Collections.sort(myDataset);
                     mAdapter.notifyDataSetChanged();
                 }
-
+                llInsetNo.setVisibility(View.GONE);
             } else if (requestCode == 2) {
                 mAdapter.photoGoogleMapResult(data);
             }

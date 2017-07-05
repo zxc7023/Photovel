@@ -21,7 +21,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
@@ -29,7 +28,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -38,15 +36,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
+import com.kakao.kakaolink.v2.KakaoLinkResponse;
+import com.kakao.kakaolink.v2.KakaoLinkService;
+import com.kakao.network.ErrorResult;
+import com.kakao.network.callback.ResponseCallback;
+import com.kakao.util.helper.log.Logger;
 import com.mikhaellopez.circularimageview.CircularImageView;
+import com.photovel.FcmPushTest;
 import com.photovel.FontActivity2;
 import com.photovel.MainActivity;
-import com.photovel.MainNewAdapter;
-import com.photovel.MainRecommendAdapter;
 import com.photovel.NavigationItemSelected;
 import com.photovel.R;
-import com.photovel.common.BookMarkMain;
-import com.photovel.friend.FriendListMain;
 import com.photovel.http.JsonConnection;
 import com.photovel.http.Value;
 import com.photovel.setting.SettingMain;
@@ -58,9 +58,13 @@ import com.vo.ContentDetail;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ContentDetailListMain extends FontActivity2 implements NavigationView.OnNavigationItemSelectedListener {
     private static final String TAG = "AppPermission";
@@ -70,7 +74,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
     private ContentDetailListAdapter mAdapter;
 
     private RelativeLayout RldetailData;
-    private LinearLayout RLdetailDate, LLmenu, btnMoreUserContent, btnLike, btnComment, btnBookmark;
+    private LinearLayout RLdetailDate, LLmenu, btnMoreUserContent, btnLike, btnComment, btnBookmark, btnShare;
     private TextView icglobe, icleft, icright, tvleft, tvright, iccal, icmarker, icbookmark, icthumb, iccomment, icshare, btnDetailMenu;
     private TextView tvContentInsertDate, tvContentSubject, tvContentLocation, tvUsername, tvUsername2, tvDuring, tvdetailcount, tvdetailstate, tvContent;
     private TextView tvLikeCount, tvlike, tvbookmark, tvCommentCount, tvShareCount;
@@ -95,6 +99,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
     private EditText etComment;
 
     private int friend_state;
+    private String templateId = "4639";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -156,12 +161,13 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         btnLike = (LinearLayout) findViewById(R.id.btnLike);
         btnComment = (LinearLayout) findViewById(R.id.btnComment);
         btnBookmark = (LinearLayout) findViewById(R.id.btnBookmark);
+        btnShare = (LinearLayout) findViewById(R.id.btnShare);
 
 
         btnLookLeft.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getApplicationContext(),"지도로보기",Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(),"지도로보기",Toast.LENGTH_SHORT).show();
                 Log.i("ddd","지도로 보기 클릭");
                 Intent intent=new Intent(getApplicationContext(), ContentClusterMain.class);
                 intent.putExtra("content_id",content_id);
@@ -331,11 +337,32 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
             public void onClick(View v) {
                 final JSONObject comment = new JSONObject();
                 try {
-                    JSONObject user = new JSONObject();
+                    final JSONObject user = new JSONObject();
                     user.put("user_id", user_id);
                     comment.put("content_id", content_id);
                     comment.put("comment_content", etComment.getText());
                     comment.put("user",user);
+
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            HashMap<String,String> hashMap = new HashMap<String, String>();
+                            JSONObject job = new JSONObject();
+                            try {
+                                job.put("user_id",content.getUser().getUser_id());
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            String token = JsonConnection.getConnection(Value.usergetPushTokenURL,"POST",job);
+                            Log.i("tokenValue",token);
+                            hashMap.put("user_id_sender",user_nick_name);
+                            hashMap.put("user_id_receiver",content.getUser().getUser_id());
+                            hashMap.put("comment_content", etComment.getText().toString());
+                            hashMap.put("content_id", String.valueOf(content_id));
+                            FcmPushTest.pushFCMNotification(token,hashMap);
+                        }
+                    }).start();
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -419,6 +446,14 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
                     tvbookmark.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.textBlue));
                     bookmarkFlag=1;
                 }
+            }
+        });
+
+        //공유하기
+        btnShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                contentshare(v);
             }
         });
 
@@ -634,7 +669,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
                         Log.i("ddd","friend_state"+friend_state);
 
                         if(friend_state == 0){ //친구가아닐때
-                            Toast.makeText(getApplicationContext(),"친구추가성공!",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(),"친구신청을 성공 하였습니다!",Toast.LENGTH_SHORT).show();
                         }else if(friend_state == 1){ //내가 이미 친구신청을 했을때
                             Toast.makeText(getApplicationContext(),"이미 친구신청을 하였습니다",Toast.LENGTH_SHORT).show();
                         }else if(friend_state == 2){ //친구일때
@@ -674,7 +709,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         ns.selected(id, getApplicationContext());
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
-        finish();
+        //finish();
         return true;
     }
 
@@ -698,5 +733,84 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
             startActivity(intent);
             super.onBackPressed();
         }
+    }
+
+    //공유 메뉴클릭시
+    public void contentshare(View v){
+        android.widget.PopupMenu menu = new android.widget.PopupMenu(this, v);
+        menu.inflate(R.menu.content_share_menu);
+        menu.setOnMenuItemClickListener(new android.widget.PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.kakao_share:
+                        sendFeedTemplate();
+                        tvShareCount.setText(String.valueOf(content.getContent_share_count()+1));
+                        Thread share = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                JsonConnection.getConnection(Value.contentURL+"/"+content_id+"/share", "POST", null);
+                            }
+                        });
+                        share.start();
+                        try {
+                            share.join();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    case R.id.facebook_share:
+                        Toast.makeText(getApplicationContext(),"아직 개발중입니닷",Toast.LENGTH_SHORT).show();
+                        break;
+                }
+                return false;
+            }
+        });
+        try {
+            Field[] fields = menu.getClass().getDeclaredFields();
+            for (Field field : fields) {
+                if ("mPopup".equals(field.getName())) {
+                    field.setAccessible(true);
+                    Object menuPopupHelper = field.get(menu);
+                    Class<?> classPopupHelper = Class.forName(menuPopupHelper
+                            .getClass().getName());
+                    Method setForceIcons = classPopupHelper.getMethod(
+                            "setForceShowIcon", boolean.class);
+                    setForceIcons.invoke(menuPopupHelper, true);
+                    break;
+                }
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+        menu.show();
+    }
+
+    //카카오 링크 공유
+    private void sendFeedTemplate() {
+        Map<String, String> templateArgs = new HashMap<String, String>();
+        templateArgs.put("${img_size}", String.valueOf(myDataset.size()));
+        for(int i=0; i<3; i++){
+            templateArgs.put("${image_url"+i+"}", Value.contentPhotoURL+"/"+content_id+"/"+myDataset.get(i).getPhoto().getPhoto_file_name());
+        }
+
+        templateArgs.put("${user_profile}", Value.contentPhotoURL+"/profile/"+content.getUser().getUser_profile_photo());
+        templateArgs.put("${user_nick_name}", content.getUser().getUser_nick_name());
+        templateArgs.put("${content_subject}",content.getContent_subject());
+        templateArgs.put("${content}", content.getContent());
+        templateArgs.put("${good_count}", String.valueOf(content.getGood_count()));
+        templateArgs.put("${comment_count}",String.valueOf(content.getComment_count()));
+        templateArgs.put("${content_share_count}", String.valueOf(content.getContent_share_count()));
+        KakaoLinkService.getInstance().sendCustom(this, templateId, templateArgs, new ResponseCallback<KakaoLinkResponse>() {
+            @Override
+            public void onFailure(ErrorResult errorResult) {
+                Logger.e(errorResult.toString());
+                Toast.makeText(getApplicationContext(), errorResult.toString(), Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onSuccess(KakaoLinkResponse result) {
+            }
+        });
     }
 }

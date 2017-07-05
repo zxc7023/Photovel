@@ -35,8 +35,8 @@ import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.mikhaellopez.circularimageview.CircularImageView;
-import com.photovel.R;
 import com.photovel.FontActivity;
+import com.photovel.R;
 import com.photovel.http.JsonConnection;
 import com.photovel.http.MultipartConnection;
 import com.photovel.http.Value;
@@ -157,6 +157,7 @@ public class ContentUpdateMain extends FontActivity {
                 String responseData = JsonConnection.getConnection(Value.contentURL+"/"+content_id+"/"+user_id, "GET", null);
                 content = JSON.parseObject(responseData, Content.class);
                 myDataset = content.getDetails();
+                originData = content.getDetails();
             }
         };
         contentList.start();
@@ -603,7 +604,7 @@ public class ContentUpdateMain extends FontActivity {
             // Should we show an explanation?
             if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                 // Explain to the user why we need to write the permission.
-                Toast.makeText(this, "Read/Write external storage", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "Read/Write external storage", Toast.LENGTH_SHORT).show();
             }
 
             requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE},

@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
@@ -16,8 +15,8 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -27,25 +26,24 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
-import android.view.DragEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ViewFlipper;
 
 import com.alibaba.fastjson.JSON;
+import com.kakao.kakaolink.v2.KakaoLinkResponse;
+import com.kakao.kakaolink.v2.KakaoLinkService;
+import com.kakao.network.ErrorResult;
+import com.kakao.network.callback.ResponseCallback;
+import com.kakao.util.helper.log.Logger;
 import com.mikhaellopez.circularimageview.CircularImageView;
 import com.photovel.FontActivity2;
 import com.photovel.MainActivity;
@@ -62,17 +60,42 @@ import com.vo.ContentDetail;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ContentSlideShowMain extends FontActivity2 implements NavigationView.OnNavigationItemSelectedListener {
     private SearchView searchView;
-    private static final String TAG = "ContentSlideShow";
+    private static final String TAG = "ContentSlideShowMain";
     Toolbar toolbar;
 
+////////////////슬라이드쇼용 필드//////////////////
+    private ViewPager vpSlideShow;
+    private Context mContext = ContentSlideShowMain.this;
+    private ArrayList<Bitmap> images = new ArrayList<>();
+    private SeekBar slideSeekBar;
+    private ContentSlideShowAdapter contentSlideShowAdapter;
+    private ContentSlideShowViewPager contentSlideShowViewPager;
+    private TextView tvCurrTime;
+    private CountDownTimer countDownTimer;
+    private TextView tvCurrPage;
+
+
+    //이미지 어댑터
+    private int MAX_PAGES = 0;
+    private int MAX_TIME = 0;
+    long TRANS_MILLI; // time in milliseconds between successive task executions.
+    int currPage = 0;
+
+/////////////////////////////////////////////////
+
+
     private RelativeLayout RldetailData;
-    private LinearLayout RLdetailDate, LLmenu, btnLike, btnComment, btnBookmark, btnMoreUserContent;
+    private LinearLayout RLdetailDate, LLmenu, btnLike, btnComment, btnBookmark, btnMoreUserContent, btnShare;
     private TextView icglobe, icleft, icright, tvleft, tvright, iccal, icmarker, icbookmark, icthumb, iccomment, icshare, btnDetailMenu;
     private TextView tvContentInsertDate, tvContentSubject, tvContentLocation, tvUsername, tvUsername2, tvDuring, tvdetailcount, tvdetailstate, tvContent;
     private TextView tvLikeCount, tvlike, tvbookmark, tvCommentCount, tvShareCount;
@@ -85,11 +108,6 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
     private String user_id, user_nick_name, user_profile;
     CircularImageView navUserProfile, myProfile;
 
-    //은디수정
-    private ViewFlipper mViewFlipper;
-    private Context mContext;
-    int index;
-
     //comment
     private BottomSheetBehavior bottomSheetBehavior;
     private RelativeLayout RlComment;
@@ -101,10 +119,10 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
     private TextView btnBack;
     private EditText etComment;
 
-    RadioButton b1, b2, b3;//radio button for indicator
-    Button play, stop;
-    SeekBar slideSeekBar;
-    TextView tvCurrPage;
+    private String templateId = "4639";
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -165,6 +183,7 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         btnComment = (LinearLayout) findViewById(R.id.btnComment);
         btnBookmark = (LinearLayout) findViewById(R.id.btnBookmark);
         btnMoreUserContent = (LinearLayout) findViewById(R.id.btnMoreUserContent);
+        btnShare = (LinearLayout) findViewById(R.id.btnShare);
 
         //imageView를 font로 바꿔주기
         Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
@@ -218,6 +237,34 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
             content.getUser().setBitmap(profile);
         }
 
+        //content의 이미지 bitmap 가져오기
+        JsonConnection.setBitmap(myDataset, Value.contentPhotoURL);
+        Log.i(TAG, "myDataset의 크기= " + myDataset.size());
+        Log.i(TAG, "myDataset.get(0).getContent_detail_id()= " + myDataset.get(0).getContent_detail_id());
+        Log.i(TAG, "myDataset.get(0).getPhoto().getBitmap()= " + myDataset.get(0).getPhoto().getBitmap());
+
+
+        for(int i=0; i<myDataset.size(); i++){
+            images.add(myDataset.get(i).getPhoto().getBitmap());
+        }
+
+        /*//content의 이미지 bitmap 가져오기
+        for (int i = 0; i < content.getDetails().size(); i++) {
+            //Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL("http://photovel.com/upload/" + content.getContent_id() + "/" + content.getDetails().get(i).getPhoto().getPhoto_file_name()).getContent());
+            Bitmap bitmap = null;
+            try {
+                bitmap = BitmapFactory.decodeStream((InputStream) new URL(Value.contentPhotoURL+ "/" + content.getContent_id() + "/" + content.getDetails().get(i).getPhoto().getPhoto_file_name()).getContent());
+                content.getDetails().get(i).getPhoto().setBitmap(bitmap);
+                //리스트에 이미지 저장
+                images.add(bitmap);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        //이미지 배열 만들기
+        imgArray = images.toArray(new Bitmap[images.size()]);*/
+
+
         //디테일 메뉴 보이기 전에 글쓴이 == 내계정 확인
         if(!content.getUser().getUser_id().equals(user_id)){
             LLmenu.setVisibility(View.GONE);
@@ -253,7 +300,7 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         //메인 사진 저장
         ivTopPhoto.setImageBitmap(content.getBitmap());
         userProfile.setImageBitmap(content.getUser().getBitmap());
-        userProfile1.setImageBitmap(content.getUser().getBitmap());
+        //userProfile1.setImageBitmap(content.getUser().getBitmap());
 
         //메인 위치 저장
         GetCurrentAddress getAddress = new GetCurrentAddress();
@@ -403,6 +450,13 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
                 }
             }
         });
+        //공유하기
+        btnShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                contentshare(v);
+            }
+        });
 
         //toolbar
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -477,154 +531,259 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
             }
         });
 
-        //find  view
-        mViewFlipper = (ViewFlipper) this.findViewById(R.id.view_flipper);
-        play = (Button) findViewById(R.id.play);
-        stop = (Button) findViewById(R.id.stop);
-
-        //SeekBar 찾아오기
+        ///////////////////////슬라이드쇼/////////////////////
+        //뷰 페이저 객체 생성
+        vpSlideShow = (ViewPager) this.findViewById(R.id.VP_slide_show);
+        //슬라이드 시크바 객체 생성
         slideSeekBar = (SeekBar) findViewById(R.id.slide_seek_bar);
-        //SeekBar 분할
-        //slideSeekBar.setMax(contentData.getDetails().size()-1);
+        //시간 보여줄 텍스트 뷰
+        tvCurrTime = (TextView) findViewById(R.id.tv_curr_time);
 
-        //현재 페이지 표시할 TextView
-        tvCurrPage = (TextView)findViewById(R.id.tv_curr_page);
+        //이미지 간 이동 속도 조절 위한 객체 생성
+        contentSlideShowViewPager = new ContentSlideShowViewPager(this);
+        //어댑터에 이미지 배열 전달
+        contentSlideShowAdapter = new ContentSlideShowAdapter(this, images);
 
-        final long frameInterval = 1000;
-        final long maxTime = 30000;
-        final int totalTime = (int) (maxTime / frameInterval);
-        final int secPerFrame = totalTime / content.getDetails().size();
-
-
-        mViewFlipper.setFlipInterval(secPerFrame*1000);// set interval time
-
-        final Animation inFromLeft = AnimationUtils.loadAnimation(this, R.anim.in_from_left);
-        Animation outFromLeft = AnimationUtils.loadAnimation(this, R.anim.out_from_left);
-        mViewFlipper.setOutAnimation(outFromLeft);
-        mViewFlipper.setInAnimation(inFromLeft);//set  animatio style
-
-        MediaPlayer mp = new MediaPlayer();
-
-        for(int i=0 ; i < content.getDetails().size(); i++){
-            ImageView iView = new ImageView(this);
-            iView.setImageBitmap(content.getDetails().get(i).getPhoto().getBitmap());
-            mViewFlipper.addView(iView,mViewFlipper.getWidth(),mViewFlipper.getHeight());
-        }
+        vpSlideShow.setAdapter(contentSlideShowAdapter);
 
 
-        final CountDownTimer cdt = new CountDownTimer(maxTime, frameInterval) {
+
+
+
+
+        //슬라이드 쇼 실행 메소드
+        init();
+        ////////////////////////////////////////////////////////////
+
+    }
+
+
+///////////////슬라이드쇼 실행 부분/////////////////
+    private void init(){
+        //이미지 넘어가는 텀
+        TRANS_MILLI = 3000;
+        //이미지가 넘어가는 속도 조절
+        contentSlideShowViewPager.setScrollDuration((int)TRANS_MILLI);
+
+        //슬라이드 쇼 전체 이미지 수
+        MAX_PAGES = images.size();
+        //슬라이드 쇼 전체 시간
+        MAX_TIME = (int) TRANS_MILLI * MAX_PAGES;
+        //(다음 이미지 띄울 때까지의 시간 * 이미지 개수).
+        slideSeekBar.setMax(MAX_TIME);
+
+
+        //슬라이드 이미지 이동 애니메이션 설정
+        vpSlideShow.setPageTransformer(true, new StackTransformer());
+        /*vpSlideShow.setPageTransformer(true, new ViewPager.PageTransformer() {
+            @Override
+            public void transformPage(View page, float position) {
+                page.setRotationX(0);
+                page.setRotationY(0);
+                page.setRotation(0);
+                page.setScaleX(1);
+                page.setScaleY(1);
+                page.setPivotX(0);
+                page.setPivotY(0);
+                page.setTranslationY(0);
+                page.setTranslationX(0f);
+            }
+        });*/
+
+        vpSlideShow.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                /*vpSlideShow.setBackground(new BitmapDrawable(getApplicationContext().getResources(),
+                        vpSlideShow.));*/
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
+
+        countDownTimer = new CountDownTimer(MAX_TIME, 1) {
             @Override
             public void onTick(long millisUntilFinished) {
-                Log.i(TAG, "onTick의 millisUntilFinished= " + millisUntilFinished);
-                /*int i = (int)(maxTime - millisUntilFinished);
-                slideSeekBar.setProgress(index);*/
-                int remainSeconds = (int)millisUntilFinished/1000;
-                int currSeconds = totalTime - remainSeconds;
-                index = currSeconds / secPerFrame;
-                slideSeekBar.setProgress(currSeconds);
+                Log.i(TAG, "millisUntilFinished= " + millisUntilFinished);
+                //시크바에 시간 진행 표시 -> onSeekBarChangeListener에서 감지
 
-                //long seconds = TimeUnit.SECONDS.toSeconds(millisUntilFinished);
-                String result = String.format("%02d", 00) + ":"
-                        + String.format("%02d", currSeconds);
-
-                tvCurrPage.setText("현재 시간 : " + result);
+                slideSeekBar.setProgress((int)(MAX_TIME - millisUntilFinished));
             }
 
             @Override
             public void onFinish() {
-
-            }
-        };
-
-        //slideSeekBar.setMax((int)TimeUnit.MILLISECONDS.toSeconds(maxTime));
-        slideSeekBar.setMax(totalTime);
-
-        //play  animation
-        play.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                play.setVisibility(View.INVISIBLE);
-                mViewFlipper.startFlipping();
-                cdt.start();
-            }
-        });
-
-        //stop animation
-        stop.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                play.setVisibility(View.VISIBLE);
-                cdt.cancel();
-                mViewFlipper.stopFlipping();
-            }
-        });
-
-
-        //slideSeekBar.setAnimation();
-        //SeekBar의 Progress 진행 위한 Thread
-        new Thread(){
-            @Override
-            public void run() {
-                //ViewFlipper의 레이아웃이 변할 경우
-                mViewFlipper.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-                    @Override
-                    public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-
-                        //UI에 접근하기 위한 runOnUiThread 구현
-                        runOnUiThread(new Runnable() {
+                //카운트 다운 타이머 정지
+                countDownTimer.cancel();
+                //마지막 도달 표시
+                slideSeekBar.setProgress(MAX_TIME);
+                //도달시 확인 메시지
+                AlertDialog.Builder restartConfirm = new AlertDialog.Builder(mContext);
+                restartConfirm.setMessage("다시 시작하시겠습니까?").setCancelable(false).setPositiveButton("확인",
+                        //확인 버튼 눌렀을 때
+                        new DialogInterface.OnClickListener() {
                             @Override
-                            public void run() {
-                                //남은 시간 확인 위한 메소드
-
-                                //ViewFlipper의 자식 뷰의 인덱스 번호
-                                index = mViewFlipper.indexOfChild(mViewFlipper.getCurrentView());
-                                //index = (maxTime / interval) / myDataset.size()
-                                slideSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                                    @Override
-                                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                                        Log.i(TAG, "onProgressChanged의 progress= " + progress);
-                                        index = progress / secPerFrame;
-                                        Log.i(TAG, "onProgressChanged의 index= " + index);
-                                    }
-
-                                    @Override
-                                    public void onStartTrackingTouch(SeekBar seekBar) {
-                                        Log.i(TAG, "onStartTrackingTouch의 index= " + index);
-                                    }
-
-                                    @Override
-                                    public void onStopTrackingTouch(SeekBar seekBar) {
-                                        Log.i(TAG, "onStopTrackingTouch의 index= " + index);
-                                        index = seekBar.getProgress() / secPerFrame;
-                                        Log.i(TAG, "onStopTrackingTouch index= " + index);
-                                        mViewFlipper.setDisplayedChild(index);
-                                    }
-                                });
-
-                                slideSeekBar.setOnDragListener(new View.OnDragListener() {
-                                    @Override
-                                    public boolean onDrag(View v, DragEvent event) {
-                                        return false;
-                                    }
-                                });
-
-
-                               /* slideSeekBar.setProgress(index);
-                                tvCurrPage.setText("현재 페이지 : " + String.valueOf(index+1));*/
+                            public void onClick(DialogInterface dialog, int which) {
+                                currPage = 0;
+                                countDownTimer.start();
+                            }
+                        }).setNegativeButton("취소",
+                        //취소 버튼 눌렀을 때
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                int finishItem = images.size()  - 1;
+                                int finishTime =(int) (TRANS_MILLI * images.size());
+                                vpSlideShow.setCurrentItem(finishItem);
+                                slideSeekBar.setProgress(finishTime);
                             }
                         });
-                    }
-                });
+                AlertDialog restartAlert = restartConfirm.create();
+                restartAlert.show();
             }
-        }.start();
+        };
+        countDownTimer.start();
 
-        final Runtime runtime = Runtime.getRuntime();
-        final long usedMemInMB=(runtime.totalMemory() - runtime.freeMemory()) / 1048576L;
-        final long maxHeapSizeInMB=runtime.maxMemory() / 1048576L;
-        final long availHeapSizeInMB = maxHeapSizeInMB;
-        Log.i(TAG, "usedMemInMB= " + usedMemInMB);
-        Log.i(TAG, "maxHeapSizeInMB= " + maxHeapSizeInMB);
-        Log.i(TAG, "availHeapSizeInMB= " + availHeapSizeInMB);
+        slideSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if(vpSlideShow.isFakeDragging()){
+                    /*//seekbar 클릭시 뷰페이저의 전체 너비 가져온다
+                    //마치 여러 사진이 붙어서 드래그로 이동할 수 있는 것처럼 보여주기 위한 설정
+                    int offset = (int) (maxOffset/100.0) * progress;
+                    int dragBy = -1 * (offset - currOffset);
+                    //fakeDragBy를 사용하려면 먼저 반드시 beginFakeDrag 사용해야 함
+                    vpSlideShow.fakeDragBy(dragBy);
+                    currOffset = offset;*/
+
+                }
+                Log.i(TAG, "onProgressChanged의 progress확인= " + progress);
+                Log.i(TAG, "milliSecondsToTimer(progress)= " + milliSecondsToTimer(progress));
+                //progress 변화에 따라 시간 표시
+                if(progress == 0){
+                    tvCurrTime.setText(milliSecondsToTimer(0));
+                } else {
+                    tvCurrTime.setText(milliSecondsToTimer(progress));
+                }
+                //현재 페이지
+                currPage = (int) (progress / TRANS_MILLI);
+                Log.i(TAG, "onProgressChanged의 currPage= " + currPage);
+                vpSlideShow.setCurrentItem(currPage);
+         }
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                //onStopTrackingTouch에서 새로운 카운트다운 타이머 시작 위해 기존 카운트다운 타이머 끄기
+                countDownTimer.cancel();
+
+                vpSlideShow.beginFakeDrag();
+            }
+
+            //터치시 시크바의 progress가 변하는 것은 onProgressChanged에서 보여주고
+            //onStopTrackingTouch는 손가락을 놓는 시점의 상태 정보만 알려준다
+            @Override
+            public void onStopTrackingTouch(final SeekBar seekBar) {
+                //시크바의 현재 위치
+                final int current_position = seekBar.getProgress();
+                Log.i(TAG, "onStopTrackingTouch의 current_position= " + current_position);
+                //전체 범위에서 현재 위치만큼 빼서 전체 이동할 범위를 줄여준다
+                countDownTimer = new CountDownTimer(MAX_TIME - current_position, 1) {
+
+                    @Override
+                    public void onTick(long millisUntilFinished) {
+                        Log.i(TAG, "millisUntilFinished= " + millisUntilFinished);
+                        //시크바에 시간 진행 표시 -> onSeekBarChangeListener에서 감지
+                        //전체 범위에서 줄어든 범위만큼 빼게 되므로 결국 증가한 만큼 보여준다.
+                        slideSeekBar.setProgress((int)(MAX_TIME - millisUntilFinished));
+                    }
+
+                    @Override
+                    public void onFinish() {
+                        //마지막 도달 표시
+                        slideSeekBar.setProgress(MAX_TIME);
+                        //도달시 확인 메시지
+                        AlertDialog.Builder restartConfirm = new AlertDialog.Builder(mContext);
+                        restartConfirm.setMessage("다시 시작하시겠습니까?").setCancelable(false).setPositiveButton("확인",
+                                //확인 버튼 눌렀을 때
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        //처음 페이지로 이동시키고
+                                        currPage = 0;
+                                        //카운트다운 타이머 시작시키기
+                                        countDownTimer.start();
+                                    }
+                                }).setNegativeButton("취소",
+                                //취소 버튼 눌렀을 때
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        //취소를 눌렀을 때 마지막 인덱스와 시간으로 보여주기 위한 값
+                                        int finishItem = images.size()  - 1;
+                                        int finishTime =(int) (TRANS_MILLI * images.size());
+                                        vpSlideShow.setCurrentItem(finishItem);
+                                        slideSeekBar.setProgress(finishTime);
+                                    }
+                                });
+                        AlertDialog restartAlert = restartConfirm.create();
+                        restartAlert.show();
+                    }
+                }.start();
+            }
+        });
+    }
+
+    //텍스트뷰에 시간 표시하기 위한 메소드. milliseconds를 시간 형태로 보여준다.
+    public String milliSecondsToTimer(long milliseconds){
+        String finalTimerString = "";
+        String secondsString = "";
+
+
+        //milliseconds를 1시간(1초 * 60 = 60초, 1분 * 60 = 60분)으로 나눈 몫
+        int hours = (int)( milliseconds / (1000*60*60));
+        //milliseconds를 1시간으로 나눈 나머지를 1분으로 나눈 몫
+        int minutes = (int)(milliseconds % (1000*60*60)) / (1000*60);
+        //millisconds를 1시간으로 나눈 나머지를 다시 1분으로 나눠서 초단위로 나눈 몫
+        int seconds = (int) ((milliseconds % (1000*60*60)) % (1000*60) / 1000);
+        // Add hours if there
+        if(hours > 0){
+            finalTimerString = hours + ":";
+        }
+
+        // 10초 미만인 경우 한 자리 숫자
+        if(seconds < 10){
+            secondsString = "0" + seconds;
+        }else{ //10초 이상인 경우 두 자리 숫자
+            secondsString = "" + seconds;}
+
+        finalTimerString = finalTimerString + minutes + ":" + secondsString;
+
+        // return timer string
+        return finalTimerString;
+    }
+
+    //onClick
+    public void goLook(View v){
+        switch (v.getId()){
+            case R.id.btnLookLeft:
+                Intent intent=new Intent(this, ContentDetailListMain.class);
+                intent.putExtra("content_id",content_id);
+                this.startActivity(intent);
+                finish();
+                break;
+            case R.id.btnLookRight:
+                Intent intent2=new Intent(this, ContentClusterMain.class);
+                intent2.putExtra("content_id",content_id);
+                this.startActivity(intent2);
+                finish();
+                break;
+        }
     }
 
     //디테일 설정 메뉴클릭시
@@ -641,7 +800,6 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
                         Intent intent = new Intent(ContentSlideShowMain.this, ContentUpdateMain.class);
                         intent.putExtra("content_id", content_id);
                         ContentSlideShowMain.this.startActivity(intent);
-                        Toast.makeText(getApplicationContext(), "수정", Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.action_delete:
                         AlertDialog.Builder dalert_confirm = new AlertDialog.Builder(ContentSlideShowMain.this);
@@ -776,7 +934,7 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         ns.selected(id, getApplicationContext());
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
-        finish();
+        //finish();
         return true;
     }
 
@@ -801,5 +959,84 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
             super.onBackPressed();
             super.onBackPressed();
         }
+    }
+
+    //공유 메뉴클릭시
+    public void contentshare(View v){
+        android.widget.PopupMenu menu = new android.widget.PopupMenu(this, v);
+        menu.inflate(R.menu.content_share_menu);
+        menu.setOnMenuItemClickListener(new android.widget.PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.kakao_share:
+                        sendFeedTemplate();
+                        tvShareCount.setText(String.valueOf(content.getContent_share_count()+1));
+                        Thread share = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                JsonConnection.getConnection(Value.contentURL+"/"+content_id+"/share", "POST", null);
+                            }
+                        });
+                        share.start();
+                        try {
+                            share.join();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    case R.id.facebook_share:
+                        Toast.makeText(getApplicationContext(),"아직 개발중입니닷",Toast.LENGTH_SHORT).show();
+                        break;
+                }
+                return false;
+            }
+        });
+        try {
+            Field[] fields = menu.getClass().getDeclaredFields();
+            for (Field field : fields) {
+                if ("mPopup".equals(field.getName())) {
+                    field.setAccessible(true);
+                    Object menuPopupHelper = field.get(menu);
+                    Class<?> classPopupHelper = Class.forName(menuPopupHelper
+                            .getClass().getName());
+                    Method setForceIcons = classPopupHelper.getMethod(
+                            "setForceShowIcon", boolean.class);
+                    setForceIcons.invoke(menuPopupHelper, true);
+                    break;
+                }
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+        menu.show();
+    }
+
+    //카카오 링크 공유
+    private void sendFeedTemplate() {
+        Map<String, String> templateArgs = new HashMap<String, String>();
+        templateArgs.put("${img_size}", String.valueOf(myDataset.size()));
+        for(int i=0; i<3; i++){
+            templateArgs.put("${image_url"+i+"}", Value.contentPhotoURL+"/"+content_id+"/"+myDataset.get(i).getPhoto().getPhoto_file_name());
+        }
+
+        templateArgs.put("${user_profile}", Value.contentPhotoURL+"/profile/"+content.getUser().getUser_profile_photo());
+        templateArgs.put("${user_nick_name}", content.getUser().getUser_nick_name());
+        templateArgs.put("${content_subject}",content.getContent_subject());
+        templateArgs.put("${content}", content.getContent());
+        templateArgs.put("${good_count}", String.valueOf(content.getGood_count()));
+        templateArgs.put("${comment_count}",String.valueOf(content.getComment_count()));
+        templateArgs.put("${content_share_count}", String.valueOf(content.getContent_share_count()));
+        KakaoLinkService.getInstance().sendCustom(this, templateId, templateArgs, new ResponseCallback<KakaoLinkResponse>() {
+            @Override
+            public void onFailure(ErrorResult errorResult) {
+                Logger.e(errorResult.toString());
+                Toast.makeText(getApplicationContext(), errorResult.toString(), Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onSuccess(KakaoLinkResponse result) {
+            }
+        });
     }
 }

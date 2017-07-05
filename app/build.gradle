@@ -35,8 +35,8 @@ dependencies {
     compile 'com.google.android.gms:play-services:11.0.0'
 
     //googleMap API
-    compile 'com.google.android.gms:play-services-maps:10.2.4'
-    compile 'com.google.android.gms:play-services-location:10.2.4'
+    compile 'com.google.android.gms:play-services-maps:11.0.0'
+    compile 'com.google.android.gms:play-services-location:11.0.0'
     compile 'com.google.maps.android:android-maps-utils:0.4.+'
     testCompile 'junit:junit:4.12'
 
@@ -59,4 +59,15 @@ dependencies {
 
     //카카오 로그인
     compile group: 'com.kakao.sdk', name: 'usermgmt', version: project.KAKAO_SDK_VERSION
+
+    //카카오 링크
+    compile group: 'com.kakao.sdk', name: 'kakaolink', version: project.KAKAO_SDK_VERSION
+
+    //viewpager CircleIndicator
+    compile 'me.relex:circleindicator:1.2.2@aar'
+    compile 'com.google.firebase:firebase-core:10.0.1'
+    apply plugin: 'com.google.gms.google-services'
+
+    //페이스북 링크
+    compile 'com.facebook.android:facebook-android-sdk:4.+'
 }

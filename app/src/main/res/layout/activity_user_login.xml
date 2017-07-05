@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/login_background_image"
@@ -36,98 +37,63 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="3"
+        android:layout_weight="2"
+        android:gravity="center"
         android:orientation="vertical">
 
         <LinearLayout
-            android:id="@+id/kakaoLoginLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="30dp"
-            android:layout_marginRight="30dp"
-            android:layout_marginTop="20dp">
-            <!--android:background="@drawable/layout_round2"
-            android:weightSum="1.0"-->
-
-            <!--<TextView
-                android:id="@+id/fa_commenting"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="0.3"
-                android:gravity="center"
-                android:text="@string/fa_commenting"
-                android:textColor="@color/kakaoIconColor"
-                android:textSize="30dp" />
-
-            <TextView
-                android:id="@+id/divided_line"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="0.1"
-                android:gravity="center"
-                android:text="l"
-                android:textColor="@color/bgWhite" />
-
-            <Button
-                android:id="@+id/KakaoLogin"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="0.6"
-                android:background="@color/transparent"
-                android:gravity="center"
-                android:text="Log in with KAKAO"
-                android:textAllCaps="false"
-                android:textColor="@color/kakaoIconColor" />-->
-
-            <com.kakao.usermgmt.LoginButton
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="0.6"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/FacebookLoginLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
             android:layout_marginTop="20dp"
-            android:background="@drawable/layout_round2"
+            android:layout_weight="1"
+            android:gravity="bottom">
 
-            android:weightSum="1.0">
+            <LinearLayout
+                android:id="@+id/kakaoLoginLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-            <TextView
-                android:id="@+id/fa_facebook_official"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="0.3"
-                android:gravity="center"
-                android:text="@string/fa_facebook_official"
-                android:textColor="@color/bgWhite"
-                android:textSize="30dp" />
-
-            <TextView
-                android:id="@+id/divided_line2"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="0.1"
-                android:gravity="center"
-                android:text="l"
-                android:textColor="@color/bgWhite" />
-
-            <Button
-                android:id="@+id/FacebookLogin"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="0.6"
-                android:background="@color/transparent"
-                android:gravity="center"
-                android:text="Log in with Facebook"
-                android:textAllCaps="false"
-                android:textColor="@color/bgWhite" />
-
+                <com.kakao.usermgmt.LoginButton
+                    android:id="@+id/LoginButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center" />
+            </LinearLayout>
         </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginTop="20dp"
+            android:layout_weight="0.75"
+            android:orientation="vertical"
+            android:background="@drawable/xml_border5"
+            android:gravity="bottom">
+
+            <RelativeLayout
+                android:id="@+id/btnLogin"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center">
+                <com.facebook.login.widget.LoginButton
+                    android:id="@+id/facebook_login_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentStart="true" />
+            </RelativeLayout>
+        </RelativeLayout>
 
         <TextView
             android:id="@+id/delimeter"
@@ -135,21 +101,30 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="----- or -----"
-            android:textColor="@color/bgWhite"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"/>
+            android:textColor="@color/bgWhite" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
+            android:layout_weight="1"
             android:background="@drawable/border"
             android:orientation="vertical">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_weight="1"
                 android:gravity="center_vertical">
 
                 <TextView
@@ -177,6 +152,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_weight="1"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -204,8 +180,8 @@
             </LinearLayout>
 
         </LinearLayout>
-    </LinearLayout>
 
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -217,6 +193,7 @@
             android:id="@+id/loginButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
             android:layout_marginTop="20dp"
@@ -227,17 +204,18 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
             android:layout_marginTop="10dp"
-            android:gravity="center_horizontal|top">
+            android:layout_weight="1"
+            android:gravity="center">
 
             <TextView
                 android:id="@+id/textView2"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginRight="10dp"
                 android:layout_weight="1"
-                android:gravity="right|center_horizontal"
+                android:gravity="center_horizontal|right"
                 android:text="비밀번호찾기"
                 android:textColor="@color/bgWhite" />
 
@@ -245,18 +223,12 @@
             <TextView
                 android:id="@+id/joinTextView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginLeft="10dp"
                 android:layout_weight="1"
-                android:gravity="left|center_horizontal"
+                android:gravity="center_horizontal|left"
                 android:text="회원가입"
                 android:textColor="@color/bgWhite" />
         </LinearLayout>
     </LinearLayout>
-
-    <!--   <Button
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:layout_gravity="center"
-           android:text="로그인없이 넘어가기" />-->
 </LinearLayout>

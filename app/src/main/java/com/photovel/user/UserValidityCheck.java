@@ -99,6 +99,7 @@ public class UserValidityCheck extends FontActivity2 {
                         User user = new User();
                         user.setUser_id(email);
                         user.setUser_password(password);
+                        user.setUser_sns_status("O");
                         intent.putExtra("user",user);
                         startActivity(intent);
 

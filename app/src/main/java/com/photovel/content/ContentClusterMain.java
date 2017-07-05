@@ -16,7 +16,6 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -45,9 +44,7 @@ import android.widget.Toast;
 import com.alibaba.fastjson.JSON;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -58,6 +55,11 @@ import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import com.google.maps.android.ui.IconGenerator;
+import com.kakao.kakaolink.v2.KakaoLinkResponse;
+import com.kakao.kakaolink.v2.KakaoLinkService;
+import com.kakao.network.ErrorResult;
+import com.kakao.network.callback.ResponseCallback;
+import com.kakao.util.helper.log.Logger;
 import com.mikhaellopez.circularimageview.CircularImageView;
 import com.photovel.FontActivity2;
 import com.photovel.MainActivity;
@@ -75,20 +77,13 @@ import com.vo.Photo;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.photovel.http.Value.contentURL;
 
@@ -99,7 +94,7 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
     Toolbar toolbar;
 
     private RelativeLayout RldetailData;
-    private LinearLayout RLdetailDate, LLmenu, btnLike, btnComment, btnBookmark, btnMoreUserContent;
+    private LinearLayout RLdetailDate, LLmenu, btnLike, btnComment, btnBookmark, btnMoreUserContent, btnShare;
     private TextView icglobe, icleft, icright, tvleft, tvright, iccal, icmarker, icbookmark, icthumb, iccomment, icshare, btnDetailMenu;
     private TextView tvContentInsertDate, tvContentSubject, tvContentLocation, tvUsername, tvUsername2, tvDuring, tvdetailcount, tvdetailstate, tvContent;
     private TextView tvLikeCount, tvlike, tvbookmark, tvCommentCount, tvShareCount;
@@ -127,6 +122,7 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
     private LinearLayout llBack;
     private TextView btnBack;
     private EditText etComment;
+    private String templateId = "4639";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -200,6 +196,7 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
         btnComment = (LinearLayout) findViewById(R.id.btnComment);
         btnBookmark = (LinearLayout) findViewById(R.id.btnBookmark);
         btnMoreUserContent = (LinearLayout) findViewById(R.id.btnMoreUserContent);
+        btnShare = (LinearLayout) findViewById(R.id.btnShare);
 
         //imageView를 font로 바꿔주기
         Typeface fontAwesomeFont = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
@@ -440,6 +437,13 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
                 }
             }
         });
+        //공유하기
+        btnShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                contentshare(v);
+            }
+        });
 
         //toolbar
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -528,7 +532,6 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
                         Intent intent = new Intent(ContentClusterMain.this, ContentUpdateMain.class);
                         intent.putExtra("content_id", content_id);
                         ContentClusterMain.this.startActivity(intent);
-                        Toast.makeText(getApplicationContext(), "수정", Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.action_delete:
                         AlertDialog.Builder dalert_confirm = new AlertDialog.Builder(ContentClusterMain.this);
@@ -663,7 +666,7 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
         ns.selected(id, getApplicationContext());
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
-        finish();
+        //finish();
         return true;
     }
 
@@ -686,7 +689,7 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
         // Show a toast with some info when the cluster is clicked.
 
         String firstName = cluster.getItems().iterator().next().getPhoto_file_name();
-        Toast.makeText(this, cluster.getSize() + " (including " + firstName + ")", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, cluster.getSize() + " (including " + firstName + ")", Toast.LENGTH_SHORT).show();
 
         // Zoom in the cluster. Need to create LatLngBounds and including all the cluster items
         // inside of bounds, then animate to center of the bounds.
@@ -739,7 +742,7 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
     @Override
     public boolean onClusterItemClick(final Photo photo) {
         // Does nothing, but you could go into the user's profile page, for example.
-        Toast.makeText(this, photo.getPhoto_file_name() + "이 선택되었습니다.", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, photo.getPhoto_file_name() + "이 선택되었습니다.", Toast.LENGTH_SHORT).show();
         mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
             @Override
             public View getInfoWindow(Marker marker) {
@@ -873,5 +876,84 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
             startActivity(intent);
             super.onBackPressed();
         }
+    }
+
+    //공유 메뉴클릭시
+    public void contentshare(View v){
+        android.widget.PopupMenu menu = new android.widget.PopupMenu(this, v);
+        menu.inflate(R.menu.content_share_menu);
+        menu.setOnMenuItemClickListener(new android.widget.PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.kakao_share:
+                        sendFeedTemplate();
+                        tvShareCount.setText(String.valueOf(content.getContent_share_count()+1));
+                        Thread share = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                JsonConnection.getConnection(Value.contentURL+"/"+content_id+"/share", "POST", null);
+                            }
+                        });
+                        share.start();
+                        try {
+                            share.join();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    case R.id.facebook_share:
+                        Toast.makeText(getApplicationContext(),"아직 개발중입니닷",Toast.LENGTH_SHORT).show();
+                        break;
+                }
+                return false;
+            }
+        });
+        try {
+            Field[] fields = menu.getClass().getDeclaredFields();
+            for (Field field : fields) {
+                if ("mPopup".equals(field.getName())) {
+                    field.setAccessible(true);
+                    Object menuPopupHelper = field.get(menu);
+                    Class<?> classPopupHelper = Class.forName(menuPopupHelper
+                            .getClass().getName());
+                    Method setForceIcons = classPopupHelper.getMethod(
+                            "setForceShowIcon", boolean.class);
+                    setForceIcons.invoke(menuPopupHelper, true);
+                    break;
+                }
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+        menu.show();
+    }
+
+    //카카오 링크 공유
+    private void sendFeedTemplate() {
+        Map<String, String> templateArgs = new HashMap<String, String>();
+        templateArgs.put("${img_size}", String.valueOf(myDataset.size()));
+        for(int i=0; i<3; i++){
+            templateArgs.put("${image_url"+i+"}", Value.contentPhotoURL+"/"+content_id+"/"+myDataset.get(i).getPhoto().getPhoto_file_name());
+        }
+
+        templateArgs.put("${user_profile}", Value.contentPhotoURL+"/profile/"+content.getUser().getUser_profile_photo());
+        templateArgs.put("${user_nick_name}", content.getUser().getUser_nick_name());
+        templateArgs.put("${content_subject}",content.getContent_subject());
+        templateArgs.put("${content}", content.getContent());
+        templateArgs.put("${good_count}", String.valueOf(content.getGood_count()));
+        templateArgs.put("${comment_count}",String.valueOf(content.getComment_count()));
+        templateArgs.put("${content_share_count}", String.valueOf(content.getContent_share_count()));
+        KakaoLinkService.getInstance().sendCustom(this, templateId, templateArgs, new ResponseCallback<KakaoLinkResponse>() {
+            @Override
+            public void onFailure(ErrorResult errorResult) {
+                Logger.e(errorResult.toString());
+                Toast.makeText(getApplicationContext(), errorResult.toString(), Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onSuccess(KakaoLinkResponse result) {
+            }
+        });
     }
 }

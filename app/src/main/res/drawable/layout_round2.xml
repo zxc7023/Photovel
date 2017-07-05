@@ -4,11 +4,11 @@
     android:shape="rectangle" android:padding="10dp">
     <solid android:color="@color/bgSlideMenuBlack"/>
     <corners
-        android:bottomRightRadius="20dp"
-        android:bottomLeftRadius="20dp"
-        android:topLeftRadius="20dp"
-        android:topRightRadius="20dp"/>
-    <stroke android:color="@color/bgWhite" android:width="1dp" />
+        android:bottomRightRadius="10dp"
+        android:bottomLeftRadius="10dp"
+        android:topLeftRadius="10dp"
+        android:topRightRadius="10dp"/>
+<!--    <stroke android:color="@color/bgWhite" android:width="1dp" />-->
     <!--    <stroke android:width="2dp"
             android:color="#BDBDBD" />-->
 </shape>

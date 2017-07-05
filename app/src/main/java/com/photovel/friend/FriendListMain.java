@@ -2,7 +2,6 @@ package com.photovel.friend;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
@@ -13,19 +12,15 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.mikhaellopez.circularimageview.CircularImageView;
@@ -33,17 +28,13 @@ import com.photovel.FontActivity2;
 import com.photovel.MainActivity;
 import com.photovel.NavigationItemSelected;
 import com.photovel.R;
-import com.photovel.common.BookMarkAdapter;
-import com.photovel.common.GridSpacingItemDecoration;
 import com.photovel.content.ContentInsertMain;
 import com.photovel.http.JsonConnection;
 import com.photovel.http.Value;
 import com.photovel.setting.SettingMain;
 import com.photovel.user.UserBitmapEncoding;
-import com.vo.Content;
 import com.vo.User;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class FriendListMain extends FontActivity2 implements NavigationView.OnNavigationItemSelectedListener {
@@ -85,13 +76,19 @@ public class FriendListMain extends FontActivity2 implements NavigationView.OnNa
         fab_search_phone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getBaseContext(), "아직 개발중입니다.", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(getApplicationContext(), FriendSearchMain.class);
+                intent.putExtra("search","phone");
+                startActivity(intent);
+                finish();
             }
         });
         fab_search_id.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getBaseContext(), "아직 개발중입니다.", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(getApplicationContext(), FriendSearchMain.class);
+                intent.putExtra("search","id");
+                startActivity(intent);
+                finish();
             }
         });
         fab_more.setOnClickListener(new View.OnClickListener() {
@@ -241,7 +238,7 @@ public class FriendListMain extends FontActivity2 implements NavigationView.OnNa
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), ContentInsertMain.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); //준기오빠의 낮은 버전을 위해 인텐트할때 넣어주기
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 getApplicationContext().startActivity(intent);
             }
         });
@@ -305,7 +302,7 @@ public class FriendListMain extends FontActivity2 implements NavigationView.OnNa
         ns.selected(id, getApplicationContext());
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
-        finish();
+        //finish();
         return true;
     }
 

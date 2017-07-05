@@ -1,14 +1,17 @@
 package com.photovel;
 
 import android.app.Activity;
-import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.util.Base64;
 import android.util.Log;
+
+import com.kakao.network.ErrorResult;
+import com.kakao.usermgmt.UserManagement;
+import com.kakao.usermgmt.callback.MeResponseCallback;
+import com.kakao.usermgmt.response.model.UserProfile;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -33,10 +36,25 @@ public class TestActivity extends Activity {
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
-        /*
-        SharedPreferences loginInfo = getSharedPreferences("loginInfo", MODE_PRIVATE);
-        String firstData = loginInfo.getString("Set-Cookie", "d");
-        Log.i("Set-Cookie",firstData);*/
+        update();
 
+    }
+    public void update(){
+        UserManagement.requestMe(new MeResponseCallback() {
+            @Override
+            public void onSessionClosed(ErrorResult errorResult) {
+                Log.i("ddd", "sessionclosed");
+            }
+
+            @Override
+            public void onNotSignedUp() {
+                Log.i("ddd", "onNotSignedUp");
+            }
+
+            @Override
+            public void onSuccess(UserProfile result) {
+                Log.i("ddd", "paht:"+result.getThumbnailImagePath());
+            }
+        });
     }
 }
