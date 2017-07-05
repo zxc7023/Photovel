@@ -885,8 +885,44 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         slideSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                Log.i(TAG, "onProgressChanged의 progress확인= " + progress);
-                Log.i(TAG, "milliSecondsToTimer(progress)= " + milliSecondsToTimer(progress));
+                if(MAX_TIME == progress){
+                    if(countDownTimer != null){
+                        countDownTimer.cancel();
+                        countDownTimer = null;
+                    }
+                    //도달시 확인 메시지
+                    AlertDialog.Builder restartConfirm = new AlertDialog.Builder(mContext);
+                    restartConfirm.setMessage("처음으로 돌아가시겠습니까?").setCancelable(false).setPositiveButton("확인",
+                            //확인 버튼 눌렀을 때
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    btnPlay.setVisibility(View.VISIBLE);
+                                    btnPause.setVisibility(View.INVISIBLE);
+                                    isPaused = false;
+                                    isStopped = false;
+                                    isTracked = false;
+                                    isTouched = false;
+                                    setPausedProgress(0);
+                                    vpSlideShow.setCurrentItem(0);
+                                    slideSeekBar.setProgress(0);
+                                    currPage = 0;
+                                }
+                            }).setNegativeButton("취소",
+                            //취소 버튼 눌렀을 때
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    int finishItem = images.size()  - 1;
+                                    int finishTime =(int) (TRANS_MILLI * images.size());
+                                    vpSlideShow.setCurrentItem(finishItem);
+                                    slideSeekBar.setProgress(finishTime);
+                                }
+                            });
+                    AlertDialog restartAlert = restartConfirm.create();
+                    restartAlert.show();
+                }
+
                 //progress 변화에 따라 시간 표시
                 if(progress == 0){
                     tvCurrTime.setText(milliSecondsToTimer(0));
