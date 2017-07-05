@@ -1,5 +1,6 @@
 package com.photovel;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -37,38 +38,38 @@ public class NavigationItemSelected extends FontActivity{
             intent = new Intent(context, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
-            finish();
+            ((Activity)context).finish();
         }else if(id==R.id.nav_my_story){
             intent = new Intent(context, ContentListMain.class);
             intent.putExtra("urlflag","M");
             intent.putExtra("user_id",user_id);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
-            finish();
+            ((Activity)context).finish();
         }else if(id==R.id.nav_my_friend){
             intent = new Intent(context, FriendListMain.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
-            finish();
+            ((Activity)context).finish();
         }else if(id==R.id.nav_book_mark){
             intent = new Intent(context, BookMarkMain.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
-            finish();
+            ((Activity)context).finish();
         }else if(id==R.id.nav_new_story){
             intent = new Intent(context, ContentListMain.class);
             intent.putExtra("urlflag","N");
             intent.putExtra("user_id","");
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
-            finish();
+            ((Activity)context).finish();
         }else if(id==R.id.nav_hot_story){
             intent = new Intent(context, ContentListMain.class);
             intent.putExtra("urlflag","R");
             intent.putExtra("user_id","");
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
-            finish();
+            ((Activity)context).finish();
         }else if(id==R.id.nav_log_out){
             Toast.makeText(context, "로그아웃", Toast.LENGTH_SHORT).show();
             logout(Value.userLogoutURL, context);
@@ -78,12 +79,12 @@ public class NavigationItemSelected extends FontActivity{
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
-            finish();
+            ((Activity)context).finish();
         }else if(id==R.id.nav_setting){
             intent = new Intent(context, SettingMain.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
-            finish();
+            ((Activity)context).finish();
         }else if(id==R.id.nav_qna){
             Toast.makeText(context,"아직 개발중입니닷",Toast.LENGTH_SHORT).show();
             return;
