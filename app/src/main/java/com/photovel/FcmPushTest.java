@@ -13,6 +13,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by junki on 2017-07-05.
@@ -22,12 +25,12 @@ public class FcmPushTest {
 
     // Method to send Notifications from server to client end.
 
-    public final static String AUTH_KEY_FCM = "AIzaSyBwKVN3QC44WxFqmruIVE_8q62f07lgMQ4";
+    public final static String AUTH_KEY_FCM = "AAAAaBiACs8:APA91bGBr5bByonwY6UL_k2VLbh0mLEAhjIGCNcTpND-5bWF6nO2CHVfC7yfrSrC6FS9BSN75bchZtiUbE-TgBWLK2_PlJD3Q02cgEIi6lcjwhgdYoNo6FbDGjrph_XKO-cvZ7nE1y6O";
     public final static String API_URL_FCM = "https://fcm.googleapis.com/fcm/send";
 
     // userDeviceIdKey is the device id you will query from your database
 
-    public static void pushFCMNotification(String userDeviceIdKey) {
+    public static void pushFCMNotification(String token ,HashMap<String,String> hashMap) {
         String authKey = AUTH_KEY_FCM; // You FCM AUTH key
         String FMCurl = API_URL_FCM;
 
@@ -44,12 +47,18 @@ public class FcmPushTest {
             conn.setRequestProperty("Content-Type", "application/json");
 
             JSONObject json = new JSONObject();
-            JSONObject info = new JSONObject();
-
+            /*JSONObject info = new JSONObject();
             info.put("body", "푸쉬 발송 테스트 입니다."); // Notification body
+            json.put("notification", info);*/
+            JSONObject data = new JSONObject();
 
-            json.put("notification", info);
-            json.put("to", userDeviceIdKey.trim()); // deviceID
+            Set<String> keySet =hashMap.keySet();
+            for(String key : keySet){
+                Log.i("FcmPushTest key" , key);
+                data.put(key,hashMap.get(key));
+            }
+            json.put("to", token.trim()); // deviceID
+            json.put("data",data);
             Log.i("FcmPushTest",json.toString());
 
             try (OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream(),"UTF-8")) {

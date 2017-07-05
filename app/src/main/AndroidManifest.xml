@@ -92,8 +92,10 @@
         <activity
             android:name=".user.UserLogin"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".user.UserValidityCheck" />
-        <activity android:name=".user.UserJoin" />
+        <activity android:name=".user.UserValidityCheck"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".user.UserJoin"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".user.KakaoSignupActivity" />
         <activity android:name=".user.KakaoUserJoinDetail" />
         <activity

@@ -346,6 +346,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
+                            HashMap<String,String> hashMap = new HashMap<String, String>();
                             JSONObject job = new JSONObject();
                             try {
                                 job.put("user_id",content.getUser().getUser_id());
@@ -354,7 +355,11 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
                             }
                             String token = JsonConnection.getConnection(Value.usergetPushTokenURL,"POST",job);
                             Log.i("tokenValue",token);
-                            FcmPushTest.pushFCMNotification(token);
+                            hashMap.put("user_id_sender",user_nick_name);
+                            hashMap.put("user_id_receiver",content.getUser().getUser_id());
+                            hashMap.put("comment_content", etComment.getText().toString());
+                            hashMap.put("content_id", String.valueOf(content_id));
+                            FcmPushTest.pushFCMNotification(token,hashMap);
                         }
                     }).start();
 
