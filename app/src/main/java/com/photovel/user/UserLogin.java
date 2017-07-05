@@ -230,7 +230,7 @@ public class UserLogin extends FontActivity2 {
 
         facebook_login_button= (LoginButton)findViewById(R.id.facebook_login_button);
         facebook_login_button.setClickable(false);
-        facebook_login_button.setReadPermissions("public_profile", "email", "publish_actions");
+        facebook_login_button.setReadPermissions("public_profile", "email");
 
         RelativeLayout btnLogin= (RelativeLayout) findViewById(R.id.btnLogin);
         btnLogin.bringToFront();
