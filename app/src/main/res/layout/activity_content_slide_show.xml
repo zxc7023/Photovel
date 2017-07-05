@@ -19,6 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:background="@color/bgSlideMenuBlack"
         android:weightSum="10">
 
         <TextView
@@ -26,37 +27,58 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="2"
+            android:textColor="@color/bgWhite"
+            android:layout_marginLeft="10dp"
             />
 
         <SeekBar
             android:id="@+id/slide_seek_bar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="8"/>
-
-
+            android:layout_weight="8"
+            android:layout_gravity="center_vertical"
+            android:maxHeight="8dp"
+            android:minHeight="8dp"
+            android:thumb="@drawable/blit_progressbar"
+            android:progressDrawable="@drawable/custom_seekbar_progress"/>
     </LinearLayout>
     <LinearLayout
+        android:layout_marginTop="20dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_horizontal">
-
-        <ImageButton
+        <FrameLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/btn_slide_play"
-            android:background="@color/transparent"/>
+            android:layout_marginRight="10dp">
+            <ImageButton
+                android:id="@+id/btn_slideshow_play"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/btn_slide_play"
+                android:background="@color/transparent"
+                android:visibility="visible"/>
+
+            <ImageButton
+                android:id="@+id/btn_slideshow_pause"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/btn_slide_pause"
+                android:background="@color/transparent"
+                android:visibility="invisible"
+                />
+
+        </FrameLayout>
         <ImageButton
+            android:id="@+id/btn_slideshow_stop"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/btn_slide_stop"
-            android:background="@color/transparent"/>
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/btn_slide_pause"
-            android:background="@color/transparent"/>
+            android:background="@color/transparent"
+            android:layout_marginLeft="10dp"/>
+
+
 
     </LinearLayout>
 </LinearLayout>

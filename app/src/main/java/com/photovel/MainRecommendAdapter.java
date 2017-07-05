@@ -17,11 +17,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.kakao.kakaolink.v2.KakaoLinkResponse;
+import com.kakao.kakaolink.v2.KakaoLinkService;
 import com.kakao.network.ErrorResult;
 import com.kakao.network.callback.ResponseCallback;
 import com.kakao.util.helper.log.Logger;
-import com.kakao.kakaolink.v2.KakaoLinkResponse;
-import com.kakao.kakaolink.v2.KakaoLinkService;
 import com.photovel.content.ContentDetailListMain;
 import com.photovel.http.JsonConnection;
 import com.photovel.http.Value;
@@ -200,7 +200,6 @@ public class MainRecommendAdapter extends RecyclerView.Adapter<MainRecommendAdap
     @Override
     public int getItemCount() {
         return mDataset.size();
-        //return 0;
     }
 
     //공유 메뉴클릭시
