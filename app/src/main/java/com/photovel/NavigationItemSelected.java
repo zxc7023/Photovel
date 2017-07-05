@@ -75,6 +75,7 @@ public class NavigationItemSelected extends FontActivity{
             kakaoLogout(context);
             facebookLogout();
             intent = new Intent(context, SessionMangement.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
             finish();
@@ -97,6 +98,7 @@ public class NavigationItemSelected extends FontActivity{
             @Override
             public void onCompleteLogout() {
                 Intent intent = new Intent(context,SessionMangement.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
             }
