@@ -1,13 +1,10 @@
 package com.photovel.content;
 
-import android.content.ClipData;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -26,11 +23,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.mikhaellopez.circularimageview.CircularImageView;
-import com.photovel.FontActivity;
 import com.photovel.FontActivity2;
 import com.photovel.MainActivity;
 import com.photovel.NavigationItemSelected;
@@ -40,18 +35,7 @@ import com.photovel.http.Value;
 import com.photovel.setting.SettingMain;
 import com.photovel.user.UserBitmapEncoding;
 import com.vo.Content;
-import com.vo.ContentDetail;
-import com.vo.Photo;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
+
 import java.util.List;
 
 public class ContentListMain extends FontActivity2 implements NavigationView.OnNavigationItemSelectedListener{

@@ -24,7 +24,6 @@ import com.kakao.kakaolink.v2.KakaoLinkService;
 import com.kakao.network.ErrorResult;
 import com.kakao.network.callback.ResponseCallback;
 import com.kakao.util.helper.log.Logger;
-import com.photovel.MainActivity;
 import com.photovel.R;
 import com.photovel.content.ContentDetailListMain;
 import com.photovel.http.JsonConnection;
@@ -220,10 +219,9 @@ public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHo
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                        Toast.makeText(mcontext,"카카오",Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.facebook_share:
-                        Toast.makeText(mcontext,"페북",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mcontext,"아직 개발중입니닷",Toast.LENGTH_SHORT).show();
                         break;
                 }
                 return false;
@@ -265,7 +263,7 @@ public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHo
             @Override
             public void onFailure(ErrorResult errorResult) {
                 Logger.e(errorResult.toString());
-                Toast.makeText(mcontext, errorResult.toString(), Toast.LENGTH_LONG).show();
+                //Toast.makeText(mcontext, errorResult.toString(), Toast.LENGTH_LONG).show();
             }
 
             @Override

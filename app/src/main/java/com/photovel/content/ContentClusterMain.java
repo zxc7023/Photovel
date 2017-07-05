@@ -16,7 +16,6 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -45,9 +44,7 @@ import android.widget.Toast;
 import com.alibaba.fastjson.JSON;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -80,21 +77,10 @@ import com.vo.Photo;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -546,7 +532,6 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
                         Intent intent = new Intent(ContentClusterMain.this, ContentUpdateMain.class);
                         intent.putExtra("content_id", content_id);
                         ContentClusterMain.this.startActivity(intent);
-                        Toast.makeText(getApplicationContext(), "수정", Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.action_delete:
                         AlertDialog.Builder dalert_confirm = new AlertDialog.Builder(ContentClusterMain.this);
@@ -704,7 +689,7 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
         // Show a toast with some info when the cluster is clicked.
 
         String firstName = cluster.getItems().iterator().next().getPhoto_file_name();
-        Toast.makeText(this, cluster.getSize() + " (including " + firstName + ")", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, cluster.getSize() + " (including " + firstName + ")", Toast.LENGTH_SHORT).show();
 
         // Zoom in the cluster. Need to create LatLngBounds and including all the cluster items
         // inside of bounds, then animate to center of the bounds.
@@ -757,7 +742,7 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
     @Override
     public boolean onClusterItemClick(final Photo photo) {
         // Does nothing, but you could go into the user's profile page, for example.
-        Toast.makeText(this, photo.getPhoto_file_name() + "이 선택되었습니다.", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, photo.getPhoto_file_name() + "이 선택되었습니다.", Toast.LENGTH_SHORT).show();
         mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
             @Override
             public View getInfoWindow(Marker marker) {
@@ -916,10 +901,9 @@ public class ContentClusterMain extends FontActivity2 implements NavigationView.
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                        Toast.makeText(getApplicationContext(),"카카오",Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.facebook_share:
-                        Toast.makeText(getApplicationContext(),"페북",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(),"아직 개발중입니닷",Toast.LENGTH_SHORT).show();
                         break;
                 }
                 return false;
