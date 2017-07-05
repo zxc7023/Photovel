@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,11 +17,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.kakao.kakaolink.v2.KakaoLinkResponse;
+import com.kakao.kakaolink.v2.KakaoLinkService;
 import com.kakao.network.ErrorResult;
 import com.kakao.network.callback.ResponseCallback;
 import com.kakao.util.helper.log.Logger;
-import com.kakao.kakaolink.v2.KakaoLinkResponse;
-import com.kakao.kakaolink.v2.KakaoLinkService;
 import com.photovel.content.ContentDetailListMain;
 import com.photovel.http.JsonConnection;
 import com.photovel.http.Value;
@@ -213,8 +212,7 @@ public class MainRecommendAdapter extends RecyclerView.Adapter<MainRecommendAdap
     }
     @Override
     public int getItemCount() {
-        //return mDataset.size();
-        return 0;
+        return mDataset.size();
     }
 
     //공유 메뉴클릭시

@@ -31,6 +31,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -83,6 +84,8 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
     private TextView tvCurrTime;
     private CountDownTimer countDownTimer;
     private TextView tvCurrPage;
+    private ImageButton btnPlay, btnStop, btnPause;
+    private int pausedProgress = 0;
 
 
     //이미지 어댑터
@@ -90,6 +93,12 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
     private int MAX_TIME = 0;
     long TRANS_MILLI; // time in milliseconds between successive task executions.
     int currPage = 0;
+    private boolean isPlayed = false;
+    private boolean isStopped = false;
+    private boolean isPaused = false;
+    private boolean isTouched = false;
+    private boolean isTracked = false;
+
 
 /////////////////////////////////////////////////
 
@@ -239,30 +248,9 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
 
         //content의 이미지 bitmap 가져오기
         JsonConnection.setBitmap(myDataset, Value.contentPhotoURL);
-        Log.i(TAG, "myDataset의 크기= " + myDataset.size());
-        Log.i(TAG, "myDataset.get(0).getContent_detail_id()= " + myDataset.get(0).getContent_detail_id());
-        Log.i(TAG, "myDataset.get(0).getPhoto().getBitmap()= " + myDataset.get(0).getPhoto().getBitmap());
-
-
         for(int i=0; i<myDataset.size(); i++){
             images.add(myDataset.get(i).getPhoto().getBitmap());
         }
-
-        /*//content의 이미지 bitmap 가져오기
-        for (int i = 0; i < content.getDetails().size(); i++) {
-            //Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL("http://photovel.com/upload/" + content.getContent_id() + "/" + content.getDetails().get(i).getPhoto().getPhoto_file_name()).getContent());
-            Bitmap bitmap = null;
-            try {
-                bitmap = BitmapFactory.decodeStream((InputStream) new URL(Value.contentPhotoURL+ "/" + content.getContent_id() + "/" + content.getDetails().get(i).getPhoto().getPhoto_file_name()).getContent());
-                content.getDetails().get(i).getPhoto().setBitmap(bitmap);
-                //리스트에 이미지 저장
-                images.add(bitmap);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        //이미지 배열 만들기
-        imgArray = images.toArray(new Bitmap[images.size()]);*/
 
 
         //디테일 메뉴 보이기 전에 글쓴이 == 내계정 확인
@@ -300,7 +288,7 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         //메인 사진 저장
         ivTopPhoto.setImageBitmap(content.getBitmap());
         userProfile.setImageBitmap(content.getUser().getBitmap());
-        //userProfile1.setImageBitmap(content.getUser().getBitmap());
+        userProfile1.setImageBitmap(content.getUser().getBitmap());
 
         //메인 위치 저장
         GetCurrentAddress getAddress = new GetCurrentAddress();
@@ -551,7 +539,10 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         slideSeekBar = (SeekBar) findViewById(R.id.slide_seek_bar);
         //시간 보여줄 텍스트 뷰
         tvCurrTime = (TextView) findViewById(R.id.tv_curr_time);
-
+        btnPlay = (ImageButton) findViewById(R.id.btn_slideshow_play);
+        btnStop = (ImageButton) findViewById(R.id.btn_slideshow_stop);
+        btnPause = (ImageButton) findViewById(R.id.btn_slideshow_pause);
+        tvCurrTime.setText(milliSecondsToTimer(0));
         //이미지 간 이동 속도 조절 위한 객체 생성
         contentSlideShowViewPager = new ContentSlideShowViewPager(this);
         //어댑터에 이미지 배열 전달
@@ -587,8 +578,7 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
 
 
         //슬라이드 이미지 이동 애니메이션 설정
-        vpSlideShow.setPageTransformer(true, new StackTransformer());
-        /*vpSlideShow.setPageTransformer(true, new ViewPager.PageTransformer() {
+        vpSlideShow.setPageTransformer(true, new ViewPager.PageTransformer() {
             @Override
             public void transformPage(View page, float position) {
                 page.setRotationX(0);
@@ -601,82 +591,313 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
                 page.setTranslationY(0);
                 page.setTranslationX(0f);
             }
-        });*/
+        });
 
-        vpSlideShow.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        btnPlay.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                /*vpSlideShow.setBackground(new BitmapDrawable(getApplicationContext().getResources(),
-                        vpSlideShow.));*/
-            }
+            public void onClick(final View v) {
+                btnPlay.setVisibility(v.INVISIBLE);
+                btnPause.setVisibility(v.VISIBLE);
+                if(isPaused && !isStopped && !isTouched && !isTracked){
+                    isPaused = false;
+                    countDownTimer = new CountDownTimer(MAX_TIME - getPausedProgress(), 1) {
+                        @Override
+                        public void onTick(long millisUntilFinished) {
+                            Log.i(TAG, "millisUntilFinished= " + millisUntilFinished);
+                            //시크바에 시간 진행 표시 -> onSeekBarChangeListener에서 감지
 
-            @Override
-            public void onPageSelected(int position) {
+                            slideSeekBar.setProgress((int)(MAX_TIME - millisUntilFinished));
+                        }
 
-            }
+                        @Override
+                        public void onFinish() {
+                            //도달시 확인 메시지
+                            AlertDialog.Builder restartConfirm = new AlertDialog.Builder(mContext);
+                            restartConfirm.setMessage("처음으로 돌아가시겠습니까?").setCancelable(false).setPositiveButton("확인",
+                                    //확인 버튼 눌렀을 때
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            btnPlay.setVisibility(v.VISIBLE);
+                                            btnPause.setVisibility(v.INVISIBLE);
+                                            isPaused = false;
+                                            isStopped = false;
+                                            isTracked = false;
+                                            isTouched = false;
+                                            if(countDownTimer != null){
+                                                countDownTimer.cancel();
+                                                countDownTimer = null;
+                                                setPausedProgress(0);
+                                                vpSlideShow.setCurrentItem(0);
+                                                slideSeekBar.setProgress(0);
+                                                currPage = 0;
+                                            }
+                                        }
+                                    }).setNegativeButton("취소",
+                                    //취소 버튼 눌렀을 때
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            int finishItem = images.size()  - 1;
+                                            int finishTime =(int) (TRANS_MILLI * images.size());
+                                            vpSlideShow.setCurrentItem(finishItem);
+                                            slideSeekBar.setProgress(finishTime);
+                                        }
+                                    });
+                            AlertDialog restartAlert = restartConfirm.create();
+                            restartAlert.show();
+                        }
+                    }.start();
+                } else if(!isPaused && isStopped && !isTouched && !isTracked){
+                    isStopped = false;
+                    countDownTimer = new CountDownTimer(MAX_TIME, 1) {
+                        @Override
+                        public void onTick(long millisUntilFinished) {
+                            Log.i(TAG, "millisUntilFinished= " + millisUntilFinished);
+                            //시크바에 시간 진행 표시 -> onSeekBarChangeListener에서 감지
 
-            @Override
-            public void onPageScrollStateChanged(int state) {
+                            slideSeekBar.setProgress((int)(MAX_TIME - millisUntilFinished));
+                        }
 
+                        @Override
+                        public void onFinish() {
+                            //도달시 확인 메시지
+                            AlertDialog.Builder restartConfirm = new AlertDialog.Builder(mContext);
+                            restartConfirm.setMessage("처음으로 돌아가시겠습니까?").setCancelable(false).setPositiveButton("확인",
+                                    //확인 버튼 눌렀을 때
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            btnPlay.setVisibility(v.VISIBLE);
+                                            btnPause.setVisibility(v.INVISIBLE);
+                                            isPaused = false;
+                                            isStopped = false;
+                                            isTracked = false;
+                                            isTouched = false;
+                                            if(countDownTimer != null){
+                                                countDownTimer.cancel();
+                                                countDownTimer = null;
+                                                setPausedProgress(0);
+                                                vpSlideShow.setCurrentItem(0);
+                                                slideSeekBar.setProgress(0);
+                                                currPage = 0;
+                                            }
+                                        }
+                                    }).setNegativeButton("취소",
+                                    //취소 버튼 눌렀을 때
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            int finishItem = images.size()  - 1;
+                                            int finishTime =(int) (TRANS_MILLI * images.size());
+                                            vpSlideShow.setCurrentItem(finishItem);
+                                            slideSeekBar.setProgress(finishTime);
+                                        }
+                                    });
+                            AlertDialog restartAlert = restartConfirm.create();
+                            restartAlert.show();
+                        }
+                    }.start();
+                } else if(!isPaused && !isStopped && isTouched && !isTracked){
+                    isTouched = false;
+                    countDownTimer = new CountDownTimer(MAX_TIME - getPausedProgress(), 1) {
+                        @Override
+                        public void onTick(long millisUntilFinished) {
+                            Log.i(TAG, "millisUntilFinished= " + millisUntilFinished);
+                            //시크바에 시간 진행 표시 -> onSeekBarChangeListener에서 감지
+
+                            slideSeekBar.setProgress((int)(MAX_TIME - millisUntilFinished));
+                        }
+
+                        @Override
+                        public void onFinish() {
+                            //도달시 확인 메시지
+                            AlertDialog.Builder restartConfirm = new AlertDialog.Builder(mContext);
+                            restartConfirm.setMessage("처음으로 돌아가시겠습니까?").setCancelable(false).setPositiveButton("확인",
+                                    //확인 버튼 눌렀을 때
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            btnPlay.setVisibility(v.VISIBLE);
+                                            btnPause.setVisibility(v.INVISIBLE);
+                                            isPaused = false;
+                                            isStopped = false;
+                                            isTracked = false;
+                                            isTouched = false;
+                                            if(countDownTimer != null){
+                                                countDownTimer.cancel();
+                                                countDownTimer = null;
+                                                setPausedProgress(0);
+                                                vpSlideShow.setCurrentItem(0);
+                                                slideSeekBar.setProgress(0);
+                                                currPage = 0;
+                                            }
+                                        }
+                                    }).setNegativeButton("취소",
+                                    //취소 버튼 눌렀을 때
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            int finishItem = images.size()  - 1;
+                                            int finishTime =(int) (TRANS_MILLI * images.size());
+                                            vpSlideShow.setCurrentItem(finishItem);
+                                            slideSeekBar.setProgress(finishTime);
+                                        }
+                                    });
+                            AlertDialog restartAlert = restartConfirm.create();
+                            restartAlert.show();
+                        }
+                    }.start();
+                } else if(!isPaused && !isStopped && !isTouched && isTracked){
+                    isTracked = false;
+                    countDownTimer = new CountDownTimer(MAX_TIME - getPausedProgress(), 1) {
+                        @Override
+                        public void onTick(long millisUntilFinished) {
+                            Log.i(TAG, "millisUntilFinished= " + millisUntilFinished);
+                            //시크바에 시간 진행 표시 -> onSeekBarChangeListener에서 감지
+
+                            slideSeekBar.setProgress((int)(MAX_TIME - millisUntilFinished));
+                        }
+
+                        @Override
+                        public void onFinish() {
+                            //도달시 확인 메시지
+                            AlertDialog.Builder restartConfirm = new AlertDialog.Builder(mContext);
+                            restartConfirm.setMessage("?").setCancelable(false).setPositiveButton("확인",
+                                    //확인 버튼 눌렀을 때
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            btnPlay.setVisibility(v.VISIBLE);
+                                            btnPause.setVisibility(v.INVISIBLE);
+                                            isPaused = false;
+                                            isStopped = false;
+                                            isTracked = false;
+                                            isTouched = false;
+                                            if(countDownTimer != null){
+                                                countDownTimer.cancel();
+                                                countDownTimer = null;
+                                                setPausedProgress(0);
+                                                vpSlideShow.setCurrentItem(0);
+                                                slideSeekBar.setProgress(0);
+                                                currPage = 0;
+                                            }
+                                        }
+                                    }).setNegativeButton("취소",
+                                    //취소 버튼 눌렀을 때
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            int finishItem = images.size()  - 1;
+                                            int finishTime =(int) (TRANS_MILLI * images.size());
+                                            vpSlideShow.setCurrentItem(finishItem);
+                                            slideSeekBar.setProgress(finishTime);
+                                        }
+                                    });
+                            AlertDialog restartAlert = restartConfirm.create();
+                            restartAlert.show();
+                        }
+                    }.start();
+                } else if(!isPaused && !isStopped && !isTouched && !isTracked){
+                    countDownTimer = new CountDownTimer(MAX_TIME - getPausedProgress(), 1) {
+                        @Override
+                        public void onTick(long millisUntilFinished) {
+                            Log.i(TAG, "millisUntilFinished= " + millisUntilFinished);
+                            //시크바에 시간 진행 표시 -> onSeekBarChangeListener에서 감지
+
+                            slideSeekBar.setProgress((int)(MAX_TIME - millisUntilFinished));
+                        }
+
+                        @Override
+                        public void onFinish() {
+                            //도달시 확인 메시지
+                            AlertDialog.Builder restartConfirm = new AlertDialog.Builder(mContext);
+                            restartConfirm.setMessage("처음으로 돌아가시겠습니까?").setCancelable(false).setPositiveButton("확인",
+                                    //확인 버튼 눌렀을 때
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            btnPlay.setVisibility(v.VISIBLE);
+                                            btnPause.setVisibility(v.INVISIBLE);
+                                            isPaused = false;
+                                            isStopped = false;
+                                            isTracked = false;
+                                            isTouched = false;
+                                            if(countDownTimer != null){
+                                                countDownTimer.cancel();
+                                                countDownTimer = null;
+                                                setPausedProgress(0);
+                                                vpSlideShow.setCurrentItem(0);
+                                                slideSeekBar.setProgress(0);
+                                                currPage = 0;
+                                            }
+                                        }
+                                    }).setNegativeButton("취소",
+                                    //취소 버튼 눌렀을 때
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            int finishItem = images.size()  - 1;
+                                            int finishTime =(int) (TRANS_MILLI * images.size());
+                                            vpSlideShow.setCurrentItem(finishItem);
+                                            slideSeekBar.setProgress(finishTime);
+                                        }
+                                    });
+                            AlertDialog restartAlert = restartConfirm.create();
+                            restartAlert.show();
+                        }
+                    }.start();
+                }
             }
         });
 
-
-        countDownTimer = new CountDownTimer(MAX_TIME, 1) {
+        btnStop.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onTick(long millisUntilFinished) {
-                Log.i(TAG, "millisUntilFinished= " + millisUntilFinished);
-                //시크바에 시간 진행 표시 -> onSeekBarChangeListener에서 감지
-
-                slideSeekBar.setProgress((int)(MAX_TIME - millisUntilFinished));
+            public void onClick(View v) {
+                isPaused = false;
+                isStopped = true;
+                isTracked = false;
+                isTouched = false;
+                if(countDownTimer != null){
+                    btnPlay.setVisibility(v.VISIBLE);
+                    btnPause.setVisibility(v.INVISIBLE);
+                    countDownTimer.cancel();
+                    countDownTimer = null;
+                    setPausedProgress(0);
+                    vpSlideShow.setCurrentItem(0);
+                    slideSeekBar.setProgress(0);
+                    currPage = 0;
+                } else {
+                    btnPlay.setVisibility(v.VISIBLE);
+                    btnPause.setVisibility(v.INVISIBLE);
+                    setPausedProgress(0);
+                    vpSlideShow.setCurrentItem(0);
+                    slideSeekBar.setProgress(0);
+                    currPage = 0;
+                }
             }
+        });
 
+        btnPause.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onFinish() {
-                //카운트 다운 타이머 정지
-                countDownTimer.cancel();
-                //마지막 도달 표시
-                slideSeekBar.setProgress(MAX_TIME);
-                //도달시 확인 메시지
-                AlertDialog.Builder restartConfirm = new AlertDialog.Builder(mContext);
-                restartConfirm.setMessage("다시 시작하시겠습니까?").setCancelable(false).setPositiveButton("확인",
-                        //확인 버튼 눌렀을 때
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                currPage = 0;
-                                countDownTimer.start();
-                            }
-                        }).setNegativeButton("취소",
-                        //취소 버튼 눌렀을 때
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                int finishItem = images.size()  - 1;
-                                int finishTime =(int) (TRANS_MILLI * images.size());
-                                vpSlideShow.setCurrentItem(finishItem);
-                                slideSeekBar.setProgress(finishTime);
-                            }
-                        });
-                AlertDialog restartAlert = restartConfirm.create();
-                restartAlert.show();
+            public void onClick(View v) {
+                btnPlay.setVisibility(v.VISIBLE);
+                btnPause.setVisibility(v.INVISIBLE);
+                isPaused = true;
+                isStopped = false;
+                isTracked = false;
+                isTouched = false;
+                if(countDownTimer != null){
+                    countDownTimer.cancel();
+                    vpSlideShow.setCurrentItem((int) (getPausedProgress() / TRANS_MILLI));
+                    slideSeekBar.setProgress(getPausedProgress());
+                }
             }
-        };
-        countDownTimer.start();
+        });
 
         slideSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if(vpSlideShow.isFakeDragging()){
-                    /*//seekbar 클릭시 뷰페이저의 전체 너비 가져온다
-                    //마치 여러 사진이 붙어서 드래그로 이동할 수 있는 것처럼 보여주기 위한 설정
-                    int offset = (int) (maxOffset/100.0) * progress;
-                    int dragBy = -1 * (offset - currOffset);
-                    //fakeDragBy를 사용하려면 먼저 반드시 beginFakeDrag 사용해야 함
-                    vpSlideShow.fakeDragBy(dragBy);
-                    currOffset = offset;*/
-
-                }
                 Log.i(TAG, "onProgressChanged의 progress확인= " + progress);
                 Log.i(TAG, "milliSecondsToTimer(progress)= " + milliSecondsToTimer(progress));
                 //progress 변화에 따라 시간 표시
@@ -689,24 +910,26 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
                 currPage = (int) (progress / TRANS_MILLI);
                 Log.i(TAG, "onProgressChanged의 currPage= " + currPage);
                 vpSlideShow.setCurrentItem(currPage);
-         }
+                setPausedProgress(progress);
+            }
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
                 //onStopTrackingTouch에서 새로운 카운트다운 타이머 시작 위해 기존 카운트다운 타이머 끄기
-                countDownTimer.cancel();
+                if(countDownTimer != null){
+                    countDownTimer.cancel();
+                    countDownTimer = null;
+                }
+                isTouched = true;
 
-                vpSlideShow.beginFakeDrag();
             }
 
             //터치시 시크바의 progress가 변하는 것은 onProgressChanged에서 보여주고
             //onStopTrackingTouch는 손가락을 놓는 시점의 상태 정보만 알려준다
             @Override
             public void onStopTrackingTouch(final SeekBar seekBar) {
-                //시크바의 현재 위치
-                final int current_position = seekBar.getProgress();
-                Log.i(TAG, "onStopTrackingTouch의 current_position= " + current_position);
                 //전체 범위에서 현재 위치만큼 빼서 전체 이동할 범위를 줄여준다
-                countDownTimer = new CountDownTimer(MAX_TIME - current_position, 1) {
+                btnPause.performClick();
+                /*countDownTimer = new CountDownTimer(MAX_TIME - getPausedProgress(), 1) {
 
                     @Override
                     public void onTick(long millisUntilFinished) {
@@ -722,15 +945,23 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
                         slideSeekBar.setProgress(MAX_TIME);
                         //도달시 확인 메시지
                         AlertDialog.Builder restartConfirm = new AlertDialog.Builder(mContext);
-                        restartConfirm.setMessage("다시 시작하시겠습니까?").setCancelable(false).setPositiveButton("확인",
+                        restartConfirm.setMessage("처음으로 돌아가시겠습니까?").setCancelable(false).setPositiveButton("확인",
                                 //확인 버튼 눌렀을 때
                                 new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        //처음 페이지로 이동시키고
-                                        currPage = 0;
-                                        //카운트다운 타이머 시작시키기
-                                        countDownTimer.start();
+                                        isPaused = false;
+                                        isStopped = true;
+                                        isTracked = false;
+                                        isTouched = false;
+                                        if(countDownTimer != null){
+                                            countDownTimer.cancel();
+                                            countDownTimer = null;
+                                            setPausedProgress(0);
+                                            vpSlideShow.setCurrentItem(0);
+                                            slideSeekBar.setProgress(0);
+                                            currPage = 0;
+                                        }
                                     }
                                 }).setNegativeButton("취소",
                                 //취소 버튼 눌렀을 때
@@ -747,9 +978,17 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
                         AlertDialog restartAlert = restartConfirm.create();
                         restartAlert.show();
                     }
-                }.start();
+                }.start();*/
             }
         });
+    }
+
+    public int getPausedProgress() {
+        return pausedProgress;
+    }
+
+    public void setPausedProgress(int pausedProgress) {
+        this.pausedProgress = pausedProgress;
     }
 
     //텍스트뷰에 시간 표시하기 위한 메소드. milliseconds를 시간 형태로 보여준다.
