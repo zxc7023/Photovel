@@ -768,9 +768,6 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         return finalTimerString;
     }
 
-
-
-
     //onClick
     public void goLook(View v){
         switch (v.getId()){
@@ -803,7 +800,6 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
                         Intent intent = new Intent(ContentSlideShowMain.this, ContentUpdateMain.class);
                         intent.putExtra("content_id", content_id);
                         ContentSlideShowMain.this.startActivity(intent);
-                        Toast.makeText(getApplicationContext(), "수정", Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.action_delete:
                         AlertDialog.Builder dalert_confirm = new AlertDialog.Builder(ContentSlideShowMain.this);
@@ -938,7 +934,7 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         ns.selected(id, getApplicationContext());
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
-        finish();
+        //finish();
         return true;
     }
 
@@ -947,87 +943,6 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
         getMenuInflater().inflate(R.menu.other_toolbar, menu);
         return true;
     }
-
-
-
-
-    /*//DB에서 content정보 받아오기
-    public Content getContentData(int id){
-        Content content = null;
-        HttpURLConnection conn = null;
-        Log.i(TAG, "getPhotoData의 id= " + id);
-
-        String qry = Value.contentURL+"/" + id;
-        Log.i(TAG, "1.getPhotoData의 qry= " + qry);
-
-        try {
-            URL strUrl = new URL(qry);
-            conn = (HttpURLConnection) strUrl.openConnection();
-            conn.setDoInput(true);//서버로부터 결과값을 응답받음
-            //conn.setDoOutput(true);//서버로 값을 출력. GET방식의 경우 이 설정을 하면 405에러가 난다. 왜???
-            //conn.connect();
-            conn.setRequestMethod("GET");
-            Log.i(TAG, "2.getPhotoData의 qry= " + qry);
-            *//*
-            OutputStream os = conn.getOutputStream();
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-            // bw.write(id);
-
-            bw.flush();
-            bw.close();*//*
-
-            final int responseCode = conn.getResponseCode(); //정상인 경우 200번, 그 외 오류있는 경우 오류 번호 반환
-            Log.i(TAG, "getPhotoData의 responseCode= " + responseCode);
-            switch (responseCode){
-                case HttpURLConnection.HTTP_OK:
-
-                    InputStream is = conn.getInputStream();
-                    Reader reader = new InputStreamReader(is, "UTF-8");
-                    BufferedReader br = new BufferedReader(reader);
-                    // while(br.read() != -1 ){
-                    String responseData = null;
-
-                    responseData = br.readLine();
-                    Log.i(TAG, "getPhotoData의 response data= " + responseData);
-
-                    content = JSON.parseObject(responseData, Content.class);
-
-                    br.close();
-                    reader.close();
-                    is.close();
-
-                    break;
-                case HttpURLConnection.HTTP_NOT_FOUND:
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getApplicationContext(), "페이지를 찾을 수 없습니다.", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-
-                    break;
-                default:
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getApplicationContext(), "response code: " + responseCode, Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                    break;
-            }
-
-            return content;
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-
-            conn.disconnect();
-        }
-
-        return null;
-    }*/
 
     //Android BackButton EventListener
     @Override
@@ -1069,10 +984,9 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                        Toast.makeText(getApplicationContext(),"카카오",Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.facebook_share:
-                        Toast.makeText(getApplicationContext(),"페북",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(),"아직 개발중입니닷",Toast.LENGTH_SHORT).show();
                         break;
                 }
                 return false;
@@ -1125,42 +1039,4 @@ public class ContentSlideShowMain extends FontActivity2 implements NavigationVie
             }
         });
     }
-
-
-
-
-   /* //DB에서 bitmap정보 받아오기
-    public void getImage(){
-        Thread thread2 = new Thread(){
-            @Override
-            public void run() {
-                super.run();
-                try {
-                    for (int i = 0; i < content.getDetails().size(); i++) {
-                        //Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL("http://photovel.com/upload/" + content.getContent_id() + "/" + content.getDetails().get(i).getPhoto().getPhoto_file_name()).getContent());
-                        Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL(Value.contentPhotoURL+ "/" + content.getContent_id() + "/" + content.getDetails().get(i).getPhoto().getPhoto_file_name()).getContent());
-                        content.getDetails().get(i).getPhoto().setBitmap(bitmap);
-                        //리스트에 이미지 저장
-                        images.add(bitmap);
-                        //File filePath = new File(Environment.getExternalStorageDirectory());
-                        //FileUtils.copyURLToFile(new URL("http://photovel.com/upload/" + contentData.getContent_id() + "/" + contentData.getDetails().get(i).getPhoto().getPhotoFileName()), );
-                    }
-                    //순서가 확실한 이미지 배열 만들기
-                    imgArray = images.toArray(new Bitmap[images.size()]);
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        thread2.start();
-        try {
-            thread2.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-    }*/
-
-
 }

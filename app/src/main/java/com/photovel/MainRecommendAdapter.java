@@ -4,10 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
-import android.net.Uri;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,9 +17,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.facebook.FacebookSdk;
-import com.facebook.share.model.ShareContent;
-import com.facebook.share.model.ShareLinkContent;
 import com.kakao.network.ErrorResult;
 import com.kakao.network.callback.ResponseCallback;
 import com.kakao.util.helper.log.Logger;
@@ -38,7 +33,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import bolts.AppLinks;
 
 public class MainRecommendAdapter extends RecyclerView.Adapter<MainRecommendAdapter.ViewHolder>{
     private List<Content> mDataset;
@@ -232,12 +226,10 @@ public class MainRecommendAdapter extends RecyclerView.Adapter<MainRecommendAdap
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-
-                        Toast.makeText(mcontext,"카카오",Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.facebook_share:
                         sendFacebook();
-                        Toast.makeText(mcontext,"페북",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mcontext,"아직 개발중입니닷",Toast.LENGTH_SHORT).show();
                         break;
                 }
                 return false;
@@ -288,7 +280,6 @@ public class MainRecommendAdapter extends RecyclerView.Adapter<MainRecommendAdap
             @Override
             public void onFailure(ErrorResult errorResult) {
                 Logger.e(errorResult.toString());
-                Toast.makeText(mcontext, errorResult.toString(), Toast.LENGTH_LONG).show();
             }
 
             @Override

@@ -1,36 +1,13 @@
 package com.photovel;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.nfc.Tag;
 import android.os.Bundle;
-import android.text.LoginFilter;
 import android.util.Log;
-import android.widget.TextView;
-import android.widget.Toast;
 
-
-import com.google.android.gms.internal.pr;
 import com.photovel.http.SessionConnection;
-import com.photovel.http.Value;
 import com.photovel.user.UserLogin;
 
-import java.io.BufferedWriter;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by Junki on 2017-06-23.

@@ -167,7 +167,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         btnLookLeft.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getApplicationContext(),"지도로보기",Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(),"지도로보기",Toast.LENGTH_SHORT).show();
                 Log.i("ddd","지도로 보기 클릭");
                 Intent intent=new Intent(getApplicationContext(), ContentClusterMain.class);
                 intent.putExtra("content_id",content_id);
@@ -709,7 +709,7 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
         ns.selected(id, getApplicationContext());
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
-        finish();
+        //finish();
         return true;
     }
 
@@ -758,10 +758,9 @@ public class ContentDetailListMain extends FontActivity2 implements NavigationVi
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                        Toast.makeText(getApplicationContext(),"카카오",Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.facebook_share:
-                        Toast.makeText(getApplicationContext(),"페북",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(),"아직 개발중입니닷",Toast.LENGTH_SHORT).show();
                         break;
                 }
                 return false;

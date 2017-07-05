@@ -9,7 +9,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
@@ -33,14 +32,8 @@ import com.photovel.http.JsonConnection;
 import com.photovel.http.Value;
 import com.vo.Content;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
@@ -356,7 +349,7 @@ public class ContentListAdapter extends RecyclerView.Adapter<ContentListAdapter.
                         Intent intent = new Intent(mcontext, ContentUpdateMain.class);
                         intent.putExtra("content_id", content_id);
                         mcontext.startActivity(intent);
-                        Toast.makeText(mcontext, "수정", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(mcontext, "수정", Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.action_delete:
                         AlertDialog.Builder dalert_confirm = new AlertDialog.Builder(mcontext);
@@ -461,10 +454,9 @@ public class ContentListAdapter extends RecyclerView.Adapter<ContentListAdapter.
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                        Toast.makeText(mcontext,"카카오",Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.facebook_share:
-                        Toast.makeText(mcontext,"페북",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mcontext,"아직 개발중입니닷",Toast.LENGTH_SHORT).show();
                         break;
                 }
                 return false;

@@ -15,10 +15,6 @@ import android.widget.TextView;
 
 import com.photovel.R;
 
-//import android.support.v4.widget.CursorAdapter;
-
-//import android.widget.CursorAdapter;
-
 public class SearchListAdapter extends CursorAdapter implements Filterable {
     private static final String TAG = "SearchListAdapter";
     private Context context;
