@@ -157,6 +157,7 @@ public class ContentUpdateMain extends FontActivity {
                 String responseData = JsonConnection.getConnection(Value.contentURL+"/"+content_id+"/"+user_id, "GET", null);
                 content = JSON.parseObject(responseData, Content.class);
                 myDataset = content.getDetails();
+                originData = content.getDetails();
             }
         };
         contentList.start();

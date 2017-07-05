@@ -384,7 +384,7 @@ public class MainActivity extends FontActivity2 implements NavigationView.OnNavi
         ns.selected(id, getApplicationContext());
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
-        finish();
+        //finish();
         return true;
     }
 
