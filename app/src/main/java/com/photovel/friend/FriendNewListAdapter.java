@@ -11,10 +11,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.alibaba.fastjson.JSON;
 import com.mikhaellopez.circularimageview.CircularImageView;
 import com.photovel.R;
-import com.photovel.content.ContentDetailListMain;
 import com.photovel.content.ContentListMain;
 import com.photovel.http.JsonConnection;
 import com.photovel.http.Value;
@@ -108,7 +106,7 @@ public class FriendNewListAdapter extends RecyclerView.Adapter<FriendNewListAdap
                 Intent intent = new Intent(mcontext, FriendListMain.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
                 mcontext.startActivity(intent);
-                Toast.makeText(mcontext, "친구수락완료", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mcontext, "친구수락 완료", Toast.LENGTH_SHORT).show();
             }
         });
 

@@ -1,9 +1,6 @@
 package com.photovel.search;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.database.DataSetObserver;
 import android.database.MatrixCursor;
@@ -29,13 +26,11 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.photovel.R;
-import com.photovel.content.ContentListMain;
 import com.photovel.utils.AnimationUtil.AnimationUtil;
 import com.vo.Content;
 

@@ -4,13 +4,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 
-import org.json.JSONObject;
-
 import com.vo.Comment;
 import com.vo.Content;
 import com.vo.ContentDetail;
 import com.vo.MainImage;
 import com.vo.User;
+
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -22,11 +22,10 @@ import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by EunD on 2017-06-26.
+ * Created by Eundi on 2017-06-26.
  */
 
 public class JsonConnection {

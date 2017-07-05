@@ -1,6 +1,5 @@
 package com.photovel;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -29,15 +28,8 @@ import com.photovel.http.JsonConnection;
 import com.photovel.http.Value;
 import com.vo.Content;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -239,11 +231,9 @@ public class MainNewAdapter extends RecyclerView.Adapter<MainNewAdapter.ViewHold
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-
-                        Toast.makeText(mcontext,"카카오",Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.facebook_share:
-                        Toast.makeText(mcontext,"페북",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mcontext,"아직 개발중입니닷",Toast.LENGTH_SHORT).show();
                         break;
                 }
                 return false;
@@ -285,7 +275,6 @@ public class MainNewAdapter extends RecyclerView.Adapter<MainNewAdapter.ViewHold
             @Override
             public void onFailure(ErrorResult errorResult) {
                 Logger.e(errorResult.toString());
-                Toast.makeText(mcontext, errorResult.toString(), Toast.LENGTH_LONG).show();
             }
 
             @Override
