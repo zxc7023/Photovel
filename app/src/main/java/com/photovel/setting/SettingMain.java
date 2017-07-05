@@ -2,111 +2,59 @@ package com.photovel.setting;
 
 import android.Manifest;
 import android.annotation.TargetApi;
-import android.content.ClipData;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Typeface;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.design.widget.BottomSheetBehavior;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.PopupMenu;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.ContextThemeWrapper;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.maps.android.clustering.Cluster;
-import com.google.maps.android.clustering.ClusterItem;
-import com.google.maps.android.clustering.ClusterManager;
-import com.google.maps.android.clustering.view.DefaultClusterRenderer;
-import com.google.maps.android.ui.IconGenerator;
 import com.mikhaellopez.circularimageview.CircularImageView;
-import com.photovel.FontActivity;
 import com.photovel.FontActivity2;
 import com.photovel.MainActivity;
 import com.photovel.NavigationItemSelected;
 import com.photovel.R;
-import com.photovel.content.CommentAdapter;
-import com.photovel.content.ContentDetailListMain;
 import com.photovel.content.ContentInsertMain;
-import com.photovel.content.ContentSlideShowMain;
-import com.photovel.content.ContentUpdateMain;
-import com.photovel.content.GetCurrentAddress;
-import com.photovel.content.MultiDrawable;
-import com.photovel.content.MySupportMapFragment;
-import com.photovel.content.PhotoGeoDegree;
 import com.photovel.content.PhotoRealPathUtil;
 import com.photovel.friend.FriendListMain;
 import com.photovel.http.JsonConnection;
 import com.photovel.http.MultipartConnection;
 import com.photovel.http.Value;
 import com.photovel.user.UserBitmapEncoding;
-import com.vo.Comment;
-import com.vo.Content;
-import com.vo.ContentDetail;
 import com.vo.Permission;
-import com.vo.Photo;
-import com.vo.User;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
 
 public class SettingMain extends FontActivity2 implements NavigationView.OnNavigationItemSelectedListener{
     private Toolbar toolbar;
@@ -339,7 +287,7 @@ public class SettingMain extends FontActivity2 implements NavigationView.OnNavig
                                 editor.putString("user_profile",user_profile);
                                 editor.commit();
 
-                                Toast.makeText(getApplicationContext(),"정보수정 성공",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(),"정보수정 완료",Toast.LENGTH_SHORT).show();
                                 Intent intent = new Intent(getApplicationContext(), SettingMain.class);
                                 getApplicationContext().startActivity(intent);
                                 finish();
@@ -498,7 +446,7 @@ public class SettingMain extends FontActivity2 implements NavigationView.OnNavig
             // Should we show an explanation?
             if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                 // Explain to the user why we need to write the permission.
-                Toast.makeText(this, "Read/Write external storage", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "Read/Write external storage", Toast.LENGTH_SHORT).show();
             }
 
             requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE},

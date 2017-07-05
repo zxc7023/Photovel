@@ -1,15 +1,9 @@
 package com.photovel;
+
 import android.util.Log;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
-import com.photovel.http.JsonConnection;
-import com.photovel.http.Value;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
 
 
 

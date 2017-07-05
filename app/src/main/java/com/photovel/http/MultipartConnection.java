@@ -18,7 +18,7 @@ import java.net.URLEncoder;
 import java.util.List;
 
 /**
- * Created by EunD on 2017-06-26.
+ * Created by Eundi on 2017-06-26.
  */
 
 public class MultipartConnection {

@@ -32,22 +32,21 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.mikhaellopez.circularimageview.CircularImageView;
-import com.photovel.search.SearchView;
-import com.photovel.search.SearchListAdapter;
-import com.photovel.http.JsonConnection;
-import com.photovel.setting.SettingMain;
-import com.alibaba.fastjson.JSON;
 import com.photovel.content.ContentInsertMain;
+import com.photovel.http.JsonConnection;
 import com.photovel.http.Value;
+import com.photovel.search.SearchListAdapter;
+import com.photovel.search.SearchView;
+import com.photovel.setting.SettingMain;
 import com.photovel.user.UserBitmapEncoding;
 import com.synnapps.carouselview.CarouselView;
 import com.synnapps.carouselview.ImageListener;
 import com.vo.Content;
 import com.vo.MainImage;
-import com.vo.User;
 
 import org.json.JSONException;
 import org.json.JSONObject;

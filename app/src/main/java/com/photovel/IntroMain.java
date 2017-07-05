@@ -1,9 +1,7 @@
 package com.photovel;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 
 import me.relex.circleindicator.CircleIndicator;
 

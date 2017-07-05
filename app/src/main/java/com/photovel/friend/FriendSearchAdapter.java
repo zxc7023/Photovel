@@ -1,7 +1,6 @@
 package com.photovel.friend;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
@@ -15,7 +14,6 @@ import android.widget.Toast;
 
 import com.mikhaellopez.circularimageview.CircularImageView;
 import com.photovel.R;
-import com.photovel.content.ContentListMain;
 import com.photovel.http.JsonConnection;
 import com.photovel.http.Value;
 import com.vo.User;

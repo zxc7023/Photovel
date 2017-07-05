@@ -1,6 +1,5 @@
 package com.photovel.user;
 
-import android.app.Activity;
 import android.content.Context;
 
 import com.kakao.auth.ApprovalType;

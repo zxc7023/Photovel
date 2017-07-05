@@ -1,33 +1,23 @@
 package com.photovel.friend;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Typeface;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mikhaellopez.circularimageview.CircularImageView;
-import com.photovel.MainActivity;
 import com.photovel.R;
-import com.photovel.common.BookMarkMain;
-import com.photovel.content.ContentDetailListMain;
 import com.photovel.content.ContentListMain;
 import com.photovel.http.JsonConnection;
 import com.photovel.http.Value;
-import com.vo.Content;
 import com.vo.User;
 
 import java.util.List;
@@ -125,7 +115,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Vi
                                 Intent intent = new Intent(mcontext, FriendListMain.class);
                                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   //재사용 ㄴㄴ
                                 mcontext.startActivity(intent);
-                                Toast.makeText(mcontext, "친구삭제완료", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(mcontext, "친구삭제 완료", Toast.LENGTH_SHORT).show();
                             }
                         }).setNegativeButton("취소",
                         new DialogInterface.OnClickListener() {

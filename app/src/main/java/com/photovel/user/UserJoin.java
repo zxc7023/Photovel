@@ -1,11 +1,7 @@
 package com.photovel.user;
 
-import android.app.ActivityManager;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Typeface;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.util.Log;
@@ -21,28 +17,13 @@ import android.widget.Toast;
 
 import com.photovel.BackPressCloseHandler;
 import com.photovel.FontActivity2;
-import com.photovel.MainActivity;
 import com.photovel.R;
-import com.photovel.http.JsonConnection;
 import com.photovel.http.LoginConnection;
 import com.photovel.http.Value;
 import com.vo.User;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-
-import static java.lang.Class.forName;
 
 /**
  * Created by Junki on 2017-06-19.
@@ -107,7 +88,7 @@ public class UserJoin extends FontActivity2 {
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
-                Toast.makeText(UserJoin.this, "현재 클릭된 id는" + checkedId, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(UserJoin.this, "현재 클릭된 id는" + checkedId, Toast.LENGTH_SHORT).show();
                 checkRadioId = checkedId;
             }
         });
