@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.photovel.content.ContentSlideShowViewPager
+            android:id="@+id/VP_slide_show"
+            android:layout_width="match_parent"
+            android:layout_height="300dp" />
+
+    </RelativeLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/bgSlideMenuBlack">
+
+        <TextView
+            android:id="@+id/tv_curr_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:textColor="@color/bgWhite"
+            />
+
+        <SeekBar
+            android:id="@+id/slide_seek_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:maxHeight="8dp"
+            android:minHeight="8dp"
+            android:thumb="@drawable/blit_progressbar"
+            android:progressDrawable="@drawable/custom_seekbar_progress"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal">
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp">
+            <ImageButton
+                android:id="@+id/btn_slideshow_play"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/btn_slide_play"
+                android:background="@color/transparent"
+                android:visibility="visible"/>
+
+            <ImageButton
+                android:id="@+id/btn_slideshow_pause"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/btn_slide_pause"
+                android:background="@color/transparent"
+                android:visibility="invisible"
+                />
+
+        </FrameLayout>
+        <ImageButton
+            android:id="@+id/btn_slideshow_stop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/btn_slide_stop"
+            android:background="@color/transparent"
+            android:layout_marginLeft="10dp"/>
+
+
+
+    </LinearLayout>
+</LinearLayout>
+
+
+

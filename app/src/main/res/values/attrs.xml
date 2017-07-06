@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="SearchView">
+        <attr name="searchBackground" format="reference|integer" />
+        <attr name="searchCloseIcon" format="reference|integer" />
+        <attr name="searchBackIcon" format="reference|integer" />
+        <attr name="searchSuggestionIcon" format="reference|integer" />
+        <attr name="searchSuggestionBackground" format="reference|integer" />
+        <attr name="android:hint" />
+        <attr name="android:textColor" />
+        <attr name="android:textColorHint" />
+        <attr name="android:inputType" />
+    </declare-styleable>
+</resources>

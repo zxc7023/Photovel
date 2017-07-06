@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="fa_icon_trash">&#xf014;</string>
+    <string name="fa_icon_pen">&#xf040;</string>
+    <string name="fa_icon_marker">&#xf041;</string>
+    <string name="fa_chevron_left">&#xf053;</string>
+    <string name="fa_globe">&#xf0ac;</string>
+    <string name="fa_flag">&#xf024;</string>
+    <string name="fa_video_camera">&#xf03d;</string>
+    <string name="fa_calendar">&#xf073;</string>
+    <string name="fa_thumbs_o_up">&#xf164;</string>
+    <string name="fa_user">&#xf007;</string>
+    <string name="fa_comments">&#xf086;</string>
+    <string name="fa_share">&#xf064;</string>
+    <string name="fa_bookmark">&#xf02e;</string>
+    <string name="fa_bookmark_o">&#xf097;</string> <!--색깔빈거-->
+    <string name="fa_ellipsis_v">&#xf142;</string>
+    <string name="fa_paw">&#xf1b0;</string>
+    <string name="fa_tint">&#xf043;</string>
+    <string name="fa_circle">&#xf111;</string>
+    <string name="fa_photo">&#xf03e;</string>
+    <string name="fa_lock">&#xf023;</string>
+    <string name="fa_user_circle">&#xf2bd;</string>
+    <string name="fa_mobile_phone">&#xf10b;</string>
+    <string name="fa_transgender">&#xf224;</string>
+    <string name="fa_times">&#xf00d;</string>
+    <string name="fa_plus_circle">&#xf055;</string>
+    <string name="fa_facebook_official">&#xf230;</string>
+    <string name="fa_commenting">&#xf27a;</string>
+    <string name="fa_user_plus">&#xf234;</string>
+    <string name="fa_list_ul">&#xf0ca;</string>
+    <string name="fa_search">&#xf002;</string>
+    <string name="fa_caret_down">&#xf0d7;</string>
+    <string name="fa_caret_up">&#xf0d8;</string>
+    <string name="fa_close">&#xf00d;</string>
+    <string name="fa_arrow_left">&#xf060;</string>
+
+</resources>
